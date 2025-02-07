@@ -4,12 +4,13 @@ import { Login } from "./pages/auth/Login";
 import { Register } from "./pages/auth/Register";
 import { ConfirmarCuenta } from "./pages/auth/ConfirmarCuenta";
 import { OlvidePassword } from "./pages/auth/OlvidePassword";
+import { Home } from "./pages/Home";
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<div>Home</div>} />
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<AuthLayout />}>
           <Route index element={<Login />} />
           <Route path="register" element={<Register />} />
