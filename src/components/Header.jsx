@@ -2,9 +2,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingCart, User, Menu, X } from "lucide-react"; // Íconos de Lucide (opcional)
 
+
+
 const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isCartOpen, setIsCartOpen] = useState(false);
+
 
     // Simulación de productos en el carrito (después deberías obtenerlos de tu estado global)
     const cartItems = [
@@ -18,7 +21,7 @@ const Header = () => {
 
                 {/* LOGO */}
                 <Link to="/" className="text-2xl font-bold text-blue-600">
-                    AutoAccesorios
+                    LynFront
                 </Link>
 
                 {/* MENÚ HAMBURGUESA (Móvil) */}
@@ -41,8 +44,8 @@ const Header = () => {
                     <Link to="/login" className="text-gray-700 hover:text-blue-600">
                         <User size={24} />
                     </Link>
-                    <button 
-                        onClick={() => setIsCartOpen(!isCartOpen)} 
+                    <button
+                        onClick={() => setIsCartOpen(!isCartOpen)}
                         className="relative text-gray-700 hover:text-blue-600"
                     >
                         <ShoppingCart size={24} />
@@ -75,8 +78,8 @@ const Header = () => {
                                     <span>Total:</span>
                                     <span>${cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)}</span>
                                 </div>
-                                <Link 
-                                    to="/carrito" 
+                                <Link
+                                    to="/carrito"
                                     className="mt-4 block w-full bg-blue-600 text-white text-center py-2 rounded-md hover:bg-blue-700"
                                 >
                                     Ver Carrito

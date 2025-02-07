@@ -1,4 +1,14 @@
+import { useGlobal } from '../../context/GlobalContext';
+import { useEffect } from 'react';
+
 const Login = () => {
+    const { setPageTitle } = useGlobal();
+
+    useEffect(() => {
+        const newPageName = 'Ingresar';
+        setPageTitle(`${newPageName} | LynFront`);
+    }, [setPageTitle]);
+
     return (
         <section className="bg-gray-50 dark:bg-gray-900">
             <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -45,4 +55,4 @@ const Login = () => {
     );
 };
 
-export { Login }  
+export { Login }
