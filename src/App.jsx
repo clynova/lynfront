@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthLayout } from "./layouts/AuthLayout/AuthLayout";
 import { Login } from "./pages/auth/Login";
 import { Register } from "./pages/auth/Register";
 import { ConfirmarCuenta } from "./pages/auth/ConfirmarCuenta";
@@ -8,6 +7,8 @@ import { Home } from "./pages/Home";
 import { GlobalProvider } from "./context/GlobalContext";
 import { PageTitle } from "./components/PageTitle";
 import { HelmetProvider } from 'react-helmet-async';
+import { MainLayout } from "./layouts/MainLayout/MainLayout";
+import { AuthLayout } from "./layouts/AuthLayout/AuthLayout";
 
 const App = () => {
   return (
@@ -16,7 +17,9 @@ const App = () => {
         <PageTitle />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<MainLayout />}>
+              <Route index element={<Home />} />
+            </Route>
             <Route path="/login" element={<AuthLayout />}>
               <Route index element={<Login />} />
               <Route path="register" element={<Register />} />
