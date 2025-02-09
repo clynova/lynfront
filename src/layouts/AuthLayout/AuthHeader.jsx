@@ -8,26 +8,23 @@ const AuthHeader = () => {
           {/* Logo o nombre de la marca */}
           <div className="flex-shrink-0">
             <a href="/" className="text-xl font-bold text-gray-800">
-              Treact
+              LynCry
             </a>
           </div>
 
           {/* Enlaces del Navbar */}
           <div className="hidden md:flex space-x-8">
-            <a href="/about" className="text-gray-800 hover:text-blue-500">
+            <a href="/" className="text-gray-800 hover:text-blue-500">
               Inicio
             </a>
-            <a href="/blog" className="text-gray-800 hover:text-blue-500">
-              Blog
+            <a href="/accesorios" className="text-gray-800 hover:text-blue-500">
+              Accesorios
             </a>
-            <a href="/pricing" className="text-gray-800 hover:text-blue-500">
-              Pricing
+            <a href="/limpieza" className="text-gray-800 hover:text-blue-500">
+              Limpieza
             </a>
-            <a href="/contact" className="text-gray-800 hover:text-blue-500">
-              Contact Us
-            </a>
-            <a href="/testimonials" className="text-gray-800 hover:text-blue-500">
-              Testimonials
+            <a href="/neumaticos" className="text-gray-800 hover:text-blue-500">
+              Neuomaticos
             </a>
           </div>
 
@@ -37,13 +34,13 @@ const AuthHeader = () => {
               href="/login"
               className="text-gray-800 hover:text-blue-500"
             >
-              Login
+              Ingresar
             </a>
             <a
               href="/signup"
               className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
             >
-              Sign Up
+              Registrate
             </a>
           </div>
         </div>
