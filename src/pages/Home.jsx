@@ -17,6 +17,7 @@ const Home = () => {
     <MainLayout>
       <h1>Bienvenido a nuestra tienda de accesorios para automóviles</h1>
       {/* Más contenido de la página de inicio */}
+      Aqui agregamos el contenido
     </MainLayout>
   );
 };
