@@ -17,17 +17,15 @@ const Login = () => {
     const socialButtons = [
         {
             iconImageSrc: googleIconImageSrc,
-            text: "Sign Up With Google",
+            text: "Ingresar con Google",
             url: "https://google.com"
         },
         {
             iconImageSrc: twitterIconImageSrc,
-            text: "Sign Up With Twitter",
+            text: "Ingresar con X",
             url: "https://twitter.com"
         }
     ];
-    const submitButtonText = "Sign Up";
-    const forgotPasswordUrl = "#";
     const signupUrl = "#";
 
     return (
@@ -39,7 +37,7 @@ const Login = () => {
                     </a>
 
                     <div className="text-center">
-                        <h1 className="text-2xl font-extrabold">Sign Up For Treact</h1>
+                        <h1 className="text-2xl font-extrabold">Registrate para continuar</h1>
                     </div>
 
                     <div className="mt-6">
@@ -55,7 +53,7 @@ const Login = () => {
                         ))}
                     </div>
 
-                    <div className="my-6 text-center text-gray-600 text-sm">Or Sign up with your e-mail</div>
+                    <div className="my-6 text-center text-gray-600 text-sm">O registrate con tu correo electrónico</div>
 
                     <form className="space-y-4">
                         <input
@@ -65,21 +63,21 @@ const Login = () => {
                         />
                         <input
                             type="password"
-                            placeholder="Password"
+                            placeholder="Contraseña"
                             className="w-full px-4 py-3 border rounded-lg bg-gray-100 focus:outline-none focus:border-gray-400"
                         />
                         <button
                             type="submit"
-                            className="w-full py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-700 transition"
+                            className="w-full py-3.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-primary-600 active:bg-primary-700 transition-colors focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                         >
-                            {submitButtonText}
+                            Ingresar
                         </button>
                     </form>
 
                     <div className="mt-6 text-center text-sm">
-                        <p>I agree to abide by treact's Terms of Service and its Privacy Policy</p>
+                        <p>Al registrarte, aceptas nuestros Términos de servicio y Política de privacidad.</p>
                         <p className="mt-4">
-                            Already have an account? <a href={signupUrl} className="text-primary-500">Sign in</a>
+                            ¿Ya tienes una cuenta? <a href={signupUrl} className="text-primary-500">Inicia sesión</a>
                         </p>
                     </div>
 
