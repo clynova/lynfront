@@ -24,7 +24,7 @@ const AuthHeader = () => {
               Limpieza
             </a>
             <a href="/neumaticos" className="text-gray-800 hover:text-blue-500">
-              Neuomaticos
+              Neuomaticosss
             </a>
           </div>
 
