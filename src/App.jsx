@@ -20,9 +20,9 @@ const App = () => {
             <Route path="/" element={<MainLayout />}>
               <Route index element={<Home />} />
             </Route>
-            <Route path="/login" element={<AuthLayout />}>
+            <Route path="/auth" element={<AuthLayout />}>
               <Route index element={<Login />} />
-              <Route path="register" element={<Register />} />
+              <Route path="signup" element={<Register />} />
               <Route path="confirmar-cuenta/:token" element={<ConfirmarCuenta />} />
               <Route path="olvide-password" element={<OlvidePassword />} />
             </Route>

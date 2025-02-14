@@ -98,7 +98,7 @@ const Login = () => {
             url: "https://twitter.com"
         }
     ];
-    const signupUrl = "/login/register";
+    const signupUrl = "/auth/signup";
 
     return (
         <>

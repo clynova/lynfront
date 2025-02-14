@@ -55,84 +55,100 @@ const Register = () => {
             </div>
 
             {/* Sección del formulario */}
-            <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-8 sm:p-12 bg-slate-900">
+            <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-8 ">
                 <div className="w-full max-w-md space-y-8">
                     <header className="text-center space-y-4">
                         <img src={logo} alt="Logo" className="h-16 mx-auto mb-6 animate-pulse" />
-                        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent font-display">
+                        <h1 className="text-4xl font-bold bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent font-display">
                             Crea tu cuenta
                         </h1>
-                        <p className="text-slate-400">Únete a nuestra comunidad en menos de un minuto</p>
+                        <p className="text-gray-400">Únete a nuestra comunidad en menos de un minuto</p>
                     </header>
 
                     <form className="mt-8 space-y-6" onSubmit={handleRegister}>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div className="relative group">
-                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-400">
-                                    <FiUser className="h-5 w-5" />
+                                <label className="block text-gray-400 mb-2" htmlFor="nombre">Nombre</label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-green-400">
+                                        <FiUser className="h-5 w-5" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        id="nombre"
+                                        required
+                                        placeholder="Nombre"
+                                        className="block w-full pl-12 pr-4 py-3.5 text-sm rounded-xl bg-gray-800/50
+                                                 border border-gray-700 focus:border-green-400/50 focus:ring-2 focus:ring-green-400/20
+                                                 text-gray-200 placeholder:text-gray-500
+                                                 transition duration-200 ease-in-out transform hover:border-gray-600"
+                                    />
                                 </div>
-                                <input
-                                    type="text"
-                                    required
-                                    placeholder="Nombre"
-                                    className="block w-full pl-12 pr-4 py-3.5 text-sm rounded-xl bg-slate-800/50
-                                             border border-slate-700 focus:border-blue-400/50 focus:ring-2 focus:ring-blue-400/20
-                                             text-slate-200 placeholder:text-slate-500
-                                             transition duration-200 ease-in-out transform hover:border-slate-600"
-                                />
                             </div>
                             <div className="relative group">
-                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-400">
-                                    <FiUser className="h-5 w-5" />
+                                <label className="block text-gray-400 mb-2" htmlFor="apellido">Apellido</label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-green-400">
+                                        <FiUser className="h-5 w-5" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        id="apellido"
+                                        required
+                                        placeholder="Apellido"
+                                        className="block w-full pl-12 pr-4 py-3.5 text-sm rounded-xl bg-gray-800/50
+                                                 border border-gray-700 focus:border-green-400/50 focus:ring-2 focus:ring-green-400/20
+                                                 text-gray-200 placeholder:text-gray-500
+                                                 transition duration-200 ease-in-out transform hover:border-gray-600"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="relative group">
+                            <label className="block text-gray-400 mb-2" htmlFor="email">Correo electrónico</label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-green-400">
+                                    <FiMail className="h-5 w-5" />
                                 </div>
                                 <input
-                                    type="text"
+                                    type="email"
+                                    id="email"
                                     required
-                                    placeholder="Apellido"
-                                    className="block w-full pl-12 pr-4 py-3.5 text-sm rounded-xl bg-slate-800/50
-                                             border border-slate-700 focus:border-blue-400/50 focus:ring-2 focus:ring-blue-400/20
-                                             text-slate-200 placeholder:text-slate-500
-                                             transition duration-200 ease-in-out transform hover:border-slate-600"
+                                    placeholder="Correo electrónico"
+                                    className="block w-full pl-12 pr-4 py-3.5 text-sm rounded-xl bg-gray-800/50
+                                             border border-gray-700 focus:border-green-400/50 focus:ring-2 focus:ring-green-400/20
+                                             text-gray-200 placeholder:text-gray-500
+                                             transition duration-200 ease-in-out transform hover:border-gray-600"
                                 />
                             </div>
                         </div>
 
                         <div className="relative group">
-                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-400">
-                                <FiMail className="h-5 w-5" />
+                            <label className="block text-gray-400 mb-2" htmlFor="password">Contraseña</label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-green-400">
+                                    <FiLock className="h-5 w-5" />
+                                </div>
+                                <input
+                                    type="password"
+                                    id="password"
+                                    required
+                                    placeholder="Contraseña"
+                                    className="block w-full pl-12 pr-4 py-3.5 text-sm rounded-xl bg-gray-800/50
+                                             border border-gray-700 focus:border-green-400/50 focus:ring-2 focus:ring-green-400/20
+                                             text-gray-200 placeholder:text-gray-500
+                                             transition duration-200 ease-in-out transform hover:border-gray-600"
+                                />
                             </div>
-                            <input
-                                type="email"
-                                required
-                                placeholder="Correo electrónico"
-                                className="block w-full pl-12 pr-4 py-3.5 text-sm rounded-xl bg-slate-800/50
-                                         border border-slate-700 focus:border-blue-400/50 focus:ring-2 focus:ring-blue-400/20
-                                         text-slate-200 placeholder:text-slate-500
-                                         transition duration-200 ease-in-out transform hover:border-slate-600"
-                            />
-                        </div>
-
-                        <div className="relative group">
-                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-400">
-                                <FiLock className="h-5 w-5" />
-                            </div>
-                            <input
-                                type="password"
-                                required
-                                placeholder="Contraseña"
-                                className="block w-full pl-12 pr-4 py-3.5 text-sm rounded-xl bg-slate-800/50
-                                         border border-slate-700 focus:border-blue-400/50 focus:ring-2 focus:ring-blue-400/20
-                                         text-slate-200 placeholder:text-slate-500
-                                         transition duration-200 ease-in-out transform hover:border-slate-600"
-                            />
                         </div>
 
                         <button
                             type="submit"
-                            className="w-full py-4 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600
-                                     text-white font-medium rounded-xl shadow-lg shadow-blue-500/20
+                            className="w-full py-4 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600
+                                     text-white font-medium rounded-xl shadow-lg shadow-green-500/20
                                      transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]
-                                     focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-2 focus:ring-offset-slate-900"
+                                     focus:ring-2 focus:ring-green-400/50 focus:ring-offset-2 focus:ring-offset-gray-900"
                         >
                             Crear cuenta
                         </button>
@@ -140,31 +156,31 @@ const Register = () => {
 
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-slate-700"></div>
+                            <div className="w-full border-t border-gray-700"></div>
                         </div>
                         <div className="relative flex justify-center text-sm">
-                            <span className="px-2 bg-slate-900 text-slate-400">O continúa con</span>
+                            <span className="px-2 bg-gray-900 text-gray-400">O continúa con</span>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         {socialButtons.map((socialButton, index) => (
-                            <button 
-                                key={index} 
+                            <button
+                                key={index}
                                 onClick={socialButton.onClick}
-                                className="flex items-center justify-center px-4 py-3 border border-slate-700 rounded-xl
-                                       hover:border-slate-600 bg-slate-800/30 transition-colors duration-200"
+                                className="flex items-center justify-center px-4 py-3 border border-gray-700 rounded-xl
+                                       hover:border-gray-600 bg-gray-800/30 transition-colors duration-200"
                             >
                                 <img src={socialButton.iconImageSrc} alt={socialButton.text} className="w-5 h-5" />
                             </button>
                         ))}
                     </div>
 
-                    <footer className="text-center text-sm text-slate-400">
+                    <footer className="text-center text-sm text-gray-400">
                         <p>¿Ya tienes cuenta?{" "}
                             <Link
-                                to="/login"
-                                className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
+                                to="/auth"
+                                className="text-green-400 hover:text-green-300 font-medium transition-colors"
                             >
                                 Iniciar sesión
                             </Link>
