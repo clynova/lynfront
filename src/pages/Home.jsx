@@ -1,8 +1,6 @@
 // Home.jsx
 import { useEffect } from "react";
-import { MainLayout } from '../layouts/MainLayout/MainLayout';
 import { useGlobal } from '../context/GlobalContext';
-
 
 const Home = () => {
   const { pageName, setPageName, setPageTitle } = useGlobal();
@@ -14,11 +12,11 @@ const Home = () => {
   }, [setPageTitle]);
 
   return (
-    <MainLayout>
-      <h1>Bienvenido a nuestra tienda de accesorios para automóviles</h1>
+    <>
+      <h1 className="text-3xl font-bold mb-4 text-white ">Bienvenido a nuestra tienda de accesorios para automóviles</h1>
       {/* Más contenido de la página de inicio */}
       Aqui agregamos el contenido
-    </MainLayout>
+    </>
   );
 };
 

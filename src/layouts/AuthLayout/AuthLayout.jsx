@@ -5,15 +5,17 @@ import { Footer } from "../../components/Footer";
 const AuthLayout = () => {
     return (
         <>
-            <div className="flex flex-col justify-between min-h-screen">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
                 <AuthHeader />
 
-                <main>
+                <main className="w-full max-w-6xl bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 md:p-12 md:flex md:gap-12">
+
                     <Outlet />
                 </main>
 
-                <Footer />
+
             </div>
+            <Footer />
         </>
     );
 };
