@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 const GlobalContext = createContext();
 
@@ -24,7 +25,11 @@ export const GlobalProvider = ({ children }) => {
     </GlobalContext.Provider>
   );
 };
+GlobalProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
+// Hook personalizado para usar el contexto
 // Hook personalizado para usar el contexto
 export const useGlobal = () => {
   const context = useContext(GlobalContext);
