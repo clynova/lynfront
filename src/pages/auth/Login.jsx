@@ -1,5 +1,6 @@
 import { useGlobal } from '../../context/GlobalContext';
-import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import logo from "../../images/logo.svg";
 import googleIconImageSrc from "../../images/google-icon.png";
 import twitterIconImageSrc from "../../images/twitter-icon.png";
@@ -8,9 +9,38 @@ import illustration from "../../images/login-illustration.svg";
 const Login = () => {
     const { setPageTitle } = useGlobal();
 
-    const handleLogin = () => {
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
+    });
 
-        console.log('Iniciando sesión');
+    const handleLogin = (e) => {
+        e.preventDefault();
+        console.log('Datos del formulario:', formData);
+
+        const email = formData.email;
+        const password = formData.password;
+
+        // Aquí iría la lógica de autenticación
+    };
+
+    const validacionesEmail = (email) => {
+        // Expresión regular para validar correo electrónico
+        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        return emailRegex.test(email);
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+    
+        if (name === "email") {
+           validacionesEmail(value);
+        }
+
+        setFormData({
+            ...formData,
+            [name]: value
+        });
     };
 
     useEffect(() => {
@@ -31,15 +61,15 @@ const Login = () => {
             url: "https://twitter.com"
         }
     ];
-    const signupUrl = "#";
+    const signupUrl = "/login/register";
 
     return (
         <>
             <div className="w-full md:w-1/2 space-y-8">
                 <header className="text-center">
                     <img src={logo} alt="Logo" className="h-16 mx-auto mb-6" />
-                    <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Regístrate para continuar</h1>
-                    <p className="text-gray-600 dark:text-gray-400">Crea tu cuenta en pocos segundos</p>
+                    <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Ingresa para continuar</h1>
+                    <p className="text-gray-600 dark:text-gray-400">Ingresa con tu cuenta existente</p>
                 </header>
 
                 <div className="space-y-4">
@@ -66,11 +96,14 @@ const Login = () => {
                     </div>
                 </div>
 
-                <form className="space-y-6">
+                <form className="space-y-6" onSubmit={handleLogin}>
                     <div>
                         <label className="block text-sm font-medium mb-2 dark:text-gray-300">Email</label>
                         <input
                             type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
                             className="w-full px-4 py-3 border-2 rounded-lg bg-white dark:bg-gray-700
                      border-gray-200 dark:border-gray-600 focus:border-blue-500
                      focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 transition-all"
@@ -81,6 +114,9 @@ const Login = () => {
                         <label className="block text-sm font-medium mb-2 dark:text-gray-300">Contraseña</label>
                         <input
                             type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
                             className="w-full px-4 py-3 border-2 rounded-lg bg-white dark:bg-gray-700
                      border-gray-200 dark:border-gray-600 focus:border-blue-500
                      focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 transition-all"
@@ -98,10 +134,10 @@ const Login = () => {
                 </form>
 
                 <footer className="text-center text-sm text-gray-600 dark:text-gray-400">
-                    <p>¿Ya tienes una cuenta?{" "}
-                        <a href={signupUrl} className="text-blue-600 dark:text-blue-400 font-semibold hover:underline">
-                            Inicia sesión
-                        </a>
+                    <p>No tienes una cuenta?{" "}
+                        <Link to={signupUrl} className="text-blue-600 dark:text-blue-400 font-semibold hover:underline">
+                            Registrate
+                        </Link>
                     </p>
                 </footer>
             </div>
