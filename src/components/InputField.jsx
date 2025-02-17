@@ -15,7 +15,7 @@ const InputField = ({
 		<div className="relative group">
 			<label className="block text-gray-400 mb-2 inline-flex items-center" htmlFor={id}>
 				{label}
-				{onHelpClick && (
+				{onHelpClick && Icon && (
 					<button
 						type="button"
 						onClick={onHelpClick}
@@ -27,7 +27,7 @@ const InputField = ({
 			</label>
 			<div className="relative">
 				<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-green-400">
-					<Icon className="h-5 w-5" />
+					{Icon && <Icon className="h-5 w-5" />}
 				</div>
 				<input
 					type={type}
