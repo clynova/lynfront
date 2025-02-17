@@ -93,14 +93,14 @@ const AuthHeader = () => {
           ))}
           <div className="border-t border-slate-800 pt-4">
             <Link
-              to="/auth"
+              to="/login"
               className="block w-full text-center text-slate-300 hover:text-white px-4 py-2 text-lg font-medium mb-3 transition-colors duration-200"
               onClick={() => setIsMenuOpen(false)}
             >
               Ingresar
             </Link>
             <Link
-              to="/auth/signup"
+              to="/signup"
               className="block w-full text-center bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600
                         text-white px-4 py-2 rounded-lg text-lg font-medium transition-all duration-200"
               onClick={() => setIsMenuOpen(false)}
