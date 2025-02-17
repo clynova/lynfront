@@ -5,6 +5,7 @@ import SocialButton from './SocialButton';
 import logo from "../images/logo.svg";
 import googleIconImageSrc from "../images/google-icon.png";
 import twitterIconImageSrc from "../images/twitter-icon.png";
+import { FiMail, FiLock } from 'react-icons/fi';
 
 const LoginForm = ({
     onSubmit,
@@ -66,6 +67,7 @@ const LoginForm = ({
                             label="Email"
                             placeholder="Email"
                             type="email"
+                            icon={FiMail}
                             value={formData.email}
                             onChange={handleInputChange}
                             onBlur={() => handleBlur('email')}
@@ -81,6 +83,7 @@ const LoginForm = ({
                             label="Contraseña"
                             placeholder="Contraseña"
                             type="password"
+                            icon={FiLock}
                             value={formData.password}
                             onChange={handleInputChange}
                             onBlur={() => handleBlur('password')}
