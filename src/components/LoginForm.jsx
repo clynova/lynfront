@@ -91,7 +91,7 @@ const LoginForm = ({
                         {errors.password && touched.password && (
                             <p className="mt-1 text-sm text-red-500">{errors.password}</p>
                         )}
-                        <Link to="/forgot-password" className="block mt-2 text-sm text-blue-600 hover:underline">
+                        <Link to="/auth/forgot-password" className="block mt-2 text-sm text-blue-600 hover:underline">
                             ¿Olvidaste tu contraseña?
                         </Link>
                     </div>
