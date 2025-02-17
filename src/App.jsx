@@ -10,6 +10,8 @@ import { HelmetProvider } from 'react-helmet-async';
 import { MainLayout } from "./layouts/MainLayout/MainLayout";
 import { AuthLayout } from "./layouts/AuthLayout/AuthLayout";
 import { ValidarToken } from "./pages/auth/ValidarToken";
+import { CuentaConfirmada } from "./pages/auth/cuentaConfirmada";
+import { PasswordResetSuccess } from "./pages/auth/passwordResetSuccess";
 
 const App = () => {
   return (
@@ -27,6 +29,8 @@ const App = () => {
               <Route path="confirmar-cuenta/:token" element={<ConfirmarCuenta />} />
               <Route path="forgot-password" element={<ForgotPassword />} />
               <Route path="validar-token" element={<ValidarToken />} />
+              <Route path="cuenta-confirmada" element={<CuentaConfirmada />} />
+              <Route path="password-confirmada" element={<PasswordResetSuccess />} />
             </Route>
             <Route path="/about" element={<div>About</div>} />
             <Route path="/contact" element={<div>Contact</div>} />
