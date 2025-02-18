@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import img1 from '../images/ejemplos/D_NQ_NP637426-MLA74072166204_012024-B.webp';
 import img2 from '../images/ejemplos/D_NQ_NP792256-MLA74071914036_012024-B.webp';
 import img3 from '../images/ejemplos/D_NQ_NP954611-MLA74179693633_012024-B.webp';
+import { SlArrowLeftCircle, SlArrowRightCircle } from "react-icons/sl";
 
 const slides = [
   {
@@ -41,12 +42,12 @@ const ProductSlider = () => {
     <div className="relative h-full overflow-hidden">
       {/* Slides */}
       <div className="absolute inset-0 flex transition-transform duration-500 ease-out"
-           style={{ transform: `translateX(-${current * 100}%)` }}>
+        style={{ transform: `translateX(-${current * 100}%)` }}>
         {slides.map((slide, index) => (
           <div key={index} className="w-full h-full flex-shrink-0 relative">
-            <img 
-              src={slide.image} 
-              alt={slide.title} 
+            <img
+              src={slide.image}
+              alt={slide.title}
               className="w-full h-full object-cover"
             />
             {/* Overlay */}
@@ -67,11 +68,11 @@ const ProductSlider = () => {
       {/* Controls */}
       <button onClick={prevSlide} className="absolute left-4 top-1/2 -translate-y-1/2 
                   bg-white/30 p-2 rounded-full hover:bg-white/50 transition-colors">
-        ← {/* Reemplazar con un ícono */}
+        <SlArrowLeftCircle /> {/* Reemplazar con un ícono */}
       </button>
       <button onClick={nextSlide} className="absolute right-4 top-1/2 -translate-y-1/2 
                   bg-white/30 p-2 rounded-full hover:bg-white/50 transition-colors">
-        → {/* Reemplazar con un ícono */}
+        <SlArrowRightCircle /> {/* Reemplazar con un ícono */}
       </button>
 
       {/* Indicators */}

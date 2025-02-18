@@ -1,6 +1,7 @@
 import img1 from '../images/ejemplos/D_NQ_NP637426-MLA74072166204_012024-B.webp';
 import img2 from '../images/ejemplos/D_NQ_NP792256-MLA74071914036_012024-B.webp';
 import img3 from '../images/ejemplos/D_NQ_NP954611-MLA74179693633_012024-B.webp';
+import { FaCartPlus } from "react-icons/fa";
 
 const products = [
   { id: 1, name: 'Producto Premium 1', price: '$999', image: img1, description: 'Alta calidad garantizada' },
@@ -29,7 +30,7 @@ const ProductGrid = () => {
             />
             <div className="absolute top-4 right-4">
               <button className="bg-white/80 p-2 rounded-full hover:bg-white transition-colors">
-                ♥ {/* Reemplazar con un ícono */}
+                <FaCartPlus  />
               </button>
             </div>
           </div>
