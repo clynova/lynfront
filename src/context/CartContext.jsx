@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 
 const CartContext = createContext();
 
-export const useCart = () => useContext(CartContext);
+const useCart = () => useContext(CartContext);
 
-export const CartProvider = ({ children }) => {
+const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
@@ -22,7 +22,7 @@ export const CartProvider = ({ children }) => {
       return [...curr, { ...product, quantity: 1 }];
     });
   };
-  
+
   const removeFromCart = (productId) => {
     setCartItems(curr => curr.filter(item => item.id !== productId));
   };
@@ -68,3 +68,5 @@ export const CartProvider = ({ children }) => {
 CartProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
+
+export { useCart, CartProvider }
