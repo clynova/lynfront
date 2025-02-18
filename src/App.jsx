@@ -12,6 +12,7 @@ import { AuthLayout } from "./layouts/AuthLayout/AuthLayout";
 import { ValidarToken } from "./pages/auth/ValidarToken";
 import { CuentaConfirmada } from "./pages/auth/cuentaConfirmada";
 import { PasswordResetSuccess } from "./pages/auth/passwordResetSuccess";
+import { Categorias } from "./pages/Categorias";
 
 const App = () => {
   return (
@@ -22,6 +23,9 @@ const App = () => {
           <Routes>
             <Route path="/" element={<MainLayout />}>
               <Route index element={<Home />} />
+            </Route>
+            <Route path="/categoria/:nombre" element={<MainLayout />}>
+              <Route index element={<Categorias />} />
             </Route>
             <Route path="/auth" element={<AuthLayout />}>
               <Route index element={<Login />} />

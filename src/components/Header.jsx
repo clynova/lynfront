@@ -9,9 +9,9 @@ const Header = () => {
 
   const navLinks = [
     { name: "Inicio", href: "/" },
-    { name: "Accesorios", href: "/accesorios" },
-    { name: "Limpieza", href: "/limpieza" },
-    { name: "Neumáticos", href: "/neumaticos" },
+    { name: "Accesorios", href: "/categoria/accesorios" },
+    { name: "Limpieza", href: "/categoria/limpieza" },
+    { name: "Neumáticos", href: "/categoria/neumaticos" },
   ];
 
   return (
