@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import img1 from '../images/ejemplos/D_NQ_NP637426-MLA74072166204_012024-B.webp';
-import img2 from '../images/ejemplos/D_NQ_NP792256-MLA74071914036_012024-B.webp';
-import img3 from '../images/ejemplos/D_NQ_NP954611-MLA74179693633_012024-B.webp';
+import img1 from '../images/sliders/premium.png';
+import img2 from '../images/sliders/oferta.png';
+import img3 from '../images/sliders/masvendidos.png';
 import { SlArrowLeftCircle, SlArrowRightCircle } from "react-icons/sl";
 
 const slides = [
