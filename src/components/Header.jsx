@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { HiMenuAlt3, HiX } from "react-icons/hi";
+import { HiMenuAlt3, HiX, HiSearch } from "react-icons/hi";
 import { SearchBar } from "./SearchBar/SearchBar";
 
 const Header = () => {
@@ -17,9 +17,9 @@ const Header = () => {
   return (
     <nav className="fixed w-full z-50 backdrop-blur-md bg-slate-900/80 border-b border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex items-center h-16">
           {/* Logo */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 md:w-1/4">
             <Link
               to="/"
               className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent hover:from-blue-300 hover:to-indigo-300 transition-all duration-300"
@@ -28,10 +28,9 @@ const Header = () => {
             </Link>
           </div>
 
-          {/* Barra de navegación y búsqueda - Desktop <div className="hidden md:flex space-x-8"> */}
-          
-          <div className="hidden md:flex items-center flex-grow justify-center  space-x-8 mx-8">
-            {!isSearchExpanded && (
+          {/* Contenedor de navegación - Se ajusta según el tamaño de pantalla */}
+          <div className="hidden md:flex w-2/4 justify-center">
+            {!isSearchExpanded ? (
               <div className="flex space-x-8">
                 {navLinks.map((link) => (
                   <Link
@@ -44,54 +43,71 @@ const Header = () => {
                   </Link>
                 ))}
               </div>
+            ) : (
+              <div className="w-full max-w-xl px-4">
+                <SearchBar 
+                  isExpanded={isSearchExpanded}
+                  onToggle={setIsSearchExpanded}
+                />
+              </div>
             )}
-            <SearchBar 
-              isExpanded={isSearchExpanded}
-              onToggle={setIsSearchExpanded}
-            />
           </div>
 
-          {/* Botones de autenticación - Desktop */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Link
-              to="/auth"
-              className="text-slate-300 hover:text-white px-4 py-2 text-sm font-medium transition-colors duration-200"
-            >
-              Ingresar
-            </Link>
-            <Link
-              to="/auth/signup"
-              className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600
-                        text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
-                        transform hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/25"
-            >
-              Registrarse
-            </Link>
-          </div>
-
-          {/* Botón de menú móvil */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-slate-300 hover:text-white p-2"
-            >
-              {isMenuOpen ? (
-                <HiX className="h-6 w-6" />
-              ) : (
-                <HiMenuAlt3 className="h-6 w-6" />
+          {/* Contenedor derecho */}
+          <div className="flex-1 flex justify-end items-center md:w-1/4">
+            {/* Botón de búsqueda - Solo desktop */}
+            <div className="hidden md:block">
+              {!isSearchExpanded && (
+                <button
+                  onClick={() => setIsSearchExpanded(true)}
+                  className="mr-4 p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800/50 transition-colors duration-200"
+                >
+                  <HiSearch className="h-5 w-5" />
+                </button>
               )}
-            </button>
+            </div>
+
+            {/* Botones de autenticación - Desktop */}
+            <div className="hidden md:flex items-center space-x-4">
+              <Link
+                to="/auth"
+                className="text-slate-300 hover:text-white px-4 py-2 text-sm font-medium transition-colors duration-200"
+              >
+                Ingresar
+              </Link>
+              <Link
+                to="/auth/signup"
+                className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600
+                          text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                          transform hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/25"
+              >
+                Registrarse
+              </Link>
+            </div>
+
+            {/* Botón de menú móvil */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="text-slate-300 hover:text-white p-2"
+              >
+                {isMenuOpen ? <HiX className="h-6 w-6" /> : <HiMenuAlt3 className="h-6 w-6" />}
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Menú móvil con búsqueda integrada */}
+      {/* Menú móvil */}
       <div
-        className={` ${isMenuOpen ? "translate-x-0" : "-translate-x-full"
-          } md:hidden fixed top-16 left-0 right-0 bottom-0 bg-slate-900 backdrop-blur-lg transition-transform duration-300 ease-in-out`}
+        className={`${isMenuOpen ? "translate-x-0" : "-translate-x-full"} 
+                   md:hidden fixed top-16 left-0 right-0 bottom-0 
+                   bg-slate-900 backdrop-blur-lg transition-transform duration-300 ease-in-out`}
       >
         <div className="flex flex-col p-4 space-y-4 bg-slate-900">
-          <SearchBar isExpanded={true} onToggle={() => {}} />
+          <div className="mb-2">
+            <SearchBar isExpanded={true} onToggle={() => {}} />
+          </div>
           {navLinks.map((link) => (
             <Link
               key={link.name}
