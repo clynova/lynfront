@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
+import { SearchBar } from "./SearchBar/SearchBar";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 
   const navLinks = [
     { name: "Inicio", href: "/" },
@@ -26,18 +28,27 @@ const Header = () => {
             </Link>
           </div>
 
-          {/* Enlaces de navegación - Desktop */}
-          <div className="hidden md:flex space-x-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.href}
-                className="text-slate-300 hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors duration-200 relative group"
-              >
-                {link.name}
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
-              </Link>
-            ))}
+          {/* Barra de navegación y búsqueda - Desktop <div className="hidden md:flex space-x-8"> */}
+          
+          <div className="hidden md:flex items-center flex-grow justify-center  space-x-8 mx-8">
+            {!isSearchExpanded && (
+              <div className="flex space-x-8">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.name}
+                    to={link.href}
+                    className="text-slate-300 hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors duration-200 relative group"
+                  >
+                    {link.name}
+                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
+                  </Link>
+                ))}
+              </div>
+            )}
+            <SearchBar 
+              isExpanded={isSearchExpanded}
+              onToggle={setIsSearchExpanded}
+            />
           </div>
 
           {/* Botones de autenticación - Desktop */}
@@ -74,12 +85,13 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Menú móvil */}
+      {/* Menú móvil con búsqueda integrada */}
       <div
         className={` ${isMenuOpen ? "translate-x-0" : "-translate-x-full"
           } md:hidden fixed top-16 left-0 right-0 bottom-0 bg-slate-900 backdrop-blur-lg transition-transform duration-300 ease-in-out`}
       >
         <div className="flex flex-col p-4 space-y-4 bg-slate-900">
+          <SearchBar isExpanded={true} onToggle={() => {}} />
           {navLinks.map((link) => (
             <Link
               key={link.name}
