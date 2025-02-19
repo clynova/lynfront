@@ -11,6 +11,8 @@ const Header = () => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const { cartCount, setIsCartOpen } = useCart();
 
+  const  authenticated  = false
+
   const navLinks = [
     { name: "Inicio", href: "/" },
     { name: "Accesorios", href: "/categoria/accesorios" },
@@ -90,7 +92,26 @@ const Header = () => {
 
               {/* Reemplazar botones de auth con UserDropdown */}
               <div className="hidden md:block">
-                <UserDropdown />
+                {authenticated ? <UserDropdown /> : (
+                  <>
+                    <div className="hidden md:flex items-center space-x-4">
+                      <Link
+                        to="/auth"
+                        className="text-slate-300 hover:text-white px-4 py-2 text-sm font-medium transition-colors duration-200"
+                      >
+                        Ingresar
+                      </Link>
+                      <Link
+                        to="/auth/signup"
+                        className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600
+                        text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                        transform hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/25"
+                      >
+                        Registrarse
+                      </Link>
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Botón de menú móvil */}

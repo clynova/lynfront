@@ -1,142 +1,222 @@
 export const products = [
   {
-    id: 1,
+    _id: 1,
     name: "Llanta Michelin",
-    category: "neumaticos",
+    description: "Llanta Michelin Pilot Sport 4 con tecnología de alto rendimiento para máximo agarre y durabilidad",
     price: 299.99,
-    image: "/images/products/llantaMichielin.png"  // Ruta desde public
+    images: ["/images/products/llantaMichielin.png"],
+    categoryId: "65f4c3e21d41c89231c88e01", // ID ejemplo para categoría "neumaticos"
+    stock: 15,
+    brandId: "65f4c3e21d41c89231c88e10", // ID ejemplo para marca "Michelin"
+    modelId: "65f4c3e21d41c89231c88e20", // ID ejemplo para modelo específico
   },
   {
-    id: 2,
+    _id: 2,
     name: "Kit de Limpieza Automotriz",
-    category: "limpieza",
+    description: "Kit completo de limpieza que incluye shampoo, cera, microfibras y esponjas de aplicación",
     price: 45.99,
-    image: "/images/products/2.webp"
+    images: ["/images/products/2.webp"],
+    categoryId: "65f4c3e21d41c89231c88e02", // ID ejemplo para categoría "limpieza"
+    stock: 30,
+    brandId: "65f4c3e21d41c89231c88e11",
+    modelId: null,
   },
   {
-    id: 3,
+    _id: 3,
     name: "Tapetes de Goma",
-    category: "accesorios",
+    description: "Tapetes de goma resistentes y duraderos para proteger el interior del vehículo",
     price: 29.99,
-    image: "/images/products/tapetesGoma.png"
+    images: ["/images/products/tapetesGoma.png"],
+    categoryId: "65f4c3e21d41c89231c88e03", // ID ejemplo para categoría "accesorios"
+    stock: 50,
+    brandId: "65f4c3e21d41c89231c88e12",
+    modelId: null,
   },
   {
-    id: 4,
+    _id: 4,
     name: "Aceite Motor Sintético",
-    category: "aceites",
+    description: "Aceite sintético de alta calidad para un rendimiento óptimo del motor",
     price: 89.99,
-    image: "/images/products/4.webp"
+    images: ["/images/products/4.webp"],
+    categoryId: "65f4c3e21d41c89231c88e04", // ID ejemplo para categoría "aceites"
+    stock: 20,
+    brandId: "65f4c3e21d41c89231c88e13",
+    modelId: null,
   },
   {
-    id: 5,
+    _id: 5,
     name: "Filtro de Aire K&N",
-    category: "filtros",
+    description: "Filtro de aire de alto rendimiento para mejorar la eficiencia del motor",
     price: 59.99,
-    image: "/images/products/5.webp"
+    images: ["/images/products/5.webp"],
+    categoryId: "65f4c3e21d41c89231c88e05", // ID ejemplo para categoría "filtros"
+    stock: 25,
+    brandId: "65f4c3e21d41c89231c88e14",
+    modelId: null,
   },
   {
-    id: 6,
+    _id: 6,
     name: "Batería Bosch",
-    category: "baterias",
+    description: "Batería de larga duración y alto rendimiento para todo tipo de vehículos",
     price: 159.99,
-    image: "/images/products/6.webp"
+    images: ["/images/products/6.webp"],
+    categoryId: "65f4c3e21d41c89231c88e06", // ID ejemplo para categoría "baterias"
+    stock: 10,
+    brandId: "65f4c3e21d41c89231c88e15",
+    modelId: null,
   },
   {
-    id: 7,
+    _id: 7,
     name: "Pastillas de Freno Brembo",
-    category: "frenos",
+    description: "Pastillas de freno de alto rendimiento para una frenada segura y eficiente",
     price: 79.99,
-    image: "/images/products/7.webp"
+    images: ["/images/products/7.webp"],
+    categoryId: "65f4c3e21d41c89231c88e07", // ID ejemplo para categoría "frenos"
+    stock: 40,
+    brandId: "65f4c3e21d41c89231c88e16",
+    modelId: null,
   },
   {
-    id: 8,
+    _id: 8,
     name: "Amortiguadores Monroe",
-    category: "suspension",
+    description: "Amortiguadores de alta calidad para una conducción suave y cómoda",
     price: 129.99,
-    image: "/images/products/8.webp"
+    images: ["/images/products/8.webp"],
+    categoryId: "65f4c3e21d41c89231c88e08", // ID ejemplo para categoría "suspension"
+    stock: 15,
+    brandId: "65f4c3e21d41c89231c88e17",
+    modelId: null,
   },
   {
-    id: 9,
+    _id: 9,
     name: "Cera Pulidora 3M",
-    category: "limpieza",
+    description: "Cera pulidora de alta calidad para un acabado brillante y duradero",
     price: 24.99,
-    image: "/images/products/9.webp"
+    images: ["/images/products/9.webp"],
+    categoryId: "65f4c3e21d41c89231c88e02", // ID ejemplo para categoría "limpieza"
+    stock: 35,
+    brandId: "65f4c3e21d41c89231c88e18",
+    modelId: null,
   },
   {
-    id: 10,
+    _id: 10,
     name: "Bujías NGK",
-    category: "encendido",
+    description: "Bujías de alto rendimiento para una mejor combustión y eficiencia del motor",
     price: 15.99,
-    image: "/images/products/10.webp"
+    images: ["/images/products/10.webp"],
+    categoryId: "65f4c3e21d41c89231c88e09", // ID ejemplo para categoría "encendido"
+    stock: 60,
+    brandId: "65f4c3e21d41c89231c88e19",
+    modelId: null,
   },
   {
-    id: 11,
+    _id: 11,
     name: "Funda para Asiento",
-    category: "accesorios",
+    description: "Funda de asiento de alta calidad para proteger y embellecer el interior del vehículo",
     price: 34.99,
-    image: "/images/products/11.webp"
+    images: ["/images/products/11.webp"],
+    categoryId: "65f4c3e21d41c89231c88e03", // ID ejemplo para categoría "accesorios"
+    stock: 45,
+    brandId: "65f4c3e21d41c89231c88e20",
+    modelId: null,
   },
   {
-    id: 12,
+    _id: 12,
     name: "Anticongelante Prestone",
-    category: "refrigeracion",
+    description: "Anticongelante de alta calidad para proteger el sistema de refrigeración del vehículo",
     price: 19.99,
-    image: "/images/products/12.webp"
+    images: ["/images/products/12.webp"],
+    categoryId: "65f4c3e21d41c89231c88e10", // ID ejemplo para categoría "refrigeracion"
+    stock: 50,
+    brandId: "65f4c3e21d41c89231c88e21",
+    modelId: null,
   },
   {
-    id: 13,
+    _id: 13,
     name: "Kit de Herramientas Básico",
-    category: "herramientas",
+    description: "Kit de herramientas básico para realizar reparaciones y mantenimiento del vehículo",
     price: 149.99,
-    image: "/images/products/13.webp"
+    images: ["/images/products/13.webp"],
+    categoryId: "65f4c3e21d41c89231c88e11", // ID ejemplo para categoría "herramientas"
+    stock: 20,
+    brandId: "65f4c3e21d41c89231c88e22",
+    modelId: null,
   },
   {
-    id: 14,
+    _id: 14,
     name: "Sensor de Oxígeno Bosch",
-    category: "sensores",
+    description: "Sensor de oxígeno de alta calidad para un rendimiento óptimo del motor",
     price: 89.99,
-    image: "/images/products/14.webp"
+    images: ["/images/products/14.webp"],
+    categoryId: "65f4c3e21d41c89231c88e12", // ID ejemplo para categoría "sensores"
+    stock: 25,
+    brandId: "65f4c3e21d41c89231c88e23",
+    modelId: null,
   },
   {
-    id: 15,
+    _id: 15,
     name: "Líquido de Frenos DOT 4",
-    category: "frenos",
+    description: "Líquido de frenos de alta calidad para un rendimiento óptimo del sistema de frenos",
     price: 12.99,
-    image: "/images/products/15.webp"
+    images: ["/images/products/15.webp"],
+    categoryId: "65f4c3e21d41c89231c88e07", // ID ejemplo para categoría "frenos"
+    stock: 40,
+    brandId: "65f4c3e21d41c89231c88e24",
+    modelId: null,
   },
   {
-    id: 16,
+    _id: 16,
     name: "Correa de Distribución Gates",
-    category: "motor",
+    description: "Correa de distribución de alta calidad para un rendimiento óptimo del motor",
     price: 45.99,
-    image: "/images/products/16.webp"
+    images: ["/images/products/16.webp"],
+    categoryId: "65f4c3e21d41c89231c88e13", // ID ejemplo para categoría "motor"
+    stock: 30,
+    brandId: "65f4c3e21d41c89231c88e25",
+    modelId: null,
   },
   {
-    id: 17,
+    _id: 17,
     name: "Bomba de Agua GMB",
-    category: "refrigeracion",
+    description: "Bomba de agua de alta calidad para un rendimiento óptimo del sistema de refrigeración",
     price: 69.99,
-    image: "/images/products/17.webp"
+    images: ["/images/products/17.webp"],
+    categoryId: "65f4c3e21d41c89231c88e10", // ID ejemplo para categoría "refrigeracion"
+    stock: 20,
+    brandId: "65f4c3e21d41c89231c88e26",
+    modelId: null,
   },
   {
-    id: 18,
+    _id: 18,
     name: "Luz LED para Faro",
-    category: "iluminacion",
+    description: "Luz LED de alta calidad para una mejor visibilidad y seguridad en la conducción",
     price: 39.99,
-    image: "/images/products/18.webp"
+    images: ["/images/products/18.webp"],
+    categoryId: "65f4c3e21d41c89231c88e14", // ID ejemplo para categoría "iluminacion"
+    stock: 50,
+    brandId: "65f4c3e21d41c89231c88e27",
+    modelId: null,
   },
   {
-    id: 19,
+    _id: 19,
     name: "Filtro de Aceite Mann",
-    category: "filtros",
+    description: "Filtro de aceite de alta calidad para un rendimiento óptimo del motor",
     price: 14.99,
-    image: "/images/products/19.webp"
+    images: ["/images/products/19.webp"],
+    categoryId: "65f4c3e21d41c89231c88e05", // ID ejemplo para categoría "filtros"
+    stock: 35,
+    brandId: "65f4c3e21d41c89231c88e28",
+    modelId: null,
   },
   {
-    id: 20,
+    _id: 20,
     name: "Embellecedor de Neumáticos",
-    category: "limpieza",
+    description: "Producto especializado para dar brillo y protección a los neumáticos",
     price: 16.99,
-    image: "/images/products/20.webp"
+    images: ["/images/products/20.webp"],
+    categoryId: "65f4c3e21d41c89231c88e02", // ID ejemplo para categoría "limpieza"
+    stock: 45,
+    brandId: "65f4c3e21d41c89231c88e19",
+    modelId: null,
   }
 ];

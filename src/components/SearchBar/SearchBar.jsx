@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import PropTypes from 'prop-types';
 import { HiSearch } from "react-icons/hi";
 import { products } from "../../data/products";
 import { SearchResults } from "./SearchResults";
@@ -65,6 +66,10 @@ const SearchBar = ({ isExpanded, onToggle }) => {
       )}
     </div>
   );
+};
+SearchBar.propTypes = {
+  isExpanded: PropTypes.bool.isRequired,
+  onToggle: PropTypes.func.isRequired,
 };
 
 export { SearchBar };

@@ -15,6 +15,7 @@ import { PasswordResetSuccess } from "./pages/auth/passwordResetSuccess";
 import { Categorias } from "./pages/Categorias";
 import { CartProvider } from './context/CartContext';
 import { NotFound } from "./pages/NotFound";
+import { ProductDetail } from "./pages/ProductDetail"; // Necesitarás crear este componente
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<MainLayout />}>
                 <Route index element={<Home />} />
+                <Route path="product/:_id" element={<ProductDetail />} />
               </Route>
               <Route path="/categoria/:nombre" element={<MainLayout />}>
                 <Route index element={<Categorias />} />

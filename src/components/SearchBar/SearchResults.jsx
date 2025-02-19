@@ -8,13 +8,13 @@ const SearchResults = ({ results, onClose }) => {
         <div className="absolute top-full left-0 right-0 mt-2 bg-slate-800 rounded-lg shadow-xl max-h-96 overflow-y-auto">
             {results.map((product) => (
                 <Link
-                    key={product.id}
-                    to={`/producto/${product.id}`}
+                    key={product._id}
+                    to={`/product/${product._id}`}
                     className="flex items-center p-4 hover:bg-slate-700 transition-colors"
                     onClick={onClose}
                 >
                     <img
-                        src={product.image}
+                        src={product.images[0]}
                         alt={product.name}
                         className="w-12 h-12 object-cover rounded"
                     />
@@ -30,7 +30,7 @@ const SearchResults = ({ results, onClose }) => {
 SearchResults.propTypes = {
     results: PropTypes.arrayOf(
         PropTypes.shape({
-            id: PropTypes.string.isRequired,
+            _id: PropTypes.string.isRequired,
             image: PropTypes.string.isRequired,
             name: PropTypes.string.isRequired,
             price: PropTypes.number.isRequired,
