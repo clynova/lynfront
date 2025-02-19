@@ -15,7 +15,7 @@ export const products = [
     name: "Kit de Limpieza Automotriz",
     description: "Kit completo de limpieza que incluye shampoo, cera, microfibras y esponjas de aplicación",
     price: 45.99,
-    images: ["/images/products/2.webp"],
+    images: ["/images/products/llantaMichielin.png"],
     categoryId: "65f4c3e21d41c89231c88e02", // ID ejemplo para categoría "limpieza"
     stock: 30,
     brandId: "65f4c3e21d41c89231c88e11",
@@ -37,7 +37,7 @@ export const products = [
     name: "Aceite Motor Sintético",
     description: "Aceite sintético de alta calidad para un rendimiento óptimo del motor",
     price: 89.99,
-    images: ["/images/products/4.webp"],
+    images: ["/images/products/llantaMichielin.png"],
     categoryId: "65f4c3e21d41c89231c88e04", // ID ejemplo para categoría "aceites"
     stock: 20,
     brandId: "65f4c3e21d41c89231c88e13",
@@ -48,7 +48,7 @@ export const products = [
     name: "Filtro de Aire K&N",
     description: "Filtro de aire de alto rendimiento para mejorar la eficiencia del motor",
     price: 59.99,
-    images: ["/images/products/5.webp"],
+    images: ["/images/products/llantaMichielin.png"],
     categoryId: "65f4c3e21d41c89231c88e05", // ID ejemplo para categoría "filtros"
     stock: 25,
     brandId: "65f4c3e21d41c89231c88e14",
@@ -59,7 +59,7 @@ export const products = [
     name: "Batería Bosch",
     description: "Batería de larga duración y alto rendimiento para todo tipo de vehículos",
     price: 159.99,
-    images: ["/images/products/6.webp"],
+    images: ["/images/products/llantaMichielin.png"],
     categoryId: "65f4c3e21d41c89231c88e06", // ID ejemplo para categoría "baterias"
     stock: 10,
     brandId: "65f4c3e21d41c89231c88e15",
@@ -70,7 +70,7 @@ export const products = [
     name: "Pastillas de Freno Brembo",
     description: "Pastillas de freno de alto rendimiento para una frenada segura y eficiente",
     price: 79.99,
-    images: ["/images/products/7.webp"],
+    images: ["/images/products/llantaMichielin.png"],
     categoryId: "65f4c3e21d41c89231c88e07", // ID ejemplo para categoría "frenos"
     stock: 40,
     brandId: "65f4c3e21d41c89231c88e16",
@@ -81,7 +81,7 @@ export const products = [
     name: "Amortiguadores Monroe",
     description: "Amortiguadores de alta calidad para una conducción suave y cómoda",
     price: 129.99,
-    images: ["/images/products/8.webp"],
+    images: ["/images/products/llantaMichielin.png"],
     categoryId: "65f4c3e21d41c89231c88e08", // ID ejemplo para categoría "suspension"
     stock: 15,
     brandId: "65f4c3e21d41c89231c88e17",
@@ -92,7 +92,7 @@ export const products = [
     name: "Cera Pulidora 3M",
     description: "Cera pulidora de alta calidad para un acabado brillante y duradero",
     price: 24.99,
-    images: ["/images/products/9.webp"],
+    images: ["/images/products/llantaMichielin.png"],
     categoryId: "65f4c3e21d41c89231c88e02", // ID ejemplo para categoría "limpieza"
     stock: 35,
     brandId: "65f4c3e21d41c89231c88e18",
@@ -103,7 +103,7 @@ export const products = [
     name: "Bujías NGK",
     description: "Bujías de alto rendimiento para una mejor combustión y eficiencia del motor",
     price: 15.99,
-    images: ["/images/products/10.webp"],
+    images: ["/images/products/llantaMichielin.png"],
     categoryId: "65f4c3e21d41c89231c88e09", // ID ejemplo para categoría "encendido"
     stock: 60,
     brandId: "65f4c3e21d41c89231c88e19",
