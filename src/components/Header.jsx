@@ -4,6 +4,7 @@ import { HiMenuAlt3, HiX, HiSearch, HiShoppingCart } from "react-icons/hi";
 import { SearchBar } from "./SearchBar/SearchBar";
 import { useCart } from "../context/CartContext";
 import { CartDrawer } from "./Cart/CartDrawer";
+import UserDropdown from './UserMenu/UserDropdown';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -49,7 +50,7 @@ const Header = () => {
                 </div>
               ) : (
                 <div className="w-full max-w-xl px-4">
-                  <SearchBar 
+                  <SearchBar
                     isExpanded={isSearchExpanded}
                     onToggle={setIsSearchExpanded}
                   />
@@ -57,22 +58,21 @@ const Header = () => {
               )}
             </div>
 
-            {/* Contenedor derecho */}
+            {/* Contenedor derecho - Reemplazar botones de auth con UserDropdown */}
             <div className="flex-1 flex justify-end items-center md:w-1/4">
-              {/* Botón de búsqueda - Solo desktop */}
-              <div className="hidden md:block">
+              {/* Botones de búsqueda y carrito - Agrupados en un contenedor flex */}
+              <div className="hidden md:flex items-center space-x-2">
                 {!isSearchExpanded && (
                   <>
                     <button
                       onClick={() => setIsSearchExpanded(true)}
-                      className="mr-4 p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800/50 transition-colors duration-200"
+                      className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800/50 transition-colors duration-200"
                     >
                       <HiSearch className="h-5 w-5" />
                     </button>
-                    {/* Carrito de compras */}
                     <button
                       onClick={() => setIsCartOpen(true)}
-                      className="mr-4 p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800/50 transition-colors duration-200 relative"
+                      className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800/50 transition-colors duration-200 relative"
                     >
                       <HiShoppingCart className="h-5 w-5" />
                       {cartCount > 0 && (
@@ -85,26 +85,27 @@ const Header = () => {
                 )}
               </div>
 
-              {/* Botones de autenticación - Desktop */}
-              <div className="hidden md:flex items-center space-x-4">
-                <Link
-                  to="/auth"
-                  className="text-slate-300 hover:text-white px-4 py-2 text-sm font-medium transition-colors duration-200"
-                >
-                  Ingresar
-                </Link>
-                <Link
-                  to="/auth/signup"
-                  className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600
-                            text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
-                            transform hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/25"
-                >
-                  Registrarse
-                </Link>
+              {/* Separador */}
+              <div className="hidden md:block w-4"></div>
+
+              {/* Reemplazar botones de auth con UserDropdown */}
+              <div className="hidden md:block">
+                <UserDropdown />
               </div>
 
               {/* Botón de menú móvil */}
               <div className="md:hidden">
+                <button
+                  onClick={() => setIsCartOpen(true)}
+                  className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800/50 transition-colors duration-200 relative"
+                >
+                  <HiShoppingCart className="h-5 w-5" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {cartCount}
+                    </span>
+                  )}
+                </button>
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                   className="text-slate-300 hover:text-white p-2"
@@ -124,7 +125,7 @@ const Header = () => {
         >
           <div className="flex flex-col p-4 space-y-4 bg-slate-900">
             <div className="mb-2">
-              <SearchBar isExpanded={true} onToggle={() => {}} />
+              <SearchBar isExpanded={true} onToggle={() => { }} />
             </div>
             {navLinks.map((link) => (
               <Link
