@@ -29,7 +29,7 @@ const RegisterForm = ({ onSubmit, handleSocialLogin, formData, onChange, onBlur,
             <div className="w-full max-w-md space-y-8">
                 <header className="text-center space-y-4">
                     <img src={logo} alt="Logo" className="h-16 mx-auto mb-6 animate-pulse" />
-                    <h1 className="text-4xl font-bold bg-gradient-to-r text-gray-800 dark:text-white bg-clip-text text-transparent font-display">
+                    <h1 className="text-4xl font-bold bg-gradient-to-r text-gray-800 dark:text-white bg-clip-text font-display">
                         Crea tu cuenta
                     </h1>
                     <p className="text-gray-400">
