@@ -1,8 +1,8 @@
 import { CategoryCard } from './CategoryCard';
-import imgNeumatico from '../../images/categories/Neumáticos.png';
-import imgAccesorios from '../../images/categories/Accesorios.png';
-import imgHerramientas from '../../images/categories/Herramientas.png';
-import imgLimpieza from '../../images/categories/Limpieza.png';
+import imgNeumatico from '../../images/categories/Neumáticos.webp';
+import imgAccesorios from '../../images/categories/Accesorios.webp';
+import imgHerramientas from '../../images/categories/Herramientas.webp';
+import imgLimpieza from '../../images/categories/Limpieza.webp';
 
 const categories = [
   {

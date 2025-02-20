@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import img1 from '../images/sliders/premium.png';
-import img2 from '../images/sliders/oferta.png';
-import img3 from '../images/sliders/masvendidos.png';
+import img1 from '../images/sliders/premium.webp'; // Actualizado a formato WebP
+import img2 from '../images/sliders/oferta.webp';  // Actualizado a formato WebP
+import img3 from '../images/sliders/masvendidos.webp';  // Actualizado a formato WebP
 import { SlArrowLeftCircle, SlArrowRightCircle } from "react-icons/sl";
 
 const slides = [
