@@ -13,8 +13,8 @@ const SearchResults = ({ results, onClose }) => {
                     className="flex items-center p-4 hover:bg-slate-700 transition-colors"
                     onClick={onClose}
                 >
-                    <img
-                        src={product.images[0]}
+                    <img                        
+                        src={product.images?.[0] || '/images/placeholder.png'} // Usa una imagen por defecto si no hay imágenes
                         alt={product.name}
                         className="w-12 h-12 object-cover rounded"
                     />
@@ -30,8 +30,11 @@ const SearchResults = ({ results, onClose }) => {
 SearchResults.propTypes = {
     results: PropTypes.arrayOf(
         PropTypes.shape({
-            _id: PropTypes.string.isRequired,
-            image: PropTypes.string.isRequired,
+            _id: PropTypes.oneOfType([
+                PropTypes.string,
+                PropTypes.number
+            ]).isRequired,
+            images: PropTypes.arrayOf(PropTypes.string).isRequired, // Cambiado de image a images
             name: PropTypes.string.isRequired,
             price: PropTypes.number.isRequired,
         })

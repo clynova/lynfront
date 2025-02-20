@@ -29,7 +29,7 @@ const PageTitle = () => {
       <meta name="theme-color" content="#000000" />
       
       {/* Links (por ejemplo, para favicon o fuentes) */}
-      <link rel="icon" href="/favicon.ico" />
+      <link rel="icon" href="/favicon_io/favicon.ico" />
       <link rel="canonical" href="https://tudominio.com" />
     </Helmet>
   );
