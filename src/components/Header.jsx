@@ -11,7 +11,7 @@ const Header = () => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const { cartCount, setIsCartOpen } = useCart();
 
-  const  authenticated  = false
+  const  authenticated  = true
 
   const navLinks = [
     { name: "Inicio", href: "/" },
