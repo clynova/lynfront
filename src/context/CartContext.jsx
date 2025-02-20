@@ -11,10 +11,10 @@ const CartProvider = ({ children }) => {
 
   const addToCart = (product) => {
     setCartItems(curr => {
-      const existingItem = curr.find(item => item.id === product.id);
+      const existingItem = curr.find(item => item._id === product._id);
       if (existingItem) {
         return curr.map(item =>
-          item.id === product.id
+          item._id === product._id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
@@ -24,7 +24,7 @@ const CartProvider = ({ children }) => {
   };
 
   const removeFromCart = (productId) => {
-    setCartItems(curr => curr.filter(item => item.id !== productId));
+    setCartItems(curr => curr.filter(item => item._id !== productId));
   };
 
   const updateQuantity = (productId, quantity) => {
@@ -34,7 +34,7 @@ const CartProvider = ({ children }) => {
     }
     setCartItems(curr =>
       curr.map(item =>
-        item.id === productId ? { ...item, quantity } : item
+        item._id === productId ? { ...item, quantity } : item
       )
     );
   };
@@ -69,4 +69,5 @@ CartProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { useCart, CartProvider }

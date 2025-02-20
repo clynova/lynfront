@@ -35,7 +35,7 @@ const CartDrawer = () => {
             {cartItems.length === 0 ? (
               <p className="text-slate-400 text-center">Tu carrito está vacío</p>
             ) : (
-              cartItems.map(item => <CartItem key={item.id} item={item} />)
+              cartItems.map(item => <CartItem key={item._id} item={item} />)
             )}
           </div>
 

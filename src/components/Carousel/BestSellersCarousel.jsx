@@ -30,8 +30,6 @@ const BestSellersCarousel = () => {
     const bestSellers = useBestSellers(products);
     const settings = useCarouselSettings();
 
-    console.log('Productos:', bestSellers); // Para debugging
-
     return (
         <div className="relative px-4 py-6">
             {bestSellers.length > 0 ? (
