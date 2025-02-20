@@ -1,7 +1,14 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { FaShoppingCart, FaHeart, FaShare } from 'react-icons/fa';
+import { ShareMenu } from './ShareMenu';
 
 const ActionButtons = ({ product, addToCart }) => {
+    const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
+
+    const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+    const shareTitle = product.name;
+
     return (
         <div className="mt-10 flex flex-col space-y-4">
             <button
@@ -13,6 +20,23 @@ const ActionButtons = ({ product, addToCart }) => {
                 <span>Agregar al carrito</span>
             </button>
             <div className="grid grid-cols-2 gap-4">
+
+                <div className="relative">
+                    <button
+                        aria-label="Compartir producto"
+                        onClick={() => setIsShareMenuOpen(!isShareMenuOpen)}
+                        className="w-full flex items-center justify-center space-x-2 px-6 py-3 border rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transition-colors duration-200 text-white"
+                    >
+                        <FaShare className="w-5 h-5" />
+                        <span>Compartir</span>
+                    </button>
+                    <ShareMenu
+                        url={shareUrl}
+                        title={shareTitle}
+                        isOpen={isShareMenuOpen}
+                        onClose={() => setIsShareMenuOpen(false)}
+                    />
+                </div>
                 <button
                     aria-label="Compartir producto"
                     className="flex items-center justify-center space-x-2 px-6 py-3 border  rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transition-colors duration-200 text-white"
@@ -21,13 +45,6 @@ const ActionButtons = ({ product, addToCart }) => {
                     <span>Guardar</span>
                 </button>
 
-                <button
-                    aria-label="Compartir producto"
-                    className="flex items-center justify-center space-x-2 px-6 py-3 border  rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transition-colors duration-200 text-white"
-                >
-                    <FaShare className="w-5 h-5" />
-                    <span>Compartir</span>
-                </button>
             </div>
         </div>
     );
