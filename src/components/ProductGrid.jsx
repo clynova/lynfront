@@ -1,15 +1,24 @@
+import { useEffect } from 'react';
 import { useCart } from '../context/CartContext';
-import { products } from '../data/products';
 import { FaCartPlus } from "react-icons/fa";
 import { cortarTexto } from '../utils/funcionesReutilizables';
+import { useProducts } from '../context/ProductContext';
 
-const top09Products = products.slice(0, 9);
+
 const ProductGrid = () => {
   const { addToCart } = useCart();
+  const { products, loading, error, fetchProducts } = useProducts();
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  if (loading) return <div>Cargando...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {top09Products.map(product => (
+      {products.map(product => (
         <div key={product._id}
           className="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
           <div className="relative overflow-hidden">

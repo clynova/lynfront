@@ -17,64 +17,67 @@ import { Perfil } from "./pages/Perfil";
 import { Toaster } from 'react-hot-toast';
 import { VerificationPending } from "./pages/auth/VerificationPending";
 import { VerificationSuccess } from "./pages/auth/VerificationSuccess";
+import { ProductProvider } from './context/ProductContext';
 
 const App = () => {
   return (
-    <CartProvider>
-      <HelmetProvider>
-        <GlobalProvider>
-          <PageTitle />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<MainLayout />}>
-                <Route index element={<Home />} />
-                <Route path="product/:_id" element={<ProductDetails />} />
-              </Route>
-              <Route path="/categoria/:nombre" element={<MainLayout />}>
-                <Route index element={<Categorias />} />
-              </Route>
-              <Route path="/auth" element={<AuthLayout />}>
-                <Route index element={<Login />} />
-                <Route path="signup" element={<Register />} />
-                <Route path="forgot-password" element={<ForgotPassword />} />
-                <Route path="password-confirmada" element={<PasswordResetSuccess />} />
-                <Route path="verification-pending" element={<VerificationPending />} />
-                <Route path="verification-sucess/:token" element={<VerificationSuccess />} />
-              </Route>
-              <Route path="/perfil" element={<MainLayout />}>
-                <Route index element={<Perfil />} />
-              </Route>
-              <Route path="/about" element={<div>About</div>} />
-              <Route path="/contact" element={<div>Contact</div>} />
-              <Route path="*" element={<NotFound />} />
-              <Route path="/product/:_id" element={<ProductDetails />} />
-            </Routes>
-          </BrowserRouter>
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: '#333',
-                color: '#fff',
-              },
-              success: {
-                duration: 3000,
-                style: {
-                  background: '#1db954',
-                },
-              },
-              error: {
+    <ProductProvider>
+      <CartProvider>
+        <HelmetProvider>
+          <GlobalProvider>
+            <PageTitle />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<MainLayout />}>
+                  <Route index element={<Home />} />
+                  <Route path="product/:_id" element={<ProductDetails />} />
+                </Route>
+                <Route path="/categoria/:nombre" element={<MainLayout />}>
+                  <Route index element={<Categorias />} />
+                </Route>
+                <Route path="/auth" element={<AuthLayout />}>
+                  <Route index element={<Login />} />
+                  <Route path="signup" element={<Register />} />
+                  <Route path="forgot-password" element={<ForgotPassword />} />
+                  <Route path="password-confirmada" element={<PasswordResetSuccess />} />
+                  <Route path="verification-pending" element={<VerificationPending />} />
+                  <Route path="verification-sucess/:token" element={<VerificationSuccess />} />
+                </Route>
+                <Route path="/perfil" element={<MainLayout />}>
+                  <Route index element={<Perfil />} />
+                </Route>
+                <Route path="/about" element={<div>About</div>} />
+                <Route path="/contact" element={<div>Contact</div>} />
+                <Route path="*" element={<NotFound />} />
+                <Route path="/product/:_id" element={<ProductDetails />} />
+              </Routes>
+            </BrowserRouter>
+            <Toaster
+              position="top-right"
+              toastOptions={{
                 duration: 4000,
                 style: {
-                  background: '#d32f2f',
+                  background: '#333',
+                  color: '#fff',
                 },
-              },
-            }}
-          />
-        </GlobalProvider>
-      </HelmetProvider>
-    </CartProvider>
+                success: {
+                  duration: 3000,
+                  style: {
+                    background: '#1db954',
+                  },
+                },
+                error: {
+                  duration: 4000,
+                  style: {
+                    background: '#d32f2f',
+                  },
+                },
+              }}
+            />
+          </GlobalProvider>
+        </HelmetProvider>
+      </CartProvider>
+    </ProductProvider>
   );
 };
 

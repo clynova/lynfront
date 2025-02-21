@@ -42,7 +42,10 @@ const CartItem = ({ item }) => {
 };
 CartItem.propTypes = {
   item: PropTypes.shape({
-    _id: PropTypes.number.isRequired,
+    _id: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number
+    ]).isRequired,
     name: PropTypes.string.isRequired,
     images: PropTypes.arrayOf(PropTypes.string).isRequired,
     price: PropTypes.number.isRequired,
