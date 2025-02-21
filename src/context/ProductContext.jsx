@@ -23,14 +23,14 @@ const ProductProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await axios.get(`http://localhost:4000/api/product`, {
+      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/product`, {
         params: {
           page,
           ...filters
         }
       });
       
-      setProducts(data.productos);
+      setProducts(data.products);
       setTotalPages(data.totalPages);
       setCurrentPage(page);
     } catch (err) {
@@ -42,7 +42,7 @@ const ProductProvider = ({ children }) => {
 
   const getProductById = useCallback(async (_id) => {
     try {
-      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products/${_id}`);
+      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/product/${_id}`);
       return data;
     } catch (err) {
       setError(err.response?.data?.message || 'Producto no encontrado');
