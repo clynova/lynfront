@@ -17,6 +17,7 @@ import { CartProvider } from './context/CartContext';
 import { NotFound } from "./pages/NotFound";
 import { ProductDetails } from "./pages/ProductDetails";
 import { Perfil } from "./pages/Perfil";
+import { Toaster } from 'react-hot-toast';
 
 const App = () => {
   return (
@@ -51,6 +52,28 @@ const App = () => {
               <Route path="/product/:_id" element={<ProductDetails />} />
             </Routes>
           </BrowserRouter>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#333',
+                color: '#fff',
+              },
+              success: {
+                duration: 3000,
+                style: {
+                  background: '#1db954',
+                },
+              },
+              error: {
+                duration: 4000,
+                style: {
+                  background: '#d32f2f',
+                },
+              },
+            }}
+          />
         </GlobalProvider>
       </HelmetProvider>
     </CartProvider>

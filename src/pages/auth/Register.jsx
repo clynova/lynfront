@@ -4,9 +4,12 @@ import RegisterForm from '../../components/RegisterForm';
 import AuthIllustration from '../../components/AuthIllustration';
 import illustration from "../../images/login-illustration.svg";
 import { register } from '../../services/authService';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 
 const Register = () => {
     const { setPageTitle } = useGlobal();
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         firstName: '',
@@ -96,7 +99,7 @@ const Register = () => {
 
     const handleRegister = async (e) => {
         e.preventDefault();
-        // Marcar todos los campos como tocados y validar
+        // Validación de campos
         const fields = ['firstName', 'lastName', 'email', 'password', 'repPassword'];
         const touchedFields = {};
         let isValid = true;
@@ -106,14 +109,33 @@ const Register = () => {
         });
         setTouched(touchedFields);
         if (!isValid) return;
+
         setIsLoading(true);
         try {
-            const response = await register(formData); // Llamar al servicio de registro
-            console.log('Usuario registrado:', response);
-            // Redirigir o mostrar mensaje de éxito
+            await register(formData);
+            toast.success('¡Registro exitoso! Por favor verifica tu correo electrónico.', {
+                icon: '✉️',
+            });
+            navigate('/auth/verification-pending', {
+                state: {
+                    email: formData.email,
+                    message: 'Te hemos enviado un correo de verificación. Por favor revisa tu bandeja de entrada y sigue las instrucciones para activar tu cuenta.'
+                }
+            });
         } catch (error) {
-            console.error('Error al registrar usuario:', error);
-            // Manejar errores de registro
+            if (error.status === 400) {
+                toast.error('Este correo electrónico ya está registrado', {
+                    icon: '⚠️',
+                });
+            } else if (error.status === 409) {
+                toast.error(error.msg || 'Por favor verifica los datos ingresados', {
+                    icon: '❌',
+                });
+            } else {
+                toast.error('Hubo un problema al crear tu cuenta. Por favor intenta nuevamente.', {
+                    icon: '🔥',
+                });
+            }
         } finally {
             setIsLoading(false);
         }
