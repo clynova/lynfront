@@ -2,7 +2,7 @@
 
 import PropTypes from 'prop-types';
 import AuthIllustration from './AuthIllustration';
-import illustration from "../images/happy-illustration.svg";
+import illustration from "../../images/happy-illustration.svg";
 
 const ConfirmationPage = ({ type }) => {
     // ...existing styling y estructura base...

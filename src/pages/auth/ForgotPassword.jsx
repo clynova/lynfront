@@ -1,8 +1,8 @@
 import { useGlobal } from '../../context/GlobalContext';
 import { useState, useEffect } from 'react';
 import { FiMail } from 'react-icons/fi';
-import InputField from '../../components/InputField';
-import AuthIllustration from '../../components/AuthIllustration';
+import InputField from '../../components/Auth/InputField';
+import AuthIllustration from '../../components/Auth/AuthIllustration';
 import illustration from "../../images/email-illustration.svg";
 
 const ForgotPassword = () => {

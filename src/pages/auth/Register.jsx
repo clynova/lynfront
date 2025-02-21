@@ -1,7 +1,7 @@
 import { useGlobal } from '../../context/GlobalContext';
 import { useEffect, useState } from 'react';
-import RegisterForm from '../../components/RegisterForm';
-import AuthIllustration from '../../components/AuthIllustration';
+import RegisterForm from '../../components/Auth/RegisterForm';
+import AuthIllustration from '../../components/Auth/AuthIllustration';
 import illustration from "../../images/login-illustration.svg";
 import { register } from '../../services/authService';
 import { useNavigate } from 'react-router-dom';
@@ -119,7 +119,7 @@ const Register = () => {
             navigate('/auth/verification-pending', {
                 state: {
                     email: formData.email,
-                    message: 'Te hemos enviado un correo de verificación. Por favor revisa tu bandeja de entrada y sigue las instrucciones para activar tu cuenta.'
+                    message: 'Te hemos enviado un codigo al correo para que puedas verificar tu cuenta. Por favor revisa tu bandeja de entrada y sigue las instrucciones para activar tu cuenta.'
                 }
             });
         } catch (error) {

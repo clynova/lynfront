@@ -1,7 +1,7 @@
 import { useGlobal } from '../../context/GlobalContext';
 import { useEffect, useState } from 'react';
-import LoginForm from '../../components/LoginForm';
-import AuthIllustration from '../../components/AuthIllustration';
+import LoginForm from '../../components/Auth/LoginForm';
+import AuthIllustration from '../../components/Auth/AuthIllustration';
 import illustration from "../../images/login-illustration.svg";
 
 const Login = () => {

@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom';
 import { FiUser, FiMail, FiLock } from 'react-icons/fi';
 import InputField from './InputField';
 import SocialButton from './SocialButton';
-import logo from "../images/logo.svg";
-import googleIconImageSrc from "../images/google-icon.png";
-import twitterIconImageSrc from "../images/twitter-icon.png";
+import logo from "../../images/logo.svg";
+import googleIconImageSrc from "../../images/google-icon.png";
+import twitterIconImageSrc from "../../images/twitter-icon.png";
 
 const RegisterForm = ({ onSubmit, handleSocialLogin, formData, onChange, onBlur, errors, touched, isLoading }) => {
     const [showPasswordHelp, setShowPasswordHelp] = useState(false);

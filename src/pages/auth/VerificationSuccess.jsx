@@ -3,7 +3,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { HiMail } from 'react-icons/hi';
 // Importa la instancia de Axios configurada
 
-const VerificationPending = () => {
+const VerificationSuccess = () => {
     const location = useLocation();
     const { email, message } = location.state || {};
     const [token, setToken] = useState(''); // Estado para almacenar el token ingresado
@@ -88,4 +88,4 @@ const VerificationPending = () => {
     );
 };
 
-export { VerificationPending };
+export { VerificationSuccess };

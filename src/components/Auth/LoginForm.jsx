@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import InputField from './InputField';
 import SocialButton from './SocialButton';
-import logo from "../images/logo.svg";
-import googleIconImageSrc from "../images/google-icon.png";
-import twitterIconImageSrc from "../images/twitter-icon.png";
+import logo from "../../images/logo.svg";
+import googleIconImageSrc from "../../images/google-icon.png";
+import twitterIconImageSrc from "../../images/twitter-icon.png";
 import { FiMail, FiLock } from 'react-icons/fi';
 
 const LoginForm = ({

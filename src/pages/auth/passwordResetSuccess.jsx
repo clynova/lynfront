@@ -1,4 +1,4 @@
-import ConfirmationPage from '../../components/ConfirmationPage';
+import ConfirmationPage from '../../components/Auth/ConfirmationPage';
 
 const PasswordResetSuccess = () => {
     return <ConfirmationPage type="password" />;
