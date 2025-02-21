@@ -1,13 +1,18 @@
 import { useState, useEffect, useRef } from "react";
 import PropTypes from 'prop-types';
 import { HiSearch } from "react-icons/hi";
-import { products } from "../../data/products";
+import { useProducts } from "../../context/ProductContext";
 import { SearchResults } from "./SearchResults";
 
 const SearchBar = ({ isExpanded, onToggle }) => {
+  const { products, loading, error, fetchProducts } = useProducts();
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState([]);
   const searchRef = useRef(null);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -21,6 +26,12 @@ const SearchBar = ({ isExpanded, onToggle }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onToggle]);
+
+  if (loading) return <div>Cargando...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+
+
 
   const handleSearch = (value) => {
     setSearchTerm(value);
@@ -47,13 +58,13 @@ const SearchBar = ({ isExpanded, onToggle }) => {
             autoFocus
           />
           <HiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
-          <SearchResults 
-            results={results} 
+          <SearchResults
+            results={results}
             onClose={() => {
               onToggle(false);
               setSearchTerm("");
               setResults([]);
-            }} 
+            }}
           />
         </div>
       ) : (

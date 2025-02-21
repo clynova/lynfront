@@ -1,23 +1,24 @@
+import { useEffect } from 'react';
 import Slider from "react-slick";
 import PropTypes from 'prop-types';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { products } from "../data/products.js";
+import { useProducts } from '../context/ProductContext';
 import { SlArrowLeftCircle, SlArrowRightCircle } from "react-icons/sl";
 // ...existing code...
 
 // Flechas de navegación mejoradas para mayor visibilidad
 const NextArrow = ({ onClick }) => (
-  <div 
-    onClick={onClick} 
+  <div
+    onClick={onClick}
     className="absolute right-2 top-1/2 -translate-y-1/2 z-10 cursor-pointer bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg hover:shadow-2xl transition"
   >
     <SlArrowRightCircle className="w-8 h-8 text-gray-900 dark:text-gray-100" />
   </div>
 );
 const PrevArrow = ({ onClick }) => (
-  <div 
-    onClick={onClick} 
+  <div
+    onClick={onClick}
     className="absolute left-2 top-1/2 -translate-y-1/2 z-10 cursor-pointer bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg hover:shadow-2xl transition"
   >
     <SlArrowLeftCircle className="w-8 h-8 text-gray-900 dark:text-gray-100" />
@@ -25,6 +26,18 @@ const PrevArrow = ({ onClick }) => (
 );
 
 const BestSellersCarousel = () => {
+
+  const { products, loading, error, fetchProducts } = useProducts();
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  if (loading) return <div>Cargando...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+
+
   const bestSellers = products.slice(0, 8);
   const settings = {
     dots: true,
@@ -33,7 +46,7 @@ const BestSellersCarousel = () => {
     slidesToShow: 5,
     slidesToScroll: 1,
     nextArrow: <NextArrow />,
-    prevArrow: <PrevArrow />,   
+    prevArrow: <PrevArrow />,
     responsive: [
       { breakpoint: 1024, settings: { slidesToShow: 2 } },
       { breakpoint: 640, settings: { slidesToShow: 1 } }
@@ -55,7 +68,7 @@ const BestSellersCarousel = () => {
               </div>
               <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2 truncate">{product.name}</h3>
               <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">${product.price.toFixed(2)}</p>
-              <button className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded transition-colors w-full"> 
+              <button className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded transition-colors w-full">
                 Ver Detalles
               </button>
             </div>

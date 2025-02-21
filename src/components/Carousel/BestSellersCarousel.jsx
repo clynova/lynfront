@@ -1,7 +1,8 @@
+import { useEffect } from 'react';
 import Slider from 'react-slick';
 import NextArrow from './NextArrow'; // Asegúrate de importar tus componentes de flechas
 import PrevArrow from './PrevArrow';
-import { products } from '../../data/products';
+import { useProducts } from '../../context/ProductContext';
 import ProductCard from './ProductCard';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -27,21 +28,30 @@ const useCarouselSettings = () => ({
 });
 
 const BestSellersCarousel = () => {
+    const { products, loading, error, fetchProducts } = useProducts();
+
+    useEffect(() => {
+        fetchProducts();
+    }, [fetchProducts]);
+
     const bestSellers = useBestSellers(products);
     const settings = useCarouselSettings();
+
+    if (loading) return <div>Cargando...</div>;
+    if (error) return <div>Error: {error}</div>;
 
     return (
         <div className="relative px-4 py-6">
             {bestSellers.length > 0 ? (
                 <Slider {...settings}>
                     {bestSellers.map(product => (
-                        <ProductCard 
-                            key={String(product._id)} 
+                        <ProductCard
+                            key={String(product._id)}
                             product={{
                                 ...product,
                                 _id: String(product._id),
                                 images: product.images || [] // Aseguramos que images siempre sea un array
-                            }} 
+                            }}
                         />
                     ))}
                 </Slider>
