@@ -12,7 +12,7 @@ const UserDropdown = () => {
   useOnClickOutside(dropdownRef, () => setIsOpen(false));
 
   const menuItems = [
-    { icon: <HiUser className="w-5 h-5" />, label: 'Mi Perfil', to: '/profile' },
+    { icon: <HiUser className="w-5 h-5" />, label: 'Mi Perfil', to: '/perfil' },
     { icon: <HiShoppingCart className="w-5 h-5" />, label: 'Carrito', onClick: () => setIsCartOpen(true) },
     { icon: <HiShoppingBag className="w-5 h-5" />, label: 'Mis Compras', to: '/orders' },
     { icon: <HiCog className="w-5 h-5" />, label: 'Configuración', to: '/settings' },

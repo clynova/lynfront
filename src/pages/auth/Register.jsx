@@ -3,27 +3,28 @@ import { useEffect, useState } from 'react';
 import RegisterForm from '../../components/RegisterForm';
 import AuthIllustration from '../../components/AuthIllustration';
 import illustration from "../../images/login-illustration.svg";
+import { register } from '../../services/authService';
 
 const Register = () => {
     const { setPageTitle } = useGlobal();
 
     const [formData, setFormData] = useState({
-        nombre: '',
-        apellido: '',
+        firstName: '',
+        lastName: '',
         email: '',
         password: '',
         repPassword: '',
     });
     const [errors, setErrors] = useState({
-        nombre: '',
-        apellido: '',
+        firstName: '',
+        lastName: '',
         email: '',
         password: '',
         repPassword: '',
     });
     const [touched, setTouched] = useState({
-        nombre: false,
-        apellido: false,
+        firstName: false,
+        lastName: false,
         email: false,
         password: false,
         repPassword: false,
@@ -55,10 +56,10 @@ const Register = () => {
     const validateField = (name, value) => {
         let error = '';
         switch (name) {
-            case 'nombre':
+            case 'firstName':
                 error = validateNombre(value);
                 break;
-            case 'apellido':
+            case 'lastName':
                 error = validateApellido(value);
                 break;
             case 'email':
@@ -96,7 +97,7 @@ const Register = () => {
     const handleRegister = async (e) => {
         e.preventDefault();
         // Marcar todos los campos como tocados y validar
-        const fields = ['nombre', 'apellido', 'email', 'password', 'repPassword'];
+        const fields = ['firstName', 'lastName', 'email', 'password', 'repPassword'];
         const touchedFields = {};
         let isValid = true;
         fields.forEach(field => {
@@ -106,11 +107,16 @@ const Register = () => {
         setTouched(touchedFields);
         if (!isValid) return;
         setIsLoading(true);
-        // Simular llamada a API
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setIsLoading(false);
-        console.log('Registrando usuario', formData);
-        // ... lógica real de registro ...
+        try {
+            const response = await register(formData); // Llamar al servicio de registro
+            console.log('Usuario registrado:', response);
+            // Redirigir o mostrar mensaje de éxito
+        } catch (error) {
+            console.error('Error al registrar usuario:', error);
+            // Manejar errores de registro
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleSocialLogin = (provider) => {

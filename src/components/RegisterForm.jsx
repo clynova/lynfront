@@ -40,34 +40,34 @@ const RegisterForm = ({ onSubmit, handleSocialLogin, formData, onChange, onBlur,
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <InputField
-                                id="nombre"
-                                name="nombre"
+                                id="firstName"
+                                name="firstName"
                                 label="Nombre"
                                 placeholder="Nombre"
                                 icon={FiUser}
-                                value={formData.nombre}
+                                value={formData.firstName}
                                 onChange={onChange}
-                                onBlur={() => onBlur('nombre')}
+                                onBlur={() => onBlur('firstName')}
                                 required
                             />
-                            {errors.nombre && touched.nombre && (
-                                <p className="mt-1 text-sm text-red-500">{errors.nombre}</p>
+                            {errors.firstName && touched.firstName && (
+                                <p className="mt-1 text-sm text-red-500">{errors.firstName}</p>
                             )}
                         </div>
                         <div>
                             <InputField
-                                id="apellido"
-                                name="apellido"
+                                id="lastName"
+                                name="lastName"
                                 label="Apellido"
                                 placeholder="Apellido"
                                 icon={FiUser}
-                                value={formData.apellido}
+                                value={formData.lastName}
                                 onChange={onChange}
-                                onBlur={() => onBlur('apellido')}
+                                onBlur={() => onBlur('lastName')}
                                 required
                             />
-                            {errors.apellido && touched.apellido && (
-                                <p className="mt-1 text-sm text-red-500">{errors.apellido}</p>
+                            {errors.lastName && touched.lastName && (
+                                <p className="mt-1 text-sm text-red-500">{errors.lastName}</p>
                             )}
                         </div>
                     </div>
@@ -197,8 +197,8 @@ RegisterForm.propTypes = {
     onSubmit: PropTypes.func.isRequired,
     handleSocialLogin: PropTypes.func.isRequired,
     formData: PropTypes.shape({
-        nombre: PropTypes.string.isRequired,
-        apellido: PropTypes.string.isRequired,
+        firstName: PropTypes.string.isRequired,
+        lastName: PropTypes.string.isRequired,
         email: PropTypes.string.isRequired,
         password: PropTypes.string.isRequired,
         repPassword: PropTypes.string.isRequired,
@@ -206,15 +206,15 @@ RegisterForm.propTypes = {
     onChange: PropTypes.func.isRequired,
     onBlur: PropTypes.func.isRequired,
     errors: PropTypes.shape({
-        nombre: PropTypes.string,
-        apellido: PropTypes.string,
+        firstName: PropTypes.string,
+        lastName: PropTypes.string,
         email: PropTypes.string,
         password: PropTypes.string,
         repPassword: PropTypes.string,
     }).isRequired,
     touched: PropTypes.shape({
-        nombre: PropTypes.bool,
-        apellido: PropTypes.bool,
+        firstName: PropTypes.bool,
+        lastName: PropTypes.bool,
         email: PropTypes.bool,
         password: PropTypes.bool,
         repPassword: PropTypes.bool,

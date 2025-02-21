@@ -4,14 +4,14 @@ import { HiMenuAlt3, HiX, HiSearch, HiShoppingCart } from "react-icons/hi";
 import { SearchBar } from "./SearchBar/SearchBar";
 import { useCart } from "../context/CartContext";
 import { CartDrawer } from "./Cart/CartDrawer";
-import UserDropdown from './UserMenu/UserDropdown';
+import UserDropdown from './Nav/UserDropdown';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const { cartCount, setIsCartOpen } = useCart();
 
-  const  authenticated  = true
+  const  authenticated  = false
 
   const navLinks = [
     { name: "Inicio", href: "/" },
