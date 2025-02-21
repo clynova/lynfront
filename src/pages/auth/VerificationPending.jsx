@@ -1,20 +1,29 @@
-import { useState } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { HiMail } from 'react-icons/hi';
-// Importa la instancia de Axios configurada
+import { validarToken, reenviarToken } from '../../services/authService';
+import { toast } from 'react-hot-toast';
 
 const VerificationPending = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const { email, message } = location.state || {};
-    const [token, setToken] = useState(''); // Estado para almacenar el token ingresado
-    const [error, setError] = useState(''); // Estado para manejar errores
-    const [success, setSuccess] = useState(false); // Estado para manejar el éxito
+    const [token, setToken] = useState('');
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState(false);
 
-    // Función para manejar la validación del token
+    // Protección contra acceso directo
+    useEffect(() => {
+        if (!email) {
+            navigate('/auth');
+            toast.error('Acceso no válido a la página de verificación');
+        }
+    }, [email, navigate]);
+
     const handleVerifyToken = async (e) => {
-        e.preventDefault(); // Evita el comportamiento predeterminado del formulario
-        setError(''); // Limpia el mensaje de error
-        setSuccess(false); // Limpia el estado de éxito
+        e.preventDefault();
+        setError('');
+        setSuccess(false);
 
         try {
             if (!token.trim()) {
@@ -22,14 +31,18 @@ const VerificationPending = () => {
                 return;
             }
 
-            // Envía el token al backend para validarlo
-            const response = await api.post('/auth/verify-token', { token, email });
-
-            if (response.data.success) {
-                setSuccess(true); // Marca como éxito
-                setError(''); // Limpia el mensaje de error
+            const data = await validarToken(token, email);
+            console.log(data)
+            if (data.success) {
+                console.log('exito')
+                setSuccess(true);
+                toast.success('¡Verificación exitosa!');
+                // Redirigir al login después de 2 segundos
+                setTimeout(() => {
+                    navigate('/auth');
+                }, 2000);
             } else {
-                setError(response.data.message || 'El token no es válido.');
+                setError(data.message);
             }
         } catch (err) {
             console.error('Error al verificar el token:', err);
@@ -37,10 +50,21 @@ const VerificationPending = () => {
         }
     };
 
+    const handleResendToken = async () => {
+        try {
+            await reenviarToken(email);
+            toast.success('Se ha reenviado el código de verificación');
+        } catch (error) {
+            toast.error('Error al reenviar el código', error);
+        }
+    };
+
+    if (!email) {
+        return null; // No renderizar nada mientras se redirecciona
+    }
+
     return (
-
-
-        <div className="w-full bg-white flex items-center  shadow-lg rounded-lg p-8 flex flex-col items-center">
+        <div className="w-full bg-white items-center  shadow-lg rounded-lg p-8 flex flex-col ">
             <HiMail className="text-6xl text-blue-500 mb-6" />
             <h2 className="text-3xl font-semibold text-gray-800 mb-4">Verifica tu cuenta</h2>
             <p className="text-lg text-gray-600 text-center mb-4">{message}</p>
@@ -49,17 +73,19 @@ const VerificationPending = () => {
             </p>
             <p className="text-gray-600 text-center mb-6">
                 Si no recibiste el correo, revisa tu carpeta de spam o{' '}
-                <Link to="/auth/verification-pending" className="text-blue-500 hover:text-blue-600 font-medium">
+                <button 
+                    onClick={handleResendToken}
+                    className="text-blue-500 hover:text-blue-600 font-medium"
+                >
                     reenviar correo
-                </Link>
-                .
+                </button>
             </p>
 
             {/* Formulario para ingresar el token */}
             <form onSubmit={handleVerifyToken} className="w-full max-w-md">
                 <div className="mb-4">
                     <label htmlFor="token" className="block text-sm font-medium text-gray-700 mb-2">
-                        Ingresa el token enviado a tu correo:
+                        Ingresa el codigo enviado a tu correo:
                     </label>
                     <input
                         type="text"
@@ -84,7 +110,6 @@ const VerificationPending = () => {
                 </button>
             </form>
         </div>
-
     );
 };
 

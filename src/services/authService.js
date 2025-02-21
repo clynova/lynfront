@@ -18,9 +18,27 @@ const login = async (credentials) => {
   try {
     const response = await api.post('/login', credentials);
     return response.data;
-  } catch (error) {    
+  } catch (error) {
     throw error.response.data;
   }
 };
 
-export { register, login };
+const validarToken = async (token, email) => {
+  try {
+    const response = await api.post('/api/user/confirmar', { token, email });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+const reenviarToken = async (email) => {
+  try {
+    const response = await api.post('/api/user/reenviar', { email });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export { register, login, validarToken, reenviarToken };

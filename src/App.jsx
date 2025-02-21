@@ -41,7 +41,7 @@ const App = () => {
                   <Route path="forgot-password" element={<ForgotPassword />} />
                   <Route path="password-confirmada" element={<PasswordResetSuccess />} />
                   <Route path="verification-pending" element={<VerificationPending />} />
-                  <Route path="verification-sucess/:token" element={<VerificationSuccess />} />
+                  <Route path="verification-sucess" element={<VerificationSuccess />} />
                 </Route>
                 <Route path="/perfil" element={<MainLayout />}>
                   <Route index element={<Perfil />} />
