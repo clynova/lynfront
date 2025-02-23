@@ -63,7 +63,7 @@ const Header = () => {
           {user ? (
             <>
               <Link
-                to="/perfil"
+                to="/profile"
                 className="block w-full text-center text-slate-300 hover:text-white px-4 py-2 text-lg font-medium mb-3 transition-colors duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
