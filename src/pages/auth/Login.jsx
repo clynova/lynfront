@@ -1,11 +1,15 @@
 import { useGlobal } from '../../context/GlobalContext';
 import { useEffect, useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import LoginForm from '../../components/Auth/LoginForm';
 import AuthIllustration from '../../components/Auth/AuthIllustration';
 import illustration from "../../images/login-illustration.svg";
 
 const Login = () => {
   const { setPageTitle } = useGlobal();
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -59,15 +63,22 @@ const Login = () => {
     const emailValid = validateField('email', formData.email);
     const passwordValid = validateField('password', formData.password);
     setTouched({ email: true, password: true });
+    
     if (!emailValid || !passwordValid) return;
+    
     setIsLoading(true);
     try {
-      // Simular llamada a API
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Datos del formulario:', formData);
-      // Aquí se implementaría la lógica de autenticación real
+      await login({
+        email: formData.email,
+        password: formData.password
+      });
+      navigate('/'); // Redirige al inicio después del login exitoso
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
+      setErrors(prev => ({
+        ...prev,
+        general: 'Credenciales inválidas. Por favor, intente nuevamente.'
+      }));
     } finally {
       setIsLoading(false);
     }

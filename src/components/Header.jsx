@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { HiMenuAlt3, HiX, HiSearch, HiShoppingCart } from "react-icons/hi";
 import { SearchBar } from "./SearchBar/SearchBar";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { CartDrawer } from "./Cart/CartDrawer";
 import UserDropdown from './Nav/UserDropdown';
 
@@ -10,8 +11,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const { cartCount, setIsCartOpen } = useCart();
-
-  const  authenticated  = false
+  const { user, logout } = useAuth();
 
   const navLinks = [
     { name: "Inicio", href: "/" },
@@ -19,6 +19,90 @@ const Header = () => {
     { name: "Limpieza", href: "/categoria/limpieza" },
     { name: "Neumáticos", href: "/categoria/neumaticos" },
   ];
+
+  const renderAuthButtons = () => (
+    <>
+      <Link
+        to="/auth"
+        className="text-slate-300 hover:text-white px-4 py-2 text-sm font-medium transition-colors duration-200"
+      >
+        Ingresar
+      </Link>
+      <Link
+        to="/auth/signup"
+        className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600
+        text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+        transform hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/25"
+      >
+        Registrarse
+      </Link>
+    </>
+  );
+
+  const renderMobileMenu = () => (
+    <div
+      className={`${isMenuOpen ? "translate-x-0" : "-translate-x-full"} 
+      md:hidden fixed top-16 left-0 right-0 bottom-0 
+      bg-slate-900 backdrop-blur-lg transition-transform duration-300 ease-in-out`}
+    >
+      <div className="flex flex-col p-4 space-y-4 bg-slate-900">
+        <div className="mb-2">
+          <SearchBar isExpanded={true} onToggle={() => { }} />
+        </div>
+        {navLinks.map((link) => (
+          <Link
+            key={link.name}
+            to={link.href}
+            className="text-slate-300 hover:text-blue-400 px-4 py-2 text-lg font-medium transition-colors duration-200"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            {link.name}
+          </Link>
+        ))}
+        <div className="border-t border-slate-800 pt-4">
+          {user ? (
+            <>
+              <Link
+                to="/perfil"
+                className="block w-full text-center text-slate-300 hover:text-white px-4 py-2 text-lg font-medium mb-3 transition-colors duration-200"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Mi Perfil
+              </Link>
+              <button
+                onClick={() => {
+                  logout();
+                  setIsMenuOpen(false);
+                }}
+                className="block w-full text-center bg-red-500 hover:bg-red-600
+                text-white px-4 py-2 rounded-lg text-lg font-medium transition-all duration-200"
+              >
+                Cerrar Sesión
+              </button>
+            </>
+          ) : (
+            <div className="space-y-3">
+              <Link
+                to="/auth"
+                className="block w-full text-center text-slate-300 hover:text-white px-4 py-2 text-lg font-medium transition-colors duration-200"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Ingresar
+              </Link>
+              <Link
+                to="/auth/signup"
+                className="block w-full text-center bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600
+                text-white px-4 py-2 rounded-lg text-lg font-medium transition-all duration-200"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Registrarse
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -60,7 +144,7 @@ const Header = () => {
               )}
             </div>
 
-            {/* Contenedor derecho - Reemplazar botones de auth con UserDropdown */}
+            {/* Contenedor derecho */}
             <div className="flex-1 flex justify-end items-center md:w-1/4">
               {/* Botones de búsqueda y carrito - Agrupados en un contenedor flex */}
               <div className="hidden md:flex items-center space-x-2">
@@ -90,27 +174,13 @@ const Header = () => {
               {/* Separador */}
               <div className="hidden md:block w-4"></div>
 
-              {/* Reemplazar botones de auth con UserDropdown */}
               <div className="hidden md:block">
-                {authenticated ? <UserDropdown /> : (
-                  <>
-                    <div className="hidden md:flex items-center space-x-4">
-                      <Link
-                        to="/auth"
-                        className="text-slate-300 hover:text-white px-4 py-2 text-sm font-medium transition-colors duration-200"
-                      >
-                        Ingresar
-                      </Link>
-                      <Link
-                        to="/auth/signup"
-                        className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600
-                        text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
-                        transform hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/25"
-                      >
-                        Registrarse
-                      </Link>
-                    </div>
-                  </>
+                {user ? (
+                  <UserDropdown />
+                ) : (
+                  <div className="hidden md:flex items-center space-x-4">
+                    {renderAuthButtons()}
+                  </div>
                 )}
               </div>
 
@@ -138,45 +208,7 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Menú móvil */}
-        <div
-          className={`${isMenuOpen ? "translate-x-0" : "-translate-x-full"} 
-                    md:hidden fixed top-16 left-0 right-0 bottom-0 
-                    bg-slate-900 backdrop-blur-lg transition-transform duration-300 ease-in-out`}
-        >
-          <div className="flex flex-col p-4 space-y-4 bg-slate-900">
-            <div className="mb-2">
-              <SearchBar isExpanded={true} onToggle={() => { }} />
-            </div>
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.href}
-                className="text-slate-300 hover:text-blue-400 px-4 py-2 text-lg font-medium transition-colors duration-200"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {link.name}
-              </Link>
-            ))}
-            <div className="border-t border-slate-800 pt-4">
-              <Link
-                to="/auth"
-                className="block w-full text-center text-slate-300 hover:text-white px-4 py-2 text-lg font-medium mb-3 transition-colors duration-200"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Ingresar
-              </Link>
-              <Link
-                to="/auth/signup"
-                className="block w-full text-center bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600
-                          text-white px-4 py-2 rounded-lg text-lg font-medium transition-all duration-200"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Registrarse
-              </Link>
-            </div>
-          </div>
-        </div>
+        {renderMobileMenu()}
       </nav>
       <CartDrawer />
     </>

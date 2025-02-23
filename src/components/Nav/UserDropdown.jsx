@@ -1,23 +1,36 @@
 import { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { HiUser, HiShoppingBag, HiCog, HiLogout, HiShoppingCart } from 'react-icons/hi';
 import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 
 const UserDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef();
   const { setIsCartOpen } = useCart();
-  
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
   useOnClickOutside(dropdownRef, () => setIsOpen(false));
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/auth');
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
+  };
+
   const menuItems = [
-    { icon: <HiUser className="w-5 h-5" />, label: 'Mi Perfil', to: '/perfil' },
+    { icon: <HiUser className="w-5 h-5" />, label: 'Mi Perfil', to: '/profile' },
     { icon: <HiShoppingCart className="w-5 h-5" />, label: 'Carrito', onClick: () => setIsCartOpen(true) },
     { icon: <HiShoppingBag className="w-5 h-5" />, label: 'Mis Compras', to: '/orders' },
     { icon: <HiCog className="w-5 h-5" />, label: 'Configuración', to: '/settings' },
-    { icon: <HiLogout className="w-5 h-5" />, label: 'Cerrar Sesión', to: '/logout' },
+    { icon: <HiLogout className="w-5 h-5" />, label: 'Cerrar Sesión', onClick: handleLogout },
   ];
+
 
   return (
     <div className="relative" ref={dropdownRef}>
