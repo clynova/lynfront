@@ -13,11 +13,12 @@ import { Categorias } from "./pages/Categorias";
 import { CartProvider } from './context/CartContext';
 import { NotFound } from "./pages/NotFound";
 import { ProductDetails } from "./pages/ProductDetails";
-import { Perfil } from "./pages/Perfil";
+import { MyProfile } from "./pages/Perfil/MyProfile";
 import { Toaster } from 'react-hot-toast';
 import { VerificationPending } from "./pages/auth/VerificationPending";
 import { VerificationSuccess } from "./pages/auth/VerificationSuccess";
 import { ProductProvider } from './context/ProductContext';
+import { ProfileLayout } from "./layouts/MainLayout/ProfileLayout";
 
 const App = () => {
   return (
@@ -43,8 +44,15 @@ const App = () => {
                   <Route path="verification-pending" element={<VerificationPending />} />
                   <Route path="verification-sucess" element={<VerificationSuccess />} />
                 </Route>
-                <Route path="/perfil" element={<MainLayout />}>
-                  <Route index element={<Perfil />} />
+                <Route path="/profile" element={<MainLayout />}>
+                  <Route element={<ProfileLayout />}>
+                    <Route index element={<MyProfile />} />
+                    <Route path="orders" element={<MyProfile />} />
+                    <Route path="wishlist" element={<MyProfile />} />
+                    <Route path="addresses" element={<MyProfile />} />
+                    <Route path="payment" element={<MyProfile />} />
+                    <Route path="settings" element={<MyProfile />} />
+                  </Route>
                 </Route>
                 <Route path="/about" element={<div>About</div>} />
                 <Route path="/contact" element={<div>Contact</div>} />
