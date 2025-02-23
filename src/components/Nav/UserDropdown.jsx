@@ -9,7 +9,7 @@ const UserDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef();
   const { setIsCartOpen } = useCart();
-  const { logout } = useAuth();
+  const { logout, isLoggingOut } = useAuth();
   const navigate = useNavigate();
 
   useOnClickOutside(dropdownRef, () => setIsOpen(false));
@@ -56,7 +56,9 @@ const UserDropdown = () => {
                   item.onClick();
                   setIsOpen(false);
                 }}
-                className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                disabled={item.label === 'Cerrar Sesión' && isLoggingOut}
+                className={`w-full flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors
+                  ${item.label === 'Cerrar Sesión' && isLoggingOut ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 {item.icon}
                 <span>{item.label}</span>

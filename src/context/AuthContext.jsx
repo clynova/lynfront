@@ -1,14 +1,24 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import api from '../services/api';
 import { logout as logoutService } from '../services/authService';
+import LoadingOverlay from '../components/Loading/LoadingOverlay';
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth debe ser usado dentro de un AuthProvider');
+  }
+  return context;
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     const validateToken = async () => {
@@ -51,6 +61,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
+    setIsLoggingOut(true);
     try {
       const token = localStorage.getItem('token');
       if (token) {
@@ -60,12 +71,15 @@ export const AuthProvider = ({ children }) => {
       console.error('Error durante el logout:', error);
     } finally {
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setToken(null);
       setUser(null);
+      setIsLoggingOut(false);
     }
   };
 
   if (loading) {
-    return <div>Cargando...</div>; // O tu componente de loading
+    return <LoadingOverlay message="Verificando autenticación..." />;
   }
 
   return (
@@ -75,8 +89,10 @@ export const AuthProvider = ({ children }) => {
       login, 
       logout, 
       setUser,
-      isAuthenticated: !!user
+      isAuthenticated: !!user,
+      isLoggingOut
     }}>
+      {isLoggingOut && <LoadingOverlay message="Cerrando sesión..." />}
       {children}
     </AuthContext.Provider>
   );
@@ -86,4 +102,3 @@ export const AuthProvider = ({ children }) => {
 AuthProvider.propTypes = {
   children: PropTypes.node.isRequired
 };
-export const useAuth = () => useContext(AuthContext);

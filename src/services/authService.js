@@ -43,7 +43,7 @@ const reenviarToken = async (email) => {
 
 const logout = async (token) => {
   try {
-    const response = await api.get(`${import.meta.env.VITE_API_URL}/api/user/logout`, {
+    const response = await api.get(`/api/user/logout`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
