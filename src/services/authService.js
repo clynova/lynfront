@@ -41,4 +41,17 @@ const reenviarToken = async (email) => {
   }
 };
 
-export { register, login, validarToken, reenviarToken };
+const logout = async (token) => {
+  try {
+    const response = await api.get(`${import.meta.env.VITE_API_URL}/api/user/logout`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
+export { register, login, validarToken, reenviarToken, logout };

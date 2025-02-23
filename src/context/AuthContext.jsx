@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import api from '../services/api';
+import { logout as logoutService } from '../services/authService';
 
 const AuthContext = createContext();
 
@@ -20,6 +22,7 @@ export const AuthProvider = ({ children }) => {
           setUser(response.data.user);
           localStorage.setItem('user', JSON.stringify(response.data.user));
         } catch (error) {
+          console.log(error)
           logout();
         } finally {
           setLoading(false);
@@ -47,11 +50,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setToken(null);
-    setUser(null);
+  const logout = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        await logoutService(token);
+      }
+    } catch (error) {
+      console.error('Error durante el logout:', error);
+    } finally {
+      localStorage.removeItem('token');
+      setUser(null);
+    }
   };
 
   if (loading) {
@@ -72,4 +82,8 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
+
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired
+};
 export const useAuth = () => useContext(AuthContext);
