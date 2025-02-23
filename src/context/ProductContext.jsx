@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 
@@ -18,8 +18,17 @@ const ProductProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const abortControllerRef = useRef(null);
 
   const fetchProducts = useCallback(async (page = 1, filters = {}) => {
+    // Cancelar la petición anterior si existe
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    // Crear nuevo AbortController
+    abortControllerRef.current = new AbortController();
+
     setLoading(true);
     setError(null);
     try {
@@ -27,17 +36,31 @@ const ProductProvider = ({ children }) => {
         params: {
           page,
           ...filters
-        }
+        },
+        signal: abortControllerRef.current.signal
       });
       
       setProducts(data.products);
       setTotalPages(data.totalPages);
       setCurrentPage(page);
     } catch (err) {
+      if (err.name === 'CanceledError') {
+        // Ignorar errores de peticiones canceladas
+        return;
+      }
       setError(err.response?.data?.message || 'Error al cargar los productos');
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  // Limpiar el AbortController al desmontar
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, []);
 
   const getProductById = useCallback(async (_id) => {
