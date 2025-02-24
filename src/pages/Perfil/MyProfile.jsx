@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useGlobal } from '../../context/GlobalContext';
 import { useAuth } from '../../context/AuthContext';
+import { updateProfile } from '../../services/userService';
+import toast from 'react-hot-toast';
 
 const MyProfile = () => {
   const { setPageTitle } = useGlobal();
@@ -34,30 +36,25 @@ const MyProfile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('your-api-url/update-profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
+      updateProfile(formData, token);
+      setUser({
+        ...user,
+        ...formData
       });
-      const updatedUser = await response.json();
-      setUser(updatedUser);
-      alert('Perfil actualizado exitosamente');
+      toast.success('Perfil actualizado correctamente');
     } catch (error) {
-      console.error('Error al actualizar el perfil:', error);
-      alert('Error al actualizar el perfil');
+      console.error(error);
+      toast.error('Error al actualizar el perfil');
     }
   };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-      <h1 className="text-2xl font-bold mb-6">Información Personal</h1>
+      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Información Personal</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Nombre
             </label>
             <input
@@ -65,11 +62,11 @@ const MyProfile = () => {
               name="firstName"
               value={formData.firstName}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-3"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Apellido
             </label>
             <input
@@ -77,11 +74,11 @@ const MyProfile = () => {
               name="lastName"
               value={formData.lastName}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-3"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Email
             </label>
             <input
@@ -89,11 +86,11 @@ const MyProfile = () => {
               name="email"
               value={formData.email}
               disabled
-              className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm px-4 py-3"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Teléfono
             </label>
             <input
@@ -101,7 +98,7 @@ const MyProfile = () => {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-3"
             />
           </div>
         </div>
