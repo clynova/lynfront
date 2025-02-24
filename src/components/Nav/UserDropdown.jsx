@@ -4,12 +4,13 @@ import { HiUser, HiShoppingBag, HiCog, HiLogout, HiShoppingCart } from 'react-ic
 import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { formateoNombre } from '../../utils/funcionesReutilizables';
 
 const UserDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef();
   const { setIsCartOpen } = useCart();
-  const { logout, isLoggingOut } = useAuth();
+  const { logout, isLoggingOut, user } = useAuth();
   const navigate = useNavigate();
 
   useOnClickOutside(dropdownRef, () => setIsOpen(false));
@@ -43,7 +44,7 @@ const UserDropdown = () => {
           alt="Avatar"
           className="w-8 h-8 rounded-full border-2 border-blue-500"
         />
-        <span className="font-medium">Felix Usuario</span>
+        <span className="font-medium"> {formateoNombre(user.firstName, user.lastName)} </span>
       </button>
 
       {isOpen && (

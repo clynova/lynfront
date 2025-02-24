@@ -20,6 +20,7 @@ import { VerificationSuccess } from "./pages/auth/VerificationSuccess";
 import { ProductProvider } from './context/ProductContext';
 import { ProfileLayout } from "./layouts/MainLayout/ProfileLayout";
 import { AuthProvider } from "./context/AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const App = () => {
   return (
@@ -46,7 +47,11 @@ const App = () => {
                     <Route path="verification-pending" element={<VerificationPending />} />
                     <Route path="verification-sucess" element={<VerificationSuccess />} />
                   </Route>
-                  <Route path="/profile" element={<MainLayout />}>
+                  <Route path="/profile" element={
+                    <ProtectedRoute>
+                      <MainLayout />
+                    </ProtectedRoute>
+                  }>
                     <Route element={<ProfileLayout />}>
                       <Route index element={<MyProfile />} />
                       <Route path="orders" element={<MyProfile />} />

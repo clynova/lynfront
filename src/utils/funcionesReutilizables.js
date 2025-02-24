@@ -3,5 +3,10 @@ const cortarTexto = (texto, longitud) => {
     return texto.slice(0, longitud) + '...';
 }
 
+const formateoNombre = (firstName, lastName) => {
+    const nombreCompleto = `${firstName} ${lastName}`
+    return nombreCompleto
+}
 
-export { cortarTexto}
+
+export { cortarTexto, formateoNombre }
