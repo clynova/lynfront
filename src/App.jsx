@@ -22,6 +22,7 @@ import { ProfileLayout } from "./layouts/MainLayout/ProfileLayout";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { MyOrders } from "./pages/Perfil/MyOrders";
+import { MyWishlist } from "./pages/Perfil/MyWishlist";
 
 const App = () => {
   return (
@@ -56,7 +57,7 @@ const App = () => {
                     <Route element={<ProfileLayout />}>
                       <Route index element={<MyProfile />} />
                       <Route path="orders" element={<MyOrders />} />
-                      <Route path="wishlist" element={<MyProfile />} />
+                      <Route path="wishlist" element={<MyWishlist />} />
                       <Route path="addresses" element={<MyProfile />} />
                       <Route path="payment" element={<MyProfile />} />
                       <Route path="settings" element={<MyProfile />} />

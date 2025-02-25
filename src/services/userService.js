@@ -29,4 +29,18 @@ const getOrders = async (token) => {
 }
 
 
-export { updateProfile, getOrders }
+const getWishlist = async (token) => {
+    try {
+        const response = await api.get("/api/wishlist", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    }
+    catch (error) {
+        throw error.response?.data;
+    }
+}
+
+export { updateProfile, getOrders, getWishlist }
