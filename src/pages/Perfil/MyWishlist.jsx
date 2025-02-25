@@ -1,18 +1,13 @@
 import { useEffect, useState } from "react";
 import { getWishlist } from "../../services/userService";
 import { useAuth } from "../../context/AuthContext";
+import { getImageUrl } from "../../utils/funcionesReutilizables";
 import { Link } from "react-router-dom";
 
 const MyWishlist = () => {
     const [wishlistItems, setWishlistItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const { token } = useAuth();
-    const [imageError, setImageError] = useState(false);
-    const fallbackImage = './images/placeholder.png'; // Añade una imagen por defecto
-
-    const handleImageError = () => {
-        setImageError(true);
-    };
 
     useEffect(() => {
         const fetchWishlist = async () => {
@@ -60,11 +55,15 @@ const MyWishlist = () => {
                         >
                             <Link to={`/product/${product._id}`}>
                                 <img 
-                                    src={imageError || !product.images?.[0] ? fallbackImage : product.images[0]}
+                                    src={getImageUrl(product.images?.[0])}
                                     alt={product.name}
                                     className="w-full h-48 object-cover"
                                     loading="lazy"
-                                    onError={handleImageError}
+                                    onError={(e) => {
+                                        console.log('Error loading image:', e.target.src); // Para debugging
+                                        e.target.onerror = null; // Previene loop infinito
+                                        e.target.src = '/images/placeholder.png';
+                                    }}
                                 />
                                 <div className="p-4">
                                     <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
