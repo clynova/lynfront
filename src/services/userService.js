@@ -14,5 +14,19 @@ const updateProfile = async (formData, token) => {
     }
 }
 
+const getOrders = async (token) => {
+    try {
+        const response = await api.get("/api/order", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    }
+    catch (error) {
+        throw error.response?.data;
+    }
+}
 
-export { updateProfile }
+
+export { updateProfile, getOrders }
