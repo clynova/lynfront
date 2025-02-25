@@ -28,7 +28,6 @@ const getOrders = async (token) => {
     }
 }
 
-
 const getWishlist = async (token) => {
     try {
         const response = await api.get("/api/wishlist", {
@@ -43,4 +42,19 @@ const getWishlist = async (token) => {
     }
 }
 
-export { updateProfile, getOrders, getWishlist }
+const addProductToWishlist = async (productId, token) => {
+    try {
+        const response = await api.post("/api/wishlist/add", { productId }, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    }
+    catch (error) {
+        throw error.response?.data;
+    }
+}
+
+
+export { updateProfile, getOrders, getWishlist, addProductToWishlist }

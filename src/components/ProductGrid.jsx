@@ -1,13 +1,16 @@
 import { useEffect } from 'react';
 import { useCart } from '../context/CartContext';
-import { FaCartPlus } from "react-icons/fa";
+import { CiHeart } from "react-icons/ci";
 import { cortarTexto } from '../utils/funcionesReutilizables';
 import { useProducts } from '../context/ProductContext';
+import { addProductToWishlist } from '../services/userService';
+import { useAuth } from '../context/AuthContext';
 
 
 const ProductGrid = () => {
   const { addToCart } = useCart();
   const { products, loading, error, fetchProducts } = useProducts();
+  const { token } = useAuth();
 
   useEffect(() => {
     fetchProducts();
@@ -29,9 +32,9 @@ const ProductGrid = () => {
             />
             <div className="absolute top-4 right-4">
               <button
-                onClick={() => addToCart(product)}
+                onClick={() => addProductToWishlist(product._id, token)}
                 className="bg-white/80 p-2 rounded-full hover:bg-white transition-colors">
-                <FaCartPlus />
+                <CiHeart />
               </button>
             </div>
           </div>
