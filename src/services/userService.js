@@ -56,5 +56,18 @@ const addProductToWishlist = async (productId, token) => {
     }
 }
 
+const removeFromWishlist = async (productId, token) => {
+    try {
+        const response = await api.delete(`/api/wishlist/${productId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    }
+    catch (error) {
+        throw error.response?.data;
+    }
+}
 
-export { updateProfile, getOrders, getWishlist, addProductToWishlist }
+export { updateProfile, getOrders, getWishlist, addProductToWishlist, removeFromWishlist }

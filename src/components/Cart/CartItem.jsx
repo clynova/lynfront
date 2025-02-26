@@ -1,6 +1,7 @@
 import { HiMinus, HiPlus, HiX } from 'react-icons/hi';
 import { useCart } from '../../context/CartContext';
 import PropTypes from 'prop-types';
+import { getImageUrl } from '../../utils/funcionesReutilizables';
 
 const CartItem = ({ item }) => {
   const { updateQuantity, removeFromCart } = useCart();
@@ -8,7 +9,7 @@ const CartItem = ({ item }) => {
   return (
     <div className="flex items-center py-4 border-b border-slate-700">
       <img
-        src={item.images[0]}
+        src={getImageUrl(item.images[0])}
         alt={item.name}
         className="w-16 h-16 object-cover rounded"
       />
