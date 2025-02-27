@@ -127,7 +127,15 @@ const MyOrders = () => {
     };
 
     if (loading) {
-        return <div className="text-center py-4">Cargando órdenes...</div>;
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="text-center">
+                    <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32 mb-4 mx-auto"></div>
+                    <h2 className="text-xl font-semibold text-gray-700 dark:text-white">Cargando órdenes...</h2>
+                    <p className="text-gray-500 dark:text-gray-400">Por favor, espere un momento.</p>
+                </div>
+            </div>
+        );
     }
 
     return (
