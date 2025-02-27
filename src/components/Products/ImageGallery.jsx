@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
+import { getImageUrl } from '../../utils/funcionesReutilizables';
 
 const ImageGallery = ({ images, selectedImage, setSelectedImage }) => {
     return (
         <div className="flex flex-col">
             <div className="relative">
                 <img
-                    src={images[selectedImage]}
+                    src={getImageUrl(images[selectedImage])}
                     alt="Producto seleccionado"
                     className="w-full h-96 object-cover rounded-lg"
                 />
@@ -19,7 +20,7 @@ const ImageGallery = ({ images, selectedImage, setSelectedImage }) => {
                             }`}
                     >
                         <img
-                            src={img}
+                            src={getImageUrl(img)}
                             alt={`Vista ${idx + 1}`}
                             className="w-full h-24 object-cover"
                         />

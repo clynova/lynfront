@@ -2,18 +2,24 @@ import { useState, useEffect } from 'react';
 import { useGlobal } from '../context/GlobalContext';
 import { useParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { products } from '../data/products';
 import { ImageGallery } from '../components/Products/ImageGallery';
 import { ActionButtons } from '../components/Products/ActionButtons';
+import { getProductById } from '../services/productService';
 
 const ProductDetails = () => {
   const { _id } = useParams();
   const { addToCart } = useCart();
   const [selectedImage, setSelectedImage] = useState(0);
   const { setPageTitle } = useGlobal();
+  const [product, setProduct] = useState(null);
 
-  // Simulamos obtener el producto por ID
-  const product = products.find(p => p._id === parseInt(_id));
+  useEffect(() => {
+    const fetchProduct = async () => {
+      const fetchedProduct = await getProductById(_id);
+      setProduct(fetchedProduct.product);
+    };
+    fetchProduct();
+  }, [_id]);
 
   useEffect(() => {
     if (product) {
@@ -21,10 +27,9 @@ const ProductDetails = () => {
     }
   }, [setPageTitle, product]);
 
-  if (!product) {
+  if (!product || !product.images) {
     return <div className="text-center text-2xl mt-20">Producto no encontrado</div>;
   }
-
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ marginTop: '4rem' }}>
