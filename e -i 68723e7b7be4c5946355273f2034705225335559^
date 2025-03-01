@@ -1,0 +1,431 @@
+[33mcommit 107efc38eb8e808d1d5f7c2ae57f44cab6dc7294[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Fri Feb 28 14:00:00 2025 -0300
+
+    Mensaje del commit con fecha anterior
+
+[33mcommit b00e464ddb2e77876f1536ea7cba12958f16a483[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Sat Mar 1 14:00:00 2025 -0300
+
+    Mensaje del commit con fecha anterior
+
+[33mcommit 68723e7b7be4c5946355273f2034705225335559[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Thu Feb 29 14:00:00 2024 -0300
+
+    Mensaje del commit con fecha anterior
+
+[33mcommit 275af5f4dfa4b73ff44afbf3f7e4d04e9d9b701c[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Thu Feb 27 17:35:17 2025 -0300
+
+    Se arregla orden
+
+[33mcommit f5859d9ec4c440204fc1761a4fd076b91621588a[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Thu Feb 27 17:24:10 2025 -0300
+
+    Se arregla la carga de productos
+
+[33mcommit 0befa4c74f7a0c4417bcd14380c64c6b802eb78f[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Tue Feb 25 21:21:39 2025 -0300
+
+    Se sube nuevas funciones en wishlist
+
+[33mcommit 294c9c3739ebae4bc2630c02d791e9f11866d4ed[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Tue Feb 25 03:20:54 2025 -0300
+
+    Se pueden agregar productos a la wishlist
+
+[33mcommit d122e4a805952cca8522a7d14fcda8a49b68d527[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Tue Feb 25 03:08:40 2025 -0300
+
+    Se crea funcion para cargar las imagenes correctamente
+
+[33mcommit fa6d46c867140d61c4f7985e1da912812a51bfba[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Tue Feb 25 02:53:22 2025 -0300
+
+    se crea wishlist
+
+[33mcommit de22d08cf02d0b218c3d0a3624f4f28422a7ad63[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Tue Feb 25 01:33:22 2025 -0300
+
+    Se ajusto pagina de ordenes
+
+[33mcommit 0be515cb43eba2c2e3e57a26347aa733f0315883[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Tue Feb 25 01:17:45 2025 -0300
+
+    Se creo obtener ordenes de compra por perfil
+
+[33mcommit d3422a5cb3a55a6c1999e4e74299012324163ed2[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Mon Feb 24 17:19:00 2025 -0300
+
+    Se trabaja en el perfil del usuario
+
+[33mcommit 19959a197d1bd99ad99d93bec19dd6f56145225a[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Mon Feb 24 15:29:40 2025 -0300
+
+    Se agregaron validaciones de rutas
+
+[33mcommit a1c15ee5e891b0f6c126d3cc3fa963a86f2ef86a[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Sun Feb 23 13:58:52 2025 -0300
+
+    test 2
+
+[33mcommit 3e71fdae4a32fc981869fb22ae6f15c2ea35a059[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Sun Feb 23 13:53:42 2025 -0300
+
+    se agrega mejora en la carga de productos
+
+[33mcommit 5c674785030b278028b4da6831f9bf464fedd553[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Sun Feb 23 13:37:04 2025 -0300
+
+    se agrega loading al cargar por primera vez
+
+[33mcommit eb6f8aff17c47e9ddd86e9db54d5db716f0d8122[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Sun Feb 23 13:18:34 2025 -0300
+
+    Se bloquea token en backend, si la session fue cerrada
+
+[33mcommit edcebe6dad0c9fb7e28d46b17cd10852b51e6dfe[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Sat Feb 22 23:43:07 2025 -0300
+
+    Se comienzan a validar rutas
+
+[33mcommit bac46c3c525665c2e22143ab5a83e90aa5bb73f6[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Sat Feb 22 23:33:07 2025 -0300
+
+    Se agrega validacion de token valido
+
+[33mcommit 9761592f2f6f4a9dcc96e4ce8c36578ea28080ad[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Sat Feb 22 23:06:22 2025 -0300
+
+    Se trabaja en el login de la web
+
+[33mcommit 30cb4e24adb77a38db224e9c54f382789bdddb6e[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Sat Feb 22 22:18:32 2025 -0300
+
+    Se comienza a trabajar en el perfil
+
+[33mcommit ec633525a584e93aaf365749bac785023cb1d7c9[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Fri Feb 21 11:56:38 2025 -0300
+
+    se valida el usuario
+
+[33mcommit e7dab0cf69eccc7f6aa0148c1d819e2d24cbaa77[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Fri Feb 21 01:45:07 2025 -0300
+
+    se arreglaron componentes
+
+[33mcommit 2cd58549d1396ebaf76d7ada642f734dcf3e87f4[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Fri Feb 21 00:57:28 2025 -0300
+
+    Se arreglan rutas
+
+[33mcommit 0af52c3957eb055c5b9a6835930371857439f677[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Fri Feb 21 00:32:40 2025 -0300
+
+    Se crea context de productos
+
+[33mcommit 02716061e324e9f1da73edd8e9128bb379504860[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Thu Feb 20 23:23:09 2025 -0300
+
+    Se ordenaron componentes
+
+[33mcommit f26b6eb0ca4a540187d6798deacae57551af3310[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Thu Feb 20 22:40:57 2025 -0300
+
+    Se realizaron pruebas
+
+[33mcommit a0978a24704cae2a06b2369bb8a9c1de43f881cc[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Thu Feb 20 22:17:05 2025 -0300
+
+    Se comienza a trabajar con el backend
+
+[33mcommit ad765d6f9ba483ba02c706c4b0b13de3b9ebfc4b[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Thu Feb 20 01:00:47 2025 -0300
+
+    test
+
+[33mcommit 34428039a8eab7c6f05691e478474de3a95bc2d2[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Thu Feb 20 00:46:36 2025 -0300
+
+    test
+
+[33mcommit efcdd6b7ad1452b8a66ebcb5c564e1238af605de[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Wed Feb 19 23:26:12 2025 -0300
+
+    Se mejora el SEO de la web
+
+[33mcommit c6f64931816f599e8f44e1d74f3178071621091a[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Wed Feb 19 23:19:42 2025 -0300
+
+    Se optimizan rutas y archivos
+
+[33mcommit 4f5ebad1a480fe04821d0c7e8a5208f1aa14d6b8[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Wed Feb 19 22:28:56 2025 -0300
+
+    Se arreglaron bugs
+
+[33mcommit c4fcec135603d3e41ba7d239f85848a75b237ed6[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Wed Feb 19 22:01:00 2025 -0300
+
+    Se arreglaron bugs y se armaron nuevos componentes
+
+[33mcommit 0ec435745b6a7a2c03416c305ff8f7ac190060b2[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Wed Feb 19 13:15:09 2025 -0300
+
+    Se cambio caroulsel, se mejoro performance
+
+[33mcommit e1503d2606d93815a0edb71cd47c59c591b1b415[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Wed Feb 19 01:23:04 2025 -0300
+
+    Se agrega carusel
+
+[33mcommit 0c4d28045381faf0774c7da2a5dc329f82672fa6[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Tue Feb 18 23:12:03 2025 -0300
+
+    Se corrigen bugs varios
+
+[33mcommit f7b396c8cc3eea183240a710dd68f642e5769d87[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Tue Feb 18 21:08:12 2025 -0300
+
+    Se sigue trabajando en el nav
+
+[33mcommit 29da5386b81371d87351605b156d5d55c099d021[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Tue Feb 18 17:01:08 2025 -0300
+
+    Se crearon imagenes provisorias
+
+[33mcommit 79682316c4ec20efbe027c0ccb069d09518b84aa[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Tue Feb 18 16:27:15 2025 -0300
+
+    test
+
+[33mcommit 4b19b4de62f9126ddd21c7e09c9752871b53132b[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Tue Feb 18 15:51:18 2025 -0300
+
+    Se prepara el carrito de compras
+
+[33mcommit 97243efa1c3712eaa1fe526b3a472d1cce285b01[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Tue Feb 18 14:37:37 2025 -0300
+
+    Se cambian imagene del slaider
+
+[33mcommit 753502f34bab9c71e4f57ab0a240cbbc0424077a[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Tue Feb 18 14:11:38 2025 -0300
+
+    Se comienza a trabajar en categorias
+
+[33mcommit 3d8024bccbaa2125d9e7d8f5ed91dae8b7d5aa90[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Mon Feb 17 23:00:23 2025 -0300
+
+    Se preparo barra de busqueda
+
+[33mcommit 84b8de28ad5a3f010576fee8b849e359d4f04b42[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Mon Feb 17 22:31:08 2025 -0300
+
+    Se prepara el search en el nav
+
+[33mcommit 898f9e7842daf397a9240a58a314fc759efd85f7[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Mon Feb 17 21:47:00 2025 -0300
+
+    test
+
+[33mcommit 806843522a709c70833117658fb0c1225cd4d6b7[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Mon Feb 17 18:37:27 2025 -0300
+
+    Se comienza a trabajar en el home
+
+[33mcommit 56a5c862c3ed6135c4c15cb652b304129cb5ef97[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Mon Feb 17 16:16:04 2025 -0300
+
+    Se finaliza base del auth de la web
+
+[33mcommit 9cdd831c677efde06e883b6f013730c93876034b[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Mon Feb 17 02:25:44 2025 -0300
+
+    Se envia token
+
+[33mcommit 043cae282b888bf44edd75abb27fd1dec4b5557d[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Mon Feb 17 00:03:54 2025 -0300
+
+    Se agrgaron validaciones en el formulario, agregaron iconos
+
+[33mcommit b6c35325a352cf2e6f3a174e082b848b79233443[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Sun Feb 16 23:07:31 2025 -0300
+
+    El login se separa en componentes
+
+[33mcommit 3d0269d47027e5879e4e24a0be8ea916a0fcb872[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Sun Feb 16 22:43:03 2025 -0300
+
+    Se separa el proyecto en componentes
+
+[33mcommit beed7f13af63ddcbcde539b99ee022cc40366777[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Sat Feb 15 00:46:34 2025 -0300
+
+    Se cambia el footer
+
+[33mcommit 9472e8451a210af9a075a33a2e37e84ede1c7ada[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Fri Feb 14 13:50:23 2025 -0300
+
+    Se fixean errores de contexto
+
+[33mcommit 94968139ab2802b4135fd7c7c87bc81986a2839f[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Fri Feb 14 12:34:58 2025 -0300
+
+    Se hace un fix en diversos lugares de la web
+
+[33mcommit b1f61ba9bc7c22b7fbab018f9ce0aa19c914cb81[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Fri Feb 14 02:05:36 2025 -0300
+
+    Se eliminaron dependencias
+
+[33mcommit 9610c26e53a2208b6edbde2f92104d4d742c494b[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Fri Feb 14 01:16:23 2025 -0300
+
+    Se agrega logica al login
+
+[33mcommit 58a5f3187b57c543ca67412686e43e921cef24c7[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Thu Feb 13 23:38:12 2025 -0300
+
+    Se crea logica del login
+
+[33mcommit 800d2551e8435f3296edfb3de4d50e25b3eb94ea[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Thu Feb 13 22:06:42 2025 -0300
+
+    Se modifica layout
+
+[33mcommit 521e0a02877f6f8441199f29da32241322cb3cbb[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Wed Feb 12 23:23:04 2025 -0300
+
+    Se realizaron pruebas
+
+[33mcommit d5bec952ef119df631793746f6681884ac1d74b9[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Tue Feb 11 21:09:39 2025 -0300
+
+    Se suben cosas
+
+[33mcommit d2fa6fb2ae0df67941a7c9bcde747fdb9c974f1a[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Mon Feb 10 01:47:19 2025 -0300
+
+    Se cambio login
+
+[33mcommit a71f70d99a300ab0516d9d148c547dbeed5fb75a[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Sun Feb 9 23:14:09 2025 -0300
+
+    Se agrego contdo
+
+[33mcommit 1320456d1397071b4b7f8aec53ae0e27b7bfe903[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Sat Feb 8 23:20:15 2025 -0300
+
+    Se comienza el design de la web
+
+[33mcommit 4dd2895a41d155e712085cd37738905f0a5e2d4a[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Fri Feb 7 23:05:49 2025 -0300
+
+    base
+
+[33mcommit dd1883d6433a1868d96293638aa047a68c48748e[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Fri Feb 7 00:55:12 2025 -0300
+
+    Se actualizaron rutas, se agregaron nuevas dependencias
+
+[33mcommit 55ee85933c433d4eb81a829dc02efc05c11571da[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Thu Feb 6 23:42:39 2025 -0300
+
+    Se crearon primeras plantillas de la web
+
+[33mcommit 7476d9348790026667fbf5613da51b7ebe97b73d[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Thu Feb 6 00:05:49 2025 -0300
+
+    Se crean las rutas
+
+[33mcommit d5ecb3f547f367a99f59c4c3598d63526a3b87d8[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Wed Feb 5 23:17:11 2025 -0300
+
+    Se crean las primeras rutas
+
+[33mcommit 7d39b0fa5271fb7edd4741dc838c50c17c6f8a52[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Wed Feb 5 22:21:18 2025 -0300
+
+    Instalando dependencias
+
+[33mcommit 9aed5c416caffe27cc0f1b14c25d9b303d8c88ac[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Tue Feb 4 16:00:16 2025 -0300
+
+    version estable inicial
+
+[33mcommit 07a9601e3a35d7229603fc407aa8601ce5debe71[m
+Author: Clynova <clynova.dev@gmail.com>
+Date:   Tue Feb 4 15:43:03 2025 -0300
+
+    proyecto base front lyncry
