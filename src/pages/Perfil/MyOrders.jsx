@@ -128,12 +128,8 @@ const MyOrders = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-screen">
-                <div className="text-center">
-                    <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32 mb-4 mx-auto"></div>
-                    <h2 className="text-xl font-semibold text-gray-700 dark:text-white">Test Cargando órdenes...</h2>
-                    <p className="text-gray-500 dark:text-gray-400">Por favor, espere un momento.</p>
-                </div>
+            <div className="flex items-center justify-center min-h-[200px]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
             </div>
         );
     }

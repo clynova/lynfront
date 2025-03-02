@@ -155,28 +155,61 @@ const MyAddresses = () => {
     const handleAddAddress = async (addressData) => {
         try {
             const response = await addAddress(addressData, token);
-            if (response.success) {
-                setAddresses(prev => [...prev, response.data.address]);
+            if (response.success && response.data) {
+                // La nueva dirección viene directamente en response.data, no en response.data.address
+                const newAddress = response.data;
+                
+                setAddresses(prev => {
+                    // Si la nueva dirección es predeterminada, actualizar las demás
+                    const updatedAddresses = prev.map(addr => ({
+                        ...addr,
+                        isDefault: newAddress.isDefault ? false : (addr.isDefault || false)
+                    }));
+                    // Añadir la nueva dirección
+                    return [...updatedAddresses, newAddress];
+                });
+                
                 setShowForm(false);
-                toast.success("Dirección agregada correctamente");
+                toast.success(response.msg || "Dirección agregada correctamente");
+            } else {
+                throw new Error('Error al agregar la dirección');
             }
         } catch (error) {
-            toast.error("Error al agregar la dirección");
+            console.error('Error al agregar dirección:', error);
+            toast.error(error.message || "Error al agregar la dirección");
         }
     };
 
     const handleUpdateAddress = async (addressData) => {
         try {
             const response = await updateAddress(editingAddress._id, addressData, token);
-            if (response.success) {
-                setAddresses(prev => prev.map(addr => 
-                    addr._id === editingAddress._id ? response.data.address : addr
-                ));
+            if (response.success && response.data) {
+                // La dirección actualizada viene directamente en response.data
+                const updatedAddress = response.data;
+                
+                // Si la dirección actualizada es predeterminada, actualizar todas las direcciones
+                setAddresses(prev => prev.map(addr => {
+                    if (addr._id === editingAddress._id) {
+                        return updatedAddress;
+                    }
+                    // Si la dirección actualizada es predeterminada, las demás no pueden serlo
+                    if (updatedAddress.isDefault) {
+                        return {
+                            ...addr,
+                            isDefault: false
+                        };
+                    }
+                    return addr;
+                }));
+                
                 setEditingAddress(null);
-                toast.success("Dirección actualizada correctamente");
+                toast.success(response.msg || "Dirección actualizada correctamente");
+            } else {
+                throw new Error('Error al actualizar la dirección');
             }
         } catch (error) {
-            toast.error("Error al actualizar la dirección");
+            console.error('Error al actualizar la dirección:', error);
+            toast.error(error.message || "Error al actualizar la dirección");
         }
     };
 
