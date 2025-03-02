@@ -54,4 +54,14 @@ const logout = async (token) => {
   }
 };
 
-export { register, login, validarToken, reenviarToken, logout };
+const requestPasswordReset = async (email) => {
+  try {
+    const response = await api.post('/api/user/reset', { email });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+
+
+export { register, login, validarToken, reenviarToken, logout, requestPasswordReset };

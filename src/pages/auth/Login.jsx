@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import LoginForm from '../../components/Auth/LoginForm';
 import AuthIllustration from '../../components/Auth/AuthIllustration';
 import illustration from "../../images/login-illustration.svg";
+import { toast } from 'react-hot-toast';
 
 const Login = () => {
   const { setPageTitle } = useGlobal();
@@ -12,12 +13,14 @@ const Login = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
+    email: localStorage.getItem('rememberedEmail') || '',
     password: '',
+    rememberMe: Boolean(localStorage.getItem('rememberedEmail')),
   });
   const [errors, setErrors] = useState({
     email: '',
     password: '',
+    general: '',
   });
   const [touched, setTouched] = useState({
     email: false,
@@ -51,8 +54,9 @@ const Login = () => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    const fieldValue = type === 'checkbox' ? checked : value;
+    setFormData(prev => ({ ...prev, [name]: fieldValue }));
     if (touched[name]) {
       validateField(name, value);
     }
@@ -72,12 +76,27 @@ const Login = () => {
         email: formData.email,
         password: formData.password
       });
-      navigate('/'); // Redirige al inicio después del login exitoso
+
+      // Manejar "Recordarme"
+      if (formData.rememberMe) {
+        localStorage.setItem('rememberedEmail', formData.email);
+      } else {
+        localStorage.removeItem('rememberedEmail');
+      }
+
+      toast.success('¡Bienvenido de vuelta!');
+      navigate('/');
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
+      const errorMessage = 
+        error.response?.status === 401 ? 'Credenciales incorrectas' :
+        error.response?.status === 403 ? 'Tu cuenta no está verificada. Por favor, verifica tu correo electrónico.' :
+        'Error al iniciar sesión. Por favor, intenta nuevamente.';
+      
+      toast.error(errorMessage);
       setErrors(prev => ({
         ...prev,
-        general: 'Credenciales inválidas. Por favor, intente nuevamente.'
+        general: errorMessage
       }));
     } finally {
       setIsLoading(false);

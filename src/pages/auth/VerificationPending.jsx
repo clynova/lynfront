@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { HiMail } from 'react-icons/hi';
 import { validarToken, reenviarToken } from '../../services/authService';
 import { toast } from 'react-hot-toast';
+import TokenInput from '../../components/Auth/TokenInput';
 
 const VerificationPending = () => {
     const location = useLocation();
@@ -11,6 +12,9 @@ const VerificationPending = () => {
     const [token, setToken] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
+    const [isResending, setIsResending] = useState(false);
+    const [countdown, setCountdown] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Protección contra acceso directo
     useEffect(() => {
@@ -20,91 +24,135 @@ const VerificationPending = () => {
         }
     }, [email, navigate]);
 
+    // Manejo del contador para reenvío
+    useEffect(() => {
+        if (countdown > 0) {
+            const timer = setTimeout(() => setCountdown(c => c - 1), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [countdown]);
+
+    // Auto-submit cuando el token está completo
+    useEffect(() => {
+        if (token.length === 6 && !isSubmitting && !success) {
+            handleVerifyToken();
+        }
+    }, [token]);
+
     const handleVerifyToken = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
+        if (isSubmitting) return;
+
         setError('');
         setSuccess(false);
+        setIsSubmitting(true);
 
         try {
-            if (!token.trim()) {
-                setError('Por favor, ingresa un token.');
+            if (!token || token.length !== 6) {
+                setError('Por favor, ingresa el código completo.');
                 return;
             }
-            const data = await validarToken(token, email);
-            if (data.success) {
-                setSuccess(true);
-                toast.success('¡Verificación exitosa!');
-                // Redirigir al login después de 2 segundos
-                setTimeout(() => {
-                    navigate('/auth');
-                }, 2000);
-            } else {
-                setError(data.message);
-            }
-        } catch (err) {
-            console.error('Error al verificar el token:', err);
-            setError('Ocurrió un error al verificar el token. Por favor, intenta nuevamente.');
+
+            await validarToken(token, email);
+            setSuccess(true);
+            toast.success('¡Cuenta verificada exitosamente!');
+            setTimeout(() => navigate('/auth'), 2000);
+        } catch (error) {
+            setError(error.message || 'Código inválido. Por favor, intenta nuevamente.');
+            toast.error('Código inválido');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
-    const handleResendToken = async () => {
+    const handleResendToken = useCallback(async () => {
+        if (countdown > 0) return;
+        
+        setIsResending(true);
         try {
             await reenviarToken(email);
-            toast.success('Se ha reenviado el código de verificación');
+            setCountdown(60); // 1 minuto de espera
+            toast.success('Nuevo código enviado. Revisa tu correo.', {
+                duration: 4000,
+                icon: '✉️',
+            });
         } catch (error) {
-            toast.error('Error al reenviar el código', error);
+            toast.error('Error al reenviar el código. Por favor, intenta más tarde.', {
+                icon: '❌',
+            });
+        } finally {
+            setIsResending(false);
         }
-    };
-
-    if (!email) {
-        return null; // No renderizar nada mientras se redirecciona
-    }
+    }, [email, countdown]);
 
     return (
-        <div className="w-full bg-white items-center  shadow-lg rounded-lg p-8 flex flex-col ">
+        <div className="flex flex-col items-center justify-center p-8 w-full max-w-md mx-auto">
             <HiMail className="text-6xl text-blue-500 mb-6" />
-            <h2 className="text-3xl font-semibold text-gray-800 mb-4">Verifica tu cuenta</h2>
-            <p className="text-lg text-gray-600 text-center mb-4">{message}</p>
-            <p className="text-lg text-gray-600 text-center mb-4">
-                Se ha enviado un correo a <strong>{email}</strong> con un enlace para verificar tu cuenta.
-            </p>
-            <p className="text-gray-600 text-center mb-6">
-                Si no recibiste el correo, revisa tu carpeta de spam o{' '}
-                <button 
-                    onClick={handleResendToken}
-                    className="text-blue-500 hover:text-blue-600 font-medium"
-                >
-                    reenviar correo
-                </button>
-            </p>
+            <h2 className="text-3xl font-semibold text-gray-800 dark:text-white mb-4">Verifica tu cuenta</h2>
+            
+            <div className="bg-blue-50 dark:bg-blue-900/50 p-4 rounded-lg mb-6 text-center">
+                <p className="text-blue-700 dark:text-blue-300">{message}</p>
+                <p className="mt-2 font-medium text-blue-800 dark:text-blue-200">
+                    Correo enviado a: <strong>{email}</strong>
+                </p>
+            </div>
 
-            {/* Formulario para ingresar el token */}
-            <form onSubmit={handleVerifyToken} className="w-full max-w-md">
-                <div className="mb-4">
-                    <label htmlFor="token" className="block text-sm font-medium text-gray-700 mb-2">
-                        Ingresa el codigo enviado a tu correo:
+            <form onSubmit={handleVerifyToken} className="w-full space-y-6">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+                        Ingresa el código de verificación:
                     </label>
-                    <input
-                        type="text"
-                        id="token"
-                        value={token}
-                        onChange={(e) => setToken(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-                        placeholder="Ejemplo: 123456"
+                    <TokenInput 
+                        length={6} 
+                        onChange={setToken}
                     />
                 </div>
-                {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-                {success && (
-                    <p className="text-green-500 text-sm mb-4">
-                        ¡Tu cuenta ha sido verificada exitosamente! Puedes iniciar sesión ahora.
-                    </p>
+
+                {error && (
+                    <div className="p-3 text-sm rounded-lg bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300">
+                        {error}
+                    </div>
                 )}
+
+                {success && (
+                    <div className="p-3 text-sm rounded-lg bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300">
+                        ¡Tu cuenta ha sido verificada exitosamente! Redirigiendo...
+                    </div>
+                )}
+
                 <button
                     type="submit"
-                    className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors"
+                    disabled={isSubmitting || token.length !== 6}
+                    className={`w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg 
+                             transition-colors duration-200 flex items-center justify-center
+                             ${(isSubmitting || token.length !== 6) ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                    Verificar token
+                    {isSubmitting ? (
+                        <>
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Verificando...
+                        </>
+                    ) : (
+                        'Verificar código'
+                    )}
                 </button>
+
+                <div className="text-center">
+                    <button
+                        type="button"
+                        onClick={handleResendToken}
+                        disabled={countdown > 0 || isResending}
+                        className={`text-blue-600 hover:text-blue-700 dark:text-blue-400 text-sm font-medium
+                                  ${(countdown > 0 || isResending) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                        {isResending ? 'Reenviando...' : 
+                         countdown > 0 ? `Reenviar código (${countdown}s)` : 
+                         'Reenviar código'}
+                    </button>
+                </div>
             </form>
         </div>
     );

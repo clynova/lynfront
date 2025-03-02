@@ -1,10 +1,8 @@
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import InputField from './InputField';
-import SocialButton from './SocialButton';
+import SocialAuth from './SocialAuth';
 import logo from "../../images/logo.svg";
-import googleIconImageSrc from "../../images/google-icon.png";
-import twitterIconImageSrc from "../../images/twitter-icon.png";
 import { FiMail, FiLock } from 'react-icons/fi';
 
 const LoginForm = ({
@@ -15,20 +13,8 @@ const LoginForm = ({
     errors,
     touched,
     isLoading,
+    onSocialLogin,
 }) => {
-    const socialButtons = [
-        {
-            iconImageSrc: googleIconImageSrc,
-            alt: "Google",
-            onClick: () => console.log("Ingresar con Google"),
-        },
-        {
-            iconImageSrc: twitterIconImageSrc,
-            alt: "Twitter",
-            onClick: () => console.log("Ingresar con Twitter"),
-        },
-    ];
-
     return (
         <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-8">
             <div className="w-full max-w-md space-y-8">
@@ -42,22 +28,13 @@ const LoginForm = ({
                     </p>
                 </header>
 
-                <div className="grid grid-cols-2 gap-4">
-                    {socialButtons.map((btn, index) => (
-                        <SocialButton key={index} {...btn} />
-                    ))}
-                </div>
+                <SocialAuth onSocialLogin={onSocialLogin} isLoading={isLoading} />
 
-                <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                {errors.general && (
+                    <div className="p-4 text-sm rounded-lg bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400">
+                        <p>{errors.general}</p>
                     </div>
-                    <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">
-                            o regístrate con email
-                        </span>
-                    </div>
-                </div>
+                )}
 
                 <form className="space-y-6" onSubmit={onSubmit}>
                     <div>
@@ -91,10 +68,27 @@ const LoginForm = ({
                         {errors.password && touched.password && (
                             <p className="mt-1 text-sm text-red-500">{errors.password}</p>
                         )}
-                        <Link to="/auth/forgot-password" className="block mt-2 text-sm text-blue-600 hover:underline">
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                            <input
+                                id="rememberMe"
+                                name="rememberMe"
+                                type="checkbox"
+                                checked={formData.rememberMe}
+                                onChange={handleInputChange}
+                                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
+                            />
+                            <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-600 dark:text-gray-400">
+                                Recordarme
+                            </label>
+                        </div>
+                        <Link to="/auth/forgot-password" className="text-sm text-blue-600 hover:underline dark:text-blue-400">
                             ¿Olvidaste tu contraseña?
                         </Link>
                     </div>
+
                     <button
                         type="submit"
                         disabled={isLoading}
@@ -134,7 +128,7 @@ const LoginForm = ({
 
                 <footer className="text-center text-sm text-gray-600 dark:text-gray-400">
                     <p>
-                        No tienes una cuenta?{" "}
+                        ¿No tienes una cuenta?{" "}
                         <Link
                             to="/auth/signup"
                             className="text-blue-600 dark:text-blue-400 font-semibold hover:underline"
@@ -153,18 +147,21 @@ LoginForm.propTypes = {
     formData: PropTypes.shape({
         email: PropTypes.string.isRequired,
         password: PropTypes.string.isRequired,
+        rememberMe: PropTypes.bool.isRequired,
     }).isRequired,
     handleInputChange: PropTypes.func.isRequired,
     handleBlur: PropTypes.func.isRequired,
     errors: PropTypes.shape({
         email: PropTypes.string,
         password: PropTypes.string,
+        general: PropTypes.string,
     }).isRequired,
     touched: PropTypes.shape({
         email: PropTypes.bool,
         password: PropTypes.bool,
     }).isRequired,
     isLoading: PropTypes.bool.isRequired,
+    onSocialLogin: PropTypes.func.isRequired,
 };
 
 export default LoginForm;

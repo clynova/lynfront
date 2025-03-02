@@ -3,26 +3,12 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { FiUser, FiMail, FiLock } from 'react-icons/fi';
 import InputField from './InputField';
-import SocialButton from './SocialButton';
+import SocialAuth from './SocialAuth';
+import PasswordStrengthMeter from './PasswordStrengthMeter';
 import logo from "../../images/logo.svg";
-import googleIconImageSrc from "../../images/google-icon.png";
-import twitterIconImageSrc from "../../images/twitter-icon.png";
 
-const RegisterForm = ({ onSubmit, handleSocialLogin, formData, onChange, onBlur, errors, touched, isLoading }) => {
+const RegisterForm = ({ onSubmit, onSocialLogin, formData, onChange, onBlur, errors, touched, isLoading }) => {
     const [showPasswordHelp, setShowPasswordHelp] = useState(false);
-
-    const socialButtons = [
-        {
-            iconImageSrc: googleIconImageSrc,
-            alt: "Google",
-            onClick: () => handleSocialLogin('Google'),
-        },
-        {
-            iconImageSrc: twitterIconImageSrc,
-            alt: "Twitter",
-            onClick: () => handleSocialLogin('Twitter'),
-        },
-    ];
 
     return (
         <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-8">
@@ -36,6 +22,9 @@ const RegisterForm = ({ onSubmit, handleSocialLogin, formData, onChange, onBlur,
                         Únete a nuestra comunidad en menos de un minuto
                     </p>
                 </header>
+
+                <SocialAuth onSocialLogin={onSocialLogin} isLoading={isLoading} />
+
                 <form className="mt-8 space-y-6" onSubmit={onSubmit}>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
@@ -107,6 +96,7 @@ const RegisterForm = ({ onSubmit, handleSocialLogin, formData, onChange, onBlur,
                         {errors.password && touched.password && (
                             <p className="mt-1 text-sm text-red-500">{errors.password}</p>
                         )}
+                        <PasswordStrengthMeter password={formData.password} />
                     </div>
                     <div>
                         <InputField
@@ -125,6 +115,7 @@ const RegisterForm = ({ onSubmit, handleSocialLogin, formData, onChange, onBlur,
                             <p className="mt-1 text-sm text-red-500">{errors.repPassword}</p>
                         )}
                     </div>
+
                     <button
                         type="submit"
                         disabled={isLoading}
@@ -161,22 +152,7 @@ const RegisterForm = ({ onSubmit, handleSocialLogin, formData, onChange, onBlur,
                         )}
                     </button>
                 </form>
-                <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-700"></div>
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-gray-900 text-gray-400">O continúa con</span>
-                    </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                    {socialButtons.map((btn, index) => (
-                        <SocialButton
-                            key={index}
-                            {...btn}
-                        />
-                    ))}
-                </div>
+
                 <footer className="text-center text-sm text-gray-400">
                     <p>
                         ¿Ya tienes cuenta?{" "}
@@ -195,7 +171,7 @@ const RegisterForm = ({ onSubmit, handleSocialLogin, formData, onChange, onBlur,
 
 RegisterForm.propTypes = {
     onSubmit: PropTypes.func.isRequired,
-    handleSocialLogin: PropTypes.func.isRequired,
+    onSocialLogin: PropTypes.func.isRequired,
     formData: PropTypes.shape({
         firstName: PropTypes.string.isRequired,
         lastName: PropTypes.string.isRequired,

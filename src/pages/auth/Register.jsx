@@ -48,7 +48,11 @@ const Register = () => {
     };
     const validatePassword = (value) => {
         if (!value) return 'La contraseña es requerida';
-        if (value.length < 6) return 'La contraseña debe tener al menos 6 caracteres';
+        if (value.length < 8) return 'La contraseña debe tener al menos 8 caracteres';
+        if (!/[A-Z]/.test(value)) return 'La contraseña debe incluir al menos una mayúscula';
+        if (!/[a-z]/.test(value)) return 'La contraseña debe incluir al menos una minúscula';
+        if (!/[0-9]/.test(value)) return 'La contraseña debe incluir al menos un número';
+        if (!/[!@#$%^&*]/.test(value)) return 'La contraseña debe incluir al menos un carácter especial (!@#$%^&*)';
         return '';
     };
     const validateRepPassword = (value) => {
