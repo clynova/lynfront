@@ -196,6 +196,20 @@ const addPaymentMethod = async (paymentMethodData, token) => {
     }
 }
 
+const changePassword = async (passwordData, token) => {
+    try {
+        const response = await api.put("/api/user/change-password", passwordData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    }
+    catch (error) {
+        throw error.response?.data;
+    }
+}
+
 export {
     updateProfile,
     getOrders,
@@ -210,5 +224,6 @@ export {
     setDefaultPaymentMethod,
     togglePaymentMethodStatus,
     deletePaymentMethod,
-    addPaymentMethod
+    addPaymentMethod,
+    changePassword
 }
