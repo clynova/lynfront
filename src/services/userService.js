@@ -126,14 +126,89 @@ const deleteAddress = async (addressId, token) => {
     }
 }
 
-export { 
-    updateProfile, 
-    getOrders, 
-    getWishlist, 
-    addProductToWishlist, 
-    removeFromWishlist, 
+const getMyPaymentMethods = async (token) => {
+    try {
+        const response = await api.get("/api/payment-methods", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    }
+    catch (error) {
+        throw error.response?.data;
+    }
+}
+
+const setDefaultPaymentMethod = async (paymentMethodId, token) => {
+    try {
+        const response = await api.put(`/api/payment-methods/${paymentMethodId}/default`, {}, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    }
+    catch (error) {
+        throw error.response?.data;
+    }
+}
+
+const togglePaymentMethodStatus = async (paymentMethodId, token) => {
+    try {
+        const response = await api.put(`/api/payment-methods/${paymentMethodId}/toggle-status`, {}, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    }
+    catch (error) {
+        throw error.response?.data;
+    }
+}
+
+const deletePaymentMethod = async (paymentMethodId, token) => {
+    try {
+        const response = await api.delete(`/api/payment-methods/${paymentMethodId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    }
+    catch (error) {
+        throw error.response?.data;
+    }
+}
+
+const addPaymentMethod = async (paymentMethodData, token) => {
+    try {
+        const response = await api.post("/api/payment-methods", paymentMethodData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    }
+    catch (error) {
+        throw error.response?.data;
+    }
+}
+
+export {
+    updateProfile,
+    getOrders,
+    getWishlist,
+    addProductToWishlist,
+    removeFromWishlist,
     getAddresses,
     addAddress,
     updateAddress,
-    deleteAddress
+    deleteAddress,
+    getMyPaymentMethods,
+    setDefaultPaymentMethod,
+    togglePaymentMethodStatus,
+    deletePaymentMethod,
+    addPaymentMethod
 }

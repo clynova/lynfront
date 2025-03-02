@@ -24,6 +24,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { MyOrders } from "./pages/Perfil/MyOrders";
 import { MyWishlist } from "./pages/Perfil/MyWishlist";
 import { MyAddresses } from "./pages/Perfil/MyAddresses";
+import { MyPaymentMethods } from "./pages/Perfil/MyPaymentMethods";
 
 const App = () => {
   return (
@@ -60,7 +61,7 @@ const App = () => {
                       <Route path="orders" element={<MyOrders />} />
                       <Route path="wishlist" element={<MyWishlist />} />
                       <Route path="addresses" element={<MyAddresses />} />
-                      <Route path="payment" element={<MyProfile />} />
+                      <Route path="payment" element={<MyPaymentMethods />} />
                       <Route path="settings" element={<MyProfile />} />
                     </Route>
                   </Route>
