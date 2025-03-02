@@ -23,6 +23,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { MyOrders } from "./pages/Perfil/MyOrders";
 import { MyWishlist } from "./pages/Perfil/MyWishlist";
+import { MyAddresses } from "./pages/Perfil/MyAddresses";
 
 const App = () => {
   return (
@@ -58,7 +59,7 @@ const App = () => {
                       <Route index element={<MyProfile />} />
                       <Route path="orders" element={<MyOrders />} />
                       <Route path="wishlist" element={<MyWishlist />} />
-                      <Route path="addresses" element={<MyProfile />} />
+                      <Route path="addresses" element={<MyAddresses />} />
                       <Route path="payment" element={<MyProfile />} />
                       <Route path="settings" element={<MyProfile />} />
                     </Route>

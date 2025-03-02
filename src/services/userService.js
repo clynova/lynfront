@@ -70,4 +70,70 @@ const removeFromWishlist = async (productId, token) => {
     }
 }
 
-export { updateProfile, getOrders, getWishlist, addProductToWishlist, removeFromWishlist }
+const getAddresses = async (token) => {
+    try {
+        const response = await api.get("/api/user/addresses", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    }
+    catch (error) {
+        throw error.response?.data;
+    }
+}
+
+const addAddress = async (addressData, token) => {
+    try {
+        const response = await api.post("/api/user/addresses", addressData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    }
+    catch (error) {
+        throw error.response?.data;
+    }
+}
+
+const updateAddress = async (addressId, addressData, token) => {
+    try {
+        const response = await api.put(`/api/user/addresses/${addressId}`, addressData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    }
+    catch (error) {
+        throw error.response?.data;
+    }
+}
+
+const deleteAddress = async (addressId, token) => {
+    try {
+        const response = await api.delete(`/api/user/addresses/${addressId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    }
+    catch (error) {
+        throw error.response?.data;
+    }
+}
+
+export { 
+    updateProfile, 
+    getOrders, 
+    getWishlist, 
+    addProductToWishlist, 
+    removeFromWishlist, 
+    getAddresses,
+    addAddress,
+    updateAddress,
+    deleteAddress
+}
