@@ -58,7 +58,7 @@ const addProductToWishlist = async (productId, token) => {
 
 const removeFromWishlist = async (productId, token) => {
     try {
-        const response = await api.delete(`/api/wishlist/${productId}`, {
+        const response = await api.delete(`/api/wishlist/remove/${productId}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
