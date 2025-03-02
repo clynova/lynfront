@@ -1,14 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { getOrders } from "../../services/userService";
 import { useAuth } from "../../context/AuthContext";
+import { Pagination } from "../../components/Pagination";
+import { OrderItem } from "../../components/Orders/OrderItem";
 
 const MyOrders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [ordersPerPage] = useState(5);
     const { token } = useAuth();
-    const [sortOrder, setSortOrder] = useState('desc'); // 'desc' o 'asc'
+    const [sortOrder, setSortOrder] = useState('desc');
     const [statusFilter, setStatusFilter] = useState('all');
 
     const statusOptions = {
@@ -21,25 +24,15 @@ const MyOrders = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
+                setError(null);
                 const response = await getOrders(token);
                 if (response.success) {
-                    let filteredOrders = response.orders;
-                    
-                    // Aplicar filtro por status
-                    if (statusFilter !== 'all') {
-                        filteredOrders = filteredOrders.filter(order => order.status === statusFilter);
-                    }
-
-                    // Ordenar por fecha
-                    const sortedOrders = filteredOrders.sort((a, b) => {
-                        return sortOrder === 'desc' 
-                            ? new Date(b.orderDate) - new Date(a.orderDate)
-                            : new Date(a.orderDate) - new Date(b.orderDate);
-                    });
-                    
-                    setOrders(sortedOrders);
+                    setOrders(response.orders);
+                } else {
+                    setError(response.message || 'Error al cargar los pedidos');
                 }
             } catch (error) {
+                setError(error.message || 'Error al cargar los pedidos');
                 console.error('Error al cargar órdenes:', error);
             } finally {
                 setLoading(false);
@@ -47,89 +40,59 @@ const MyOrders = () => {
         };
 
         fetchOrders();
-    }, [token, sortOrder, statusFilter]);
+    }, [token]);
 
-    const handleSortChange = (event) => {
-        setSortOrder(event.target.value);
-    };
-
-    const formatDate = (dateString) => {
+    const formatDate = useCallback((dateString) => {
         return new Date(dateString).toLocaleDateString('es-ES', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
         });
-    };
+    }, []);
 
-    const getStatusBadgeColor = (status) => {
+    const getStatusBadgeColor = useCallback((status) => {
         const statusColors = {
             pending: 'bg-yellow-100 text-yellow-800',
             completed: 'bg-green-100 text-green-800',
             canceled: 'bg-red-100 text-red-800'
         };
         return statusColors[status] || 'bg-gray-100 text-gray-800';
-    };
+    }, []);
 
-    // Obtener órdenes de la página actual
-    const indexOfLastOrder = currentPage * ordersPerPage;
-    const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-    const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
-    const totalPages = Math.ceil(orders.length / ordersPerPage);
+    const filteredAndSortedOrders = useMemo(() => {
+        let result = [...orders];
+        
+        if (statusFilter !== 'all') {
+            result = result.filter(order => order.status === statusFilter);
+        }
 
-    // Función para cambiar de página
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+        return result.sort((a, b) => {
+            return sortOrder === 'desc' 
+                ? new Date(b.orderDate) - new Date(a.orderDate)
+                : new Date(a.orderDate) - new Date(b.orderDate);
+        });
+    }, [orders, statusFilter, sortOrder]);
 
-    // Componente Paginador
-    const Pagination = () => {
-        return (
-            <div className="flex justify-center space-x-2 mt-6">
-                <button
-                    onClick={() => paginate(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className={`px-3 py-1 rounded-md ${
-                        currentPage === 1
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                    }`}
-                >
-                    Anterior
-                </button>
-                
-                <div className="flex space-x-2">
-                    {[...Array(totalPages)].map((_, index) => (
-                        <button
-                            key={index + 1}
-                            onClick={() => paginate(index + 1)}
-                            className={`px-3 py-1 rounded-md ${
-                                currentPage === index + 1
-                                ? 'bg-indigo-600 text-white'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                            }`}
-                        >
-                            {index + 1}
-                        </button>
-                    ))}
-                </div>
+    const currentOrders = useMemo(() => {
+        const indexOfLastOrder = currentPage * ordersPerPage;
+        const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+        return filteredAndSortedOrders.slice(indexOfFirstOrder, indexOfLastOrder);
+    }, [currentPage, ordersPerPage, filteredAndSortedOrders]);
 
-                <button
-                    onClick={() => paginate(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className={`px-3 py-1 rounded-md ${
-                        currentPage === totalPages
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                    }`}
-                >
-                    Siguiente
-                </button>
-            </div>
-        );
-    };
+    const totalPages = Math.ceil(filteredAndSortedOrders.length / ordersPerPage);
 
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[200px]">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                <p className="text-red-600 dark:text-red-400">{error}</p>
             </div>
         );
     }
@@ -158,7 +121,7 @@ const MyOrders = () => {
                         <label className="text-sm text-gray-600 dark:text-gray-300">Ordenar por fecha:</label>
                         <select
                             value={sortOrder}
-                            onChange={handleSortChange}
+                            onChange={(e) => setSortOrder(e.target.value)}
                             className="border border-gray-300 rounded-md px-3 py-1 text-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
                         >
                             <option value="desc">Más recientes primero</option>
@@ -168,55 +131,28 @@ const MyOrders = () => {
                 </div>
             </div>
 
-            {orders.length === 0 ? (
+            {filteredAndSortedOrders.length === 0 ? (
                 <p className="text-gray-500 dark:text-gray-400">No tienes pedidos realizados.</p>
             ) : (
                 <div className="space-y-4">
                     {currentOrders.map((order) => (
-                        <div key={order._id} className="border dark:border-gray-700 rounded-lg p-4">
-                            <div className="flex justify-between items-start mb-4">
-                                <div>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        Pedido #{order._id.slice(-8)}
-                                    </p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        {formatDate(order.orderDate)}
-                                    </p>
-                                </div>
-                                <span className={`px-3 py-1 rounded-full text-sm ${getStatusBadgeColor(order.status)}`}>
-                                    {order.status}
-                                </span>
-                            </div>
-
-                            <div className="space-y-3">
-                                {order.products.map((item, index) => (
-                                    <div key={index} className="flex justify-between items-center">
-                                        <div>
-                                            <p className="font-medium text-gray-900 dark:text-white">
-                                                {item.productId.name}
-                                            </p>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                Cantidad: {item.quantity}
-                                            </p>
-                                        </div>
-                                        <p className="font-medium text-gray-900 dark:text-white">
-                                            ${item.price * item.quantity}
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="mt-4 pt-4 border-t dark:border-gray-700">
-                                <div className="flex justify-between items-center">
-                                    <p className="font-medium text-gray-900 dark:text-white">Total</p>
-                                    <p className="font-bold text-gray-900 dark:text-white">${order.total}</p>
-                                </div>
-                            </div>
-                        </div>
+                        <OrderItem
+                            key={order._id}
+                            order={order}
+                            formatDate={formatDate}
+                            getStatusBadgeColor={getStatusBadgeColor}
+                        />
                     ))}
                 </div>
             )}
-            <Pagination />
+            
+            {filteredAndSortedOrders.length > ordersPerPage && (
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
+            )}
         </div>
     );
 };
