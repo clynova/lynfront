@@ -7,6 +7,7 @@ const formateoNombre = (firstName, lastName) => {
     const nombreCompleto = `${firstName} ${lastName}`
     return nombreCompleto
 }
+
 const getImageUrl = (imagePath) => {
     if (!imagePath) return '/images/placeholder.png';
     
@@ -19,6 +20,13 @@ const getImageUrl = (imagePath) => {
     return imagePath;
 };
 
+const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('es-AR', {
+        style: 'currency',
+        currency: 'ARS',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(amount);
+};
 
-
-export { cortarTexto, formateoNombre, getImageUrl }
+export { cortarTexto, formateoNombre, getImageUrl, formatCurrency }
