@@ -103,6 +103,21 @@ const Login = () => {
     }
   };
 
+  // Nueva función para manejar el inicio de sesión social
+  const handleSocialLogin = async (provider) => {
+    setIsLoading(true);
+    try {
+      // Aquí iría la lógica de autenticación social
+      // Por ahora solo mostramos un mensaje informativo
+      toast.error(`Inicio de sesión con ${provider} no está implementado aún`);
+    } catch (error) {
+      console.error(`Error al iniciar sesión con ${provider}:`, error);
+      toast.error(`Error al iniciar sesión con ${provider}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     setPageTitle('Ingresar | LynFront');
   }, [setPageTitle]);
@@ -117,6 +132,7 @@ const Login = () => {
         errors={errors}
         touched={touched}
         isLoading={isLoading}
+        onSocialLogin={handleSocialLogin}
       />
       <AuthIllustration illustration={illustration} />
     </>

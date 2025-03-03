@@ -2,7 +2,8 @@ import PropTypes from 'prop-types';
 import { FcGoogle } from 'react-icons/fc';
 import { FaGithub } from 'react-icons/fa';
 
-const SocialAuth = ({ onSocialLogin, isLoading }) => {
+// Usar parámetro por defecto de JavaScript para isLoading
+const SocialAuth = ({ onSocialLogin, isLoading = false }) => {
     const providers = [
         {
             id: 'google',
@@ -54,10 +55,6 @@ const SocialAuth = ({ onSocialLogin, isLoading }) => {
 SocialAuth.propTypes = {
     onSocialLogin: PropTypes.func.isRequired,
     isLoading: PropTypes.bool,
-};
-
-SocialAuth.defaultProps = {
-    isLoading: false,
 };
 
 export default SocialAuth;

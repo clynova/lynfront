@@ -147,6 +147,8 @@ const Register = () => {
 
     const handleSocialLogin = (provider) => {
         console.log(`Iniciando sesión con ${provider}`);
+        // Por ahora solo mostramos un mensaje informativo
+        toast.error(`Inicio de sesión con ${provider} no está implementado aún`);
     };
 
     return (
@@ -154,7 +156,7 @@ const Register = () => {
             <AuthIllustration illustration={illustration} />
             <RegisterForm
                 onSubmit={handleRegister}
-                handleSocialLogin={handleSocialLogin}
+                onSocialLogin={handleSocialLogin}
                 formData={formData}
                 onChange={handleChange}
                 onBlur={handleBlur}

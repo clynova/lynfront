@@ -27,7 +27,7 @@ const UserDropdown = () => {
   const menuItems = [
     { icon: <HiUser className="w-5 h-5" />, label: 'Mi Perfil', to: '/profile' },
     { icon: <HiShoppingCart className="w-5 h-5" />, label: 'Carrito', onClick: () => setIsCartOpen(true) },
-    { icon: <HiShoppingBag className="w-5 h-5" />, label: 'Mis Compras', to: '/orders' },
+    { icon: <HiShoppingBag className="w-5 h-5" />, label: 'Mis Compras', to: '/profile/orders' },
     { icon: <HiCog className="w-5 h-5" />, label: 'Configuración', to: '/profile/settings' },
     { icon: <HiLogout className="w-5 h-5" />, label: 'Cerrar Sesión', onClick: handleLogout },
   ];
