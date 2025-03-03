@@ -30,6 +30,7 @@ import { FormaEnvio } from "./pages/payment/FormaEnvio";
 import { CarroDeCompras } from "./pages/payment/CarroDeCompras";
 import { SistemaDePago } from "./pages/payment/SistemaDePago";
 import { CheckoutLayout } from "./layouts/MainLayout/CheckoutLayout";
+import { Confirmation } from './pages/payment/Confirmation';
 
 const App = () => {
   return (
@@ -77,8 +78,9 @@ const App = () => {
                   }>
                     <Route element={<CheckoutLayout />}>
                       <Route index element={<CarroDeCompras />} />
-                      <Route path="eanvio" element={<FormaEnvio />} />
+                      <Route path="envio" element={<FormaEnvio />} />
                       <Route path="pago" element={<SistemaDePago />} />
+                      <Route path="confirmation" element={<Confirmation />} />
                     </Route>
                   </Route>
                   <Route path="/about" element={<div>About</div>} />

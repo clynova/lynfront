@@ -310,4 +310,4 @@ const MyAddresses = () => {
     );
 };
 
-export { MyAddresses };
+export { MyAddresses, AddressForm };
