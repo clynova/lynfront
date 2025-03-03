@@ -26,6 +26,10 @@ import { MyWishlist } from "./pages/Perfil/MyWishlist";
 import { MyAddresses } from "./pages/Perfil/MyAddresses";
 import { MyPaymentMethods } from "./pages/Perfil/MyPaymentMethods";
 import { MyConfiguration } from "./pages/Perfil/MyConfiguration";
+import { FormaEnvio } from "./pages/payment/FormaEnvio";
+import { CarroDeCompras } from "./pages/payment/CarroDeCompras";
+import { SistemaDePago } from "./pages/payment/SistemaDePago";
+import { CheckoutLayout } from "./layouts/MainLayout/CheckoutLayout";
 
 const App = () => {
   return (
@@ -64,6 +68,17 @@ const App = () => {
                       <Route path="addresses" element={<MyAddresses />} />
                       <Route path="payment" element={<MyPaymentMethods />} />
                       <Route path="settings" element={<MyConfiguration />} />
+                    </Route>
+                  </Route>
+                  <Route path="/checkout" element={
+                    <ProtectedRoute>
+                      <MainLayout />
+                    </ProtectedRoute>
+                  }>
+                    <Route element={<CheckoutLayout />}>
+                      <Route index element={<CarroDeCompras />} />
+                      <Route path="eanvio" element={<FormaEnvio />} />
+                      <Route path="pago" element={<SistemaDePago />} />
                     </Route>
                   </Route>
                   <Route path="/about" element={<div>About</div>} />
