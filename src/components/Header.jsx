@@ -7,6 +7,47 @@ import { useAuth } from "../context/AuthContext";
 import { CartDrawer } from "./Cart/CartDrawer";
 import UserDropdown from './Nav/UserDropdown';
 
+// Componente Navigation extraído para mejor organización
+const Navigation = ({ links, onMobileClick = null }) => {
+  return (
+    <>
+      {links.map((link) => (
+        <Link
+          key={link.name}
+          to={link.href}
+          className="text-slate-300 hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors duration-200 relative group"
+          onClick={onMobileClick}
+        >
+          {link.name}
+          <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
+        </Link>
+      ))}
+    </>
+  );
+};
+
+// Componente AuthButtons extraído
+const AuthButtons = ({ onMobileClick = null }) => (
+  <>
+    <Link
+      to="/auth"
+      className="text-slate-300 hover:text-white px-4 py-2 text-sm font-medium transition-colors duration-200"
+      onClick={onMobileClick}
+    >
+      Ingresar
+    </Link>
+    <Link
+      to="/auth/signup"
+      className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600
+      text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+      transform hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/25"
+      onClick={onMobileClick}
+    >
+      Registrarse
+    </Link>
+  </>
+);
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
@@ -20,45 +61,20 @@ const Header = () => {
     { name: "Neumáticos", href: "/categoria/neumaticos" },
   ];
 
-  const renderAuthButtons = () => (
-    <>
-      <Link
-        to="/auth"
-        className="text-slate-300 hover:text-white px-4 py-2 text-sm font-medium transition-colors duration-200"
-      >
-        Ingresar
-      </Link>
-      <Link
-        to="/auth/signup"
-        className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600
-        text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
-        transform hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/25"
-      >
-        Registrarse
-      </Link>
-    </>
-  );
-
+  // Componente para el menú móvil
   const renderMobileMenu = () => (
     <div
       className={`${isMenuOpen ? "translate-x-0" : "-translate-x-full"} 
       md:hidden fixed top-16 left-0 right-0 bottom-0 
-      bg-slate-900 backdrop-blur-lg transition-transform duration-300 ease-in-out`}
+      bg-slate-900 backdrop-blur-lg transition-transform duration-300 ease-in-out z-40`}
     >
       <div className="flex flex-col p-4 space-y-4 bg-slate-900">
         <div className="mb-2">
           <SearchBar isExpanded={true} onToggle={() => { }} />
         </div>
-        {navLinks.map((link) => (
-          <Link
-            key={link.name}
-            to={link.href}
-            className="text-slate-300 hover:text-blue-400 px-4 py-2 text-lg font-medium transition-colors duration-200"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            {link.name}
-          </Link>
-        ))}
+        <div className="flex flex-col space-y-4">
+          <Navigation links={navLinks} onMobileClick={() => setIsMenuOpen(false)} />
+        </div>
         <div className="border-t border-slate-800 pt-4">
           {user ? (
             <>
@@ -81,22 +97,8 @@ const Header = () => {
               </button>
             </>
           ) : (
-            <div className="space-y-3">
-              <Link
-                to="/auth"
-                className="block w-full text-center text-slate-300 hover:text-white px-4 py-2 text-lg font-medium transition-colors duration-200"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Ingresar
-              </Link>
-              <Link
-                to="/auth/signup"
-                className="block w-full text-center bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600
-                text-white px-4 py-2 rounded-lg text-lg font-medium transition-all duration-200"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Registrarse
-              </Link>
+            <div className="space-y-3 flex flex-col">
+              <AuthButtons onMobileClick={() => setIsMenuOpen(false)} />
             </div>
           )}
         </div>
@@ -123,16 +125,7 @@ const Header = () => {
             <div className="hidden md:flex w-2/4 justify-center">
               {!isSearchExpanded ? (
                 <div className="flex space-x-8">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.name}
-                      to={link.href}
-                      className="text-slate-300 hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors duration-200 relative group"
-                    >
-                      {link.name}
-                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
-                    </Link>
-                  ))}
+                  <Navigation links={navLinks} />
                 </div>
               ) : (
                 <div className="w-full max-w-xl px-4">
@@ -153,12 +146,14 @@ const Header = () => {
                     <button
                       onClick={() => setIsSearchExpanded(true)}
                       className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800/50 transition-colors duration-200"
+                      aria-label="Buscar productos"
                     >
                       <HiSearch className="h-5 w-5" />
                     </button>
                     <button
                       onClick={() => setIsCartOpen(true)}
                       className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800/50 transition-colors duration-200 relative"
+                      aria-label="Ver carrito de compras"
                     >
                       <HiShoppingCart className="h-5 w-5" />
                       {cartCount > 0 && (
@@ -179,7 +174,7 @@ const Header = () => {
                   <UserDropdown />
                 ) : (
                   <div className="hidden md:flex items-center space-x-4">
-                    {renderAuthButtons()}
+                    <AuthButtons />
                   </div>
                 )}
               </div>
@@ -189,6 +184,7 @@ const Header = () => {
                 <button
                   onClick={() => setIsCartOpen(true)}
                   className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800/50 transition-colors duration-200 relative"
+                  aria-label="Ver carrito de compras"
                 >
                   <HiShoppingCart className="h-5 w-5" />
                   {cartCount > 0 && (
@@ -200,6 +196,7 @@ const Header = () => {
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                   className="text-slate-300 hover:text-white p-2"
+                  aria-label="Abrir menú"
                 >
                   {isMenuOpen ? <HiX className="h-6 w-6" /> : <HiMenuAlt3 className="h-6 w-6" />}
                 </button>
