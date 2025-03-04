@@ -2,9 +2,10 @@ import { createContext, useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import api from '../services/api';
 import { logout as logoutService } from '../services/authService';
-import { syncCart, getCart } from '../services/paymentService';
+import { syncCart, getCart, replaceLocalCartWithServer } from '../services/paymentService';
 import { getProductById } from '../services/productService';
 import LoadingOverlay from '../components/Loading/LoadingOverlay';
+import { toast } from 'react-hot-toast';
 
 export const AuthContext = createContext();
 
@@ -61,15 +62,32 @@ export const AuthProvider = ({ children }) => {
       const localCart = JSON.parse(localStorage.getItem('cart')) || [];
       
       try {
+        let serverCartResponse;
+        
+        // Sincronización del carrito
         if (localCart.length > 0) {
-          // Si hay productos en el carrito local, sincronizarlos con el servidor
+          // Si hay productos en el carrito local, primero verificamos si el usuario tiene un carrito en el servidor
+          try {
+            serverCartResponse = await getCart(token);
+            
+            if (serverCartResponse?.cart?.products && serverCartResponse.cart.products.length > 0) {
+              // Si hay productos tanto en el carrito local como en el servidor,
+              // preferimos el carrito local (asumiendo que son cambios más recientes)
+              // pero notificamos al usuario
+              toast.success('Se han sincronizado los productos de tu carrito');
+            }
+          } catch (error) {
+            // Si hay un error al obtener el carrito del servidor, continuamos con el carrito local
+            console.error('Error al obtener el carrito del servidor:', error);
+          }
+          
+          // En cualquier caso, sincronizamos el carrito local con el servidor
           await syncCart(localCart, token);
         } else {
-          // Si el carrito local está vacío, cargar el carrito del servidor
-          const serverCartResponse = await getCart(token);
-          if (serverCartResponse && serverCartResponse.cart && serverCartResponse.cart.products && 
-              serverCartResponse.cart.products.length > 0) {
-              
+          // Si el carrito local está vacío, cargamos el carrito del servidor
+          serverCartResponse = await getCart(token);
+          
+          if (serverCartResponse?.cart?.products && serverCartResponse.cart.products.length > 0) {
             // Obtener detalles completos de cada producto
             const cartItemsWithDetails = [];
             for (const item of serverCartResponse.cart.products) {
@@ -106,6 +124,7 @@ export const AuthProvider = ({ children }) => {
             // Guardar en localStorage solo si tenemos productos válidos
             if (cartItemsWithDetails.length > 0) {
               localStorage.setItem('cart', JSON.stringify(cartItemsWithDetails));
+              toast.success('Se ha recuperado tu carrito de compras');
             }
           }
         }

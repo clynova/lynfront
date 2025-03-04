@@ -63,18 +63,24 @@ const clearCart = async (token) => {
 };
 
 // Sync local cart with server cart (used when user logs in)
-const syncCart = async (cartItems, token) => {
-  if (!token || !cartItems || cartItems.length === 0) return null;
+const syncCart = async (cartItems, token, preferServerCart = false) => {
+  if (!token) return null;
   
   try {
+    // Si preferimos el carrito del servidor y no hay items locales, simplemente devolvemos el carrito del servidor
+    if (preferServerCart && (!cartItems || cartItems.length === 0)) {
+      return await getCart(token);
+    }
+    
+    // Si preferimos el carrito local o tenemos items locales a sincronizar
     let serverCart;
     
     try {
-      // First get the server cart to compare
+      // Obtener el carrito del servidor
       serverCart = await getCart(token);
     } catch (error) {
-      // If we can't get the server cart but it's because it's empty,
-      // initialize an empty structure and continue
+      // Si no se puede obtener el carrito del servidor porque está vacío,
+      // inicializamos una estructura vacía y continuamos
       if (error.msg?.toLowerCase().includes('vacío')) {
         serverCart = { success: true, cart: { products: [] } };
       } else {
@@ -82,40 +88,52 @@ const syncCart = async (cartItems, token) => {
       }
     }
     
-    // Now safely access the server cart products
-    const serverProducts = serverCart?.cart?.products || [];
-    
-    // Process each local cart item
-    for (const item of cartItems) {
-      // Check if the item already exists in the server cart
-      const existingItem = serverProducts.find(
-        p => p.productId === item._id
-      );
-      
-      if (!existingItem) {
-        // Add new item
-        await addToCart({
-          productId: item._id,
-          quantity: item.quantity
-        }, token);
-      } else if (existingItem.quantity !== item.quantity) {
-        // Update quantity if different
-        // First remove, then add with new quantity
-        await removeFromCart(item._id, token);
-        await addToCart({
-          productId: item._id,
-          quantity: item.quantity
-        }, token);
+    // Verificar si debemos preferir el carrito del servidor o el local
+    if (preferServerCart) {
+      // Si preferimos el carrito del servidor y este ya tiene productos, lo devolvemos directamente
+      if (serverCart?.cart?.products && serverCart.cart.products.length > 0) {
+        return serverCart;
       }
     }
     
-    // Return the updated cart
+    // Si llegamos aquí, sincronizamos el carrito local con el servidor
+    
+    // Primero, limpiamos el carrito del servidor
+    await clearCart(token);
+    
+    // Luego añadimos cada item del carrito local al servidor
+    if (cartItems && cartItems.length > 0) {
+      for (const item of cartItems) {
+        if (item._id) {
+          try {
+            await addToCart({
+              productId: item._id,
+              quantity: item.quantity || 1
+            }, token);
+          } catch (error) {
+            console.error(`Error al añadir producto ${item._id} al carrito:`, error);
+          }
+        }
+      }
+    }
+    
+    // Devolvemos el carrito actualizado
     return await getCart(token);
   } catch (error) {
     console.error("Error syncing cart:", error);
-    // Don't throw the error, just log it and return null
-    // This prevents the login flow from being disrupted
+    // No lanzamos el error, solo lo registramos y devolvemos null
+    // Esto previene que el flujo de inicio de sesión se interrumpa
     return null;
+  }
+};
+
+// Función para reemplazar completamente el carrito local con el del servidor
+const replaceLocalCartWithServer = async (token) => {
+  try {
+    return await getCart(token);
+  } catch (error) {
+    console.error("Error fetching server cart:", error);
+    return { success: false, cart: { products: [] } };
   }
 };
 
@@ -124,7 +142,8 @@ export {
   addToCart,
   removeFromCart,
   clearCart,
-  syncCart
+  syncCart,
+  replaceLocalCartWithServer
 };
 
 /*

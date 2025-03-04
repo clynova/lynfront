@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import { useAuth } from './AuthContext';
 import { addToCart as addToCartAPI, removeFromCart as removeFromCartAPI, 
          getCart, syncCart, clearCart as clearCartAPI } from '../services/paymentService';
+import { getProductById } from '../services/productService';
 
 export const CartContext = createContext();
 
@@ -38,29 +39,83 @@ export const CartProvider = ({ children }) => {
           // First check local storage cart
           const localCart = JSON.parse(localStorage.getItem('cart')) || [];
           
+          // No mezclamos automáticamente, sino que seguimos esta lógica:
           if (localCart.length > 0) {
-            // If we have local items, sync them with the server
+            // Si hay productos en el carrito local, asumimos que el usuario quiere mantenerlos
+            // Sincronizamos este carrito con el servidor
             await syncCart(localCart, token);
-          }
-          
-          // Get updated cart from server
-          const response = await getCart(token);
-          
-          if (response && response.cart && response.cart.products) {
-            // Convert API cart format to our app format
-            const serverCartItems = response.cart.products.map(item => ({
-              _id: item.productId,
-              quantity: item.quantity,
-              // We need additional product details that might not be in the API response
-              // For now, merge with any matching local items to preserve details
-              ...localCart.find(localItem => localItem._id === item.productId) || {}
-            }));
+          } else {
+            // Si el carrito local está vacío, intentamos cargar desde el servidor
+            const serverCartResponse = await getCart(token);
             
-            setCartItems(serverCartItems);
+            if (serverCartResponse?.cart?.products && serverCartResponse.cart.products.length > 0) {
+              // Cargar los detalles completos de cada producto
+              const serverCartItems = [];
+              
+              for (const item of serverCartResponse.cart.products) {
+                try {
+                  // Obtener detalles del producto
+                  const productDetails = await getProductById(item.productId);
+                  
+                  if (productDetails && productDetails.product) {
+                    const product = productDetails.product;
+                    
+                    // Asegurar que el producto tiene todos los datos necesarios
+                    if (!product.name || !product.images || product.price === undefined) {
+                      console.warn(`Producto ${item.productId} con datos incompletos:`, product);
+                      // Intentamos una estrategia de recuperación: eliminar el producto defectuoso del carrito
+                      try {
+                        await removeFromCartAPI(item.productId, token);
+                        console.log(`Producto defectuoso ${item.productId} eliminado del carrito`);
+                      } catch (removeError) {
+                        console.error(`Error al eliminar producto defectuoso ${item.productId}:`, removeError);
+                      }
+                      continue; // Saltamos este producto
+                    }
+                    
+                    // Crear un objeto de carrito completo con todas las propiedades necesarias
+                    serverCartItems.push({
+                      _id: item.productId,
+                      name: product.name,
+                      price: product.price,
+                      images: Array.isArray(product.images) ? product.images : ['placeholder.png'],
+                      quantity: item.quantity,
+                      stock: product.stock || 1,
+                      // Otras propiedades del producto
+                      ...product
+                    });
+                  }
+                } catch (error) {
+                  console.error(`Error al obtener detalles del producto ${item.productId}:`, error);
+                  // Intentamos eliminar el producto problemático
+                  try {
+                    await removeFromCartAPI(item.productId, token);
+                    console.log(`Producto problemático ${item.productId} eliminado del carrito`);
+                  } catch (removeError) {
+                    console.error(`Error al eliminar producto problemático ${item.productId}:`, removeError);
+                  }
+                }
+              }
+              
+              if (serverCartItems.length > 0) {
+                setCartItems(serverCartItems);
+                localStorage.setItem('cart', JSON.stringify(serverCartItems));
+                if (serverCartItems.length < serverCartResponse.cart.products.length) {
+                  toast.success('Se ha limpiado tu carrito de productos no disponibles');
+                } else {
+                  toast.success('Se ha cargado tu carrito guardado');
+                }
+              } else if (serverCartResponse.cart.products.length > 0) {
+                // Si no pudimos cargar ningún producto pero había productos en el carrito
+                // Limpiamos el carrito del servidor ya que los productos son inválidos
+                await clearCartAPI(token);
+                toast.error('Hubo un problema con los productos en tu carrito y ha sido limpiado');
+              }
+            }
           }
         } catch (error) {
-          toast.error('Error al cargar tu carrito');
           console.error('Error fetching cart:', error);
+          toast.error('Error al cargar tu carrito');
         } finally {
           setIsLoading(false);
         }
