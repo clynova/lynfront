@@ -2,6 +2,8 @@ import { createContext, useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import api from '../services/api';
 import { logout as logoutService } from '../services/authService';
+import { syncCart, getCart } from '../services/paymentService';
+import { getProductById } from '../services/productService';
 import LoadingOverlay from '../components/Loading/LoadingOverlay';
 
 export const AuthContext = createContext();
@@ -54,6 +56,62 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('user', JSON.stringify(user));
       setToken(token);
       setUser(user);
+      
+      // Get local cart
+      const localCart = JSON.parse(localStorage.getItem('cart')) || [];
+      
+      try {
+        if (localCart.length > 0) {
+          // Si hay productos en el carrito local, sincronizarlos con el servidor
+          await syncCart(localCart, token);
+        } else {
+          // Si el carrito local está vacío, cargar el carrito del servidor
+          const serverCartResponse = await getCart(token);
+          if (serverCartResponse && serverCartResponse.cart && serverCartResponse.cart.products && 
+              serverCartResponse.cart.products.length > 0) {
+              
+            // Obtener detalles completos de cada producto
+            const cartItemsWithDetails = [];
+            for (const item of serverCartResponse.cart.products) {
+              try {
+                // Obtener detalles del producto
+                const productDetails = await getProductById(item.productId);
+                
+                if (productDetails && productDetails.product) {
+                  // Asegurar que tenemos todas las propiedades requeridas
+                  const product = productDetails.product;
+                  
+                  // Verificar que los datos esenciales estén presentes
+                  if (!product.name || !product.images || !product.price) {
+                    console.warn(`Producto ${item.productId} con datos incompletos:`, product);
+                    continue; // Saltamos este producto si falta alguna propiedad esencial
+                  }
+                  
+                  cartItemsWithDetails.push({
+                    _id: item.productId,
+                    name: product.name,
+                    price: product.price,
+                    images: product.images || ['placeholder.png'], // Usar imagen placeholder si no hay imágenes
+                    quantity: item.quantity,
+                    stock: product.stock || 0,
+                    // Añadir cualquier otra propiedad necesaria
+                    ...product
+                  });
+                }
+              } catch (error) {
+                console.error(`Error al obtener detalles del producto ${item.productId}:`, error);
+              }
+            }
+            
+            // Guardar en localStorage solo si tenemos productos válidos
+            if (cartItemsWithDetails.length > 0) {
+              localStorage.setItem('cart', JSON.stringify(cartItemsWithDetails));
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error sincronizando el carrito después del login:', error);
+      }
     } catch (error) {
       console.error('Error durante el login:', error);
       throw error;
@@ -97,7 +155,6 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
 
 AuthProvider.propTypes = {
   children: PropTypes.node.isRequired

@@ -3,11 +3,24 @@ import { useCart } from '../../context/CartContext';
 import { CartItem } from './CartItem';
 import { Link } from 'react-router-dom';
 
+// Función auxiliar para validar que un item del carrito tiene todas las propiedades requeridas
+const isValidCartItem = (item) => {
+  return item && 
+         item._id !== undefined && 
+         item.name !== undefined && 
+         item.price !== undefined && 
+         item.quantity !== undefined &&
+         Array.isArray(item.images);
+};
+
 const CartDrawer = () => {
   const { cartItems, cartTotal, isCartOpen, setIsCartOpen } = useCart();
-
+  
+  // Filtrar los elementos del carrito que tienen todas las propiedades requeridas
+  const validCartItems = cartItems.filter(isValidCartItem);
+  
   if (!isCartOpen) return null;
-
+  
   return (
     <>
       {/* Overlay */}
@@ -32,15 +45,15 @@ const CartDrawer = () => {
 
           {/* Cart Items */}
           <div className="flex-1 overflow-y-auto p-4">
-            {cartItems.length === 0 ? (
+            {validCartItems.length === 0 ? (
               <p className="text-slate-400 text-center">Tu carrito está vacío</p>
             ) : (
-              cartItems.map(item => <CartItem key={item._id} item={item} />)
+              validCartItems.map(item => <CartItem key={item._id} item={item} />)
             )}
           </div>
 
           {/* Footer */}
-          {cartItems.length > 0 && (
+          {validCartItems.length > 0 && (
             <div className="border-t border-slate-800 p-4">
               <div className="flex justify-between mb-4">
                 <span className="text-slate-200">Total:</span>

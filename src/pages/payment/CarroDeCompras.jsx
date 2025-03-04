@@ -17,6 +17,16 @@ const CarroDeCompras = () => {
         navigate('/checkout/envio');
     };
 
+    // Función auxiliar para asegurar que el stock es un número válido y positivo
+    const getValidStock = (stock) => {
+        // Si stock es undefined, null o NaN, devolvemos 1 como valor por defecto
+        if (stock === undefined || stock === null || isNaN(stock) || stock < 1) {
+            return 1;
+        }
+        // Aseguramos que el valor es un entero
+        return Math.floor(stock);
+    };
+
     return (
         <div className="bg-white p-6 rounded-lg shadow">
             <h1 className="text-2xl font-bold mb-6">Tu Carrito de Compras</h1>
@@ -43,7 +53,7 @@ const CarroDeCompras = () => {
                                         <h3 className="font-medium">{item.name}</h3>
                                         <p className="text-gray-600">${item.price}</p>
                                         <p className="text-sm text-gray-500">
-                                            Stock disponible: {item.stock}
+                                            Stock disponible: {getValidStock(item.stock)}
                                         </p>
                                     </div>
                                 </div>
@@ -53,7 +63,8 @@ const CarroDeCompras = () => {
                                         onChange={(e) => updateQuantity(item._id, parseInt(e.target.value))}
                                         className="border rounded p-1"
                                     >
-                                        {[...Array(Math.min(10, item.stock))].map((_, i) => (
+                                        {/* Uso de la función auxiliar para asegurar un stock válido */}
+                                        {Array.from({ length: Math.min(10, getValidStock(item.stock)) }, (_, i) => (
                                             <option key={i + 1} value={i + 1}>
                                                 {i + 1}
                                             </option>
