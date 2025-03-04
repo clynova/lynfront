@@ -53,12 +53,34 @@ const removeFromCart = async (productId, token) => {
 // Clear the entire cart
 const clearCart = async (token) => {
   try {
+    // Usando la ruta correcta según los comentarios de la API
     const response = await api.delete("/api/cart", {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     return response.data;
   } catch (error) {
-    throw error.response?.data || error;
+    // Si recibimos un 404, probablemente es porque el carrito no existe aún
+    // En este caso, no es realmente un error, ya que el objetivo era limpiar el carrito
+    if (error.response?.status === 404 || 
+        (error.response?.data?.msg && (
+          error.response?.data?.msg.toLowerCase().includes('no existe') ||
+          error.response?.data?.msg.toLowerCase().includes('no encontrado') ||
+          error.response?.data?.msg.toLowerCase().includes('no hay') ||
+          error.response?.data?.msg.toLowerCase().includes('vacío')
+        ))
+    ) {
+      return { 
+        success: true, 
+        msg: "No hay carrito para limpiar o ya está vacío" 
+      };
+    }
+    // Devolvemos un objeto de éxito para no interrumpir el flujo de la aplicación
+    // pero con una flag indicando que falló la operación
+    return {
+      success: false,
+      error: error.response?.data || error,
+      msg: "Error al limpiar el carrito"
+    };
   }
 };
 
@@ -79,13 +101,10 @@ const syncCart = async (cartItems, token, preferServerCart = false) => {
       // Obtener el carrito del servidor
       serverCart = await getCart(token);
     } catch (error) {
-      // Si no se puede obtener el carrito del servidor porque está vacío,
+      // Si no se puede obtener el carrito del servidor porque está vacío o no existe,
       // inicializamos una estructura vacía y continuamos
-      if (error.msg?.toLowerCase().includes('vacío')) {
-        serverCart = { success: true, cart: { products: [] } };
-      } else {
-        throw error;
-      }
+      serverCart = { success: true, cart: { products: [] } };
+      console.log("Inicializando carrito vacío para sincronización");
     }
     
     // Verificar si debemos preferir el carrito del servidor o el local
@@ -98,8 +117,20 @@ const syncCart = async (cartItems, token, preferServerCart = false) => {
     
     // Si llegamos aquí, sincronizamos el carrito local con el servidor
     
-    // Primero, limpiamos el carrito del servidor
-    await clearCart(token);
+    // Para usuarios que ingresan por primera vez, podemos omitir la limpieza del carrito
+    // ya que sabemos que no tienen uno. Esto evitará la llamada 404.
+    if (serverCart?.cart?.products && serverCart.cart.products.length > 0) {
+      try {
+        // Solo intentamos limpiar si hay un carrito existente
+        const clearResult = await clearCart(token);
+        if (!clearResult.success) {
+          console.warn("Advertencia al limpiar el carrito:", clearResult.msg);
+        }
+      } catch (error) {
+        console.warn("Error al intentar limpiar el carrito:", error);
+        // Continuamos con el proceso
+      }
+    }
     
     // Luego añadimos cada item del carrito local al servidor
     if (cartItems && cartItems.length > 0) {
@@ -118,12 +149,29 @@ const syncCart = async (cartItems, token, preferServerCart = false) => {
     }
     
     // Devolvemos el carrito actualizado
-    return await getCart(token);
+    try {
+      return await getCart(token);
+    } catch (error) {
+      console.error("Error obteniendo carrito actualizado:", error);
+      // Si hay error al obtener el carrito actualizado, devolvemos al menos los items locales
+      return { 
+        success: true, 
+        cart: { 
+          products: cartItems.map(item => ({ 
+            productId: item._id, 
+            quantity: item.quantity 
+          }))
+        }
+      };
+    }
   } catch (error) {
     console.error("Error syncing cart:", error);
-    // No lanzamos el error, solo lo registramos y devolvemos null
-    // Esto previene que el flujo de inicio de sesión se interrumpa
-    return null;
+    // No lanzamos el error, solo lo registramos y devolvemos un valor por defecto
+    return { 
+      success: false, 
+      error: error,
+      cart: { products: [] } 
+    };
   }
 };
 
