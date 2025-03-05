@@ -2,9 +2,25 @@ import { HiMinus, HiPlus, HiX } from 'react-icons/hi';
 import { useCart } from '../../context/CartContext';
 import PropTypes from 'prop-types';
 import { getImageUrl } from '../../utils/funcionesReutilizables';
+import { useState } from 'react';
+import { toast } from 'react-hot-toast';
 
 const CartItem = ({ item }) => {
   const { updateQuantity, removeFromCart } = useCart();
+  const [isRemoving, setIsRemoving] = useState(false);
+
+  const handleRemove = async () => {
+    try {
+      setIsRemoving(true);
+      await removeFromCart(item._id);
+      // No necesitamos toast aquí ya que removeFromCart ya lo maneja internamente
+    } catch (error) {
+      toast.error('Error al eliminar el producto');
+      console.error('Error al eliminar el producto:', error);
+    } finally {
+      setIsRemoving(false);
+    }
+  };
 
   return (
     <div className="flex items-center py-4 border-b border-slate-700">
@@ -33,8 +49,9 @@ const CartItem = ({ item }) => {
         </div>
       </div>
       <button
-        onClick={() => removeFromCart(item._id)}
-        className="p-2 text-slate-400 hover:text-red-400"
+        onClick={handleRemove}
+        disabled={isRemoving}
+        className="p-2 text-slate-400 hover:text-red-400 disabled:opacity-50"
       >
         <HiX className="h-5 w-5" />
       </button>
