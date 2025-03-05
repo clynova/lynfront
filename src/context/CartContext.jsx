@@ -129,11 +129,28 @@ export const CartProvider = ({ children }) => {
         } finally {
           setIsLoading(false);
         }
+      } else if (!isAuthenticated) {
+        // Si el usuario no está autenticado, asegurarse de cargar el carrito desde localStorage
+        // pero solo si no tenemos ya items en el carrito (para evitar resetear durante la carga inicial)
+        const savedCart = localStorage.getItem('cart');
+        if (savedCart && cartItems.length === 0) {
+          setCartItems(JSON.parse(savedCart));
+        }
       }
     };
 
     fetchCartFromAPI();
   }, [isAuthenticated, token]);
+
+  // Efecto para limpiar el estado del carrito cuando el usuario cierra sesión
+  useEffect(() => {
+    if (!isAuthenticated) {
+      // Si el usuario no está autenticado, nos aseguramos que el estado del carrito
+      // refleja solo lo que hay en localStorage (que se limpia en el logout del AuthContext)
+      const savedCart = localStorage.getItem('cart');
+      setCartItems(savedCart ? JSON.parse(savedCart) : []);
+    }
+  }, [isAuthenticated]);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {

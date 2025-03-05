@@ -140,15 +140,31 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     setIsLoggingOut(true);
     try {
-      const token = localStorage.getItem('token');
-      if (token) {
-        await logoutService(token);
+      // Capturar el token antes de eliminarlo
+      const currentToken = localStorage.getItem('token');
+      
+      // Limpiar localStorage primero para evitar problemas con la sincronización
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      
+      // IMPORTANTE: Limpiar el carrito local para evitar duplicaciones en futuros logins
+      localStorage.removeItem('cart');
+      localStorage.removeItem('shippingInfo');
+      localStorage.removeItem('paymentInfo');
+      
+      // Intentar hacer logout en el servidor si hay un token válido
+      if (currentToken) {
+        try {
+          await logoutService(currentToken);
+        } catch (serverError) {
+          console.error('Error al cerrar sesión en el servidor:', serverError);
+          // Continuamos con el proceso de logout local aunque falle en el servidor
+        }
       }
     } catch (error) {
       console.error('Error durante el logout:', error);
     } finally {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      // Actualizamos el estado de la aplicación
       setToken(null);
       setUser(null);
       setIsLoggingOut(false);

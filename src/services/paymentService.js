@@ -12,9 +12,10 @@ const getCart = async (token) => {
     });
     return response.data;
   } catch (error) {
-    // If the error is a 400 with "cart is empty" message, return an empty cart structure
-    if (error.response?.status === 400 && 
-        error.response?.data?.msg?.toLowerCase().includes('vacío')) {
+    // Si recibimos cualquier error 400, asumimos que el carrito está vacío o que hay un problema de autenticación
+    // Este manejo es más general para cubrir todos los casos posibles
+    if (error.response?.status === 400) {
+      console.log("Error 400 al obtener carrito: ", error.response?.data?.msg || "Carrito no disponible");
       return { 
         success: true, 
         cart: { 
@@ -115,37 +116,69 @@ const syncCart = async (cartItems, token, preferServerCart = false) => {
       }
     }
     
-    // Si llegamos aquí, sincronizamos el carrito local con el servidor
+    // Si llegamos aquí, vamos a sincronizar el carrito local con el servidor
     
-    // Para usuarios que ingresan por primera vez, podemos omitir la limpieza del carrito
-    // ya que sabemos que no tienen uno. Esto evitará la llamada 404.
-    if (serverCart?.cart?.products && serverCart.cart.products.length > 0) {
-      try {
-        // Solo intentamos limpiar si hay un carrito existente
+    // Crear un mapa para combinar elementos duplicados y sumar sus cantidades
+    const combinedCart = new Map();
+    
+    // Primero, agregamos los productos del servidor al mapa (si no preferimos el carrito local)
+    if (!preferServerCart && serverCart?.cart?.products && serverCart.cart.products.length > 0) {
+      for (const item of serverCart.cart.products) {
+        if (item.productId) {
+          combinedCart.set(item.productId, {
+            productId: item.productId,
+            quantity: item.quantity || 1,
+            fromServer: true
+          });
+        }
+      }
+    }
+    
+    // Luego agregamos o actualizamos con los productos del carrito local
+    if (cartItems && cartItems.length > 0) {
+      for (const item of cartItems) {
+        if (item._id) {
+          const existingItem = combinedCart.get(item._id);
+          
+          if (existingItem) {
+            // Si el producto ya existe, sumamos las cantidades
+            existingItem.quantity = Math.max(existingItem.quantity, item.quantity || 1);
+            combinedCart.set(item._id, existingItem);
+          } else {
+            // Si el producto no existe, lo agregamos
+            combinedCart.set(item._id, {
+              productId: item._id,
+              quantity: item.quantity || 1,
+              fromServer: false
+            });
+          }
+        }
+      }
+    }
+    
+    // Ahora limpiamos el carrito del servidor y agregamos los productos combinados
+    try {
+      // Solo intentamos limpiar si hay un carrito existente en el servidor
+      if (serverCart?.cart?.products && serverCart.cart.products.length > 0) {
         const clearResult = await clearCart(token);
         if (!clearResult.success) {
           console.warn("Advertencia al limpiar el carrito:", clearResult.msg);
         }
-      } catch (error) {
-        console.warn("Error al intentar limpiar el carrito:", error);
-        // Continuamos con el proceso
       }
-    }
-    
-    // Luego añadimos cada item del carrito local al servidor
-    if (cartItems && cartItems.length > 0) {
-      for (const item of cartItems) {
-        if (item._id) {
-          try {
-            await addToCart({
-              productId: item._id,
-              quantity: item.quantity || 1
-            }, token);
-          } catch (error) {
-            console.error(`Error al añadir producto ${item._id} al carrito:`, error);
-          }
+      
+      // Agregamos cada producto combinado al servidor
+      for (const item of combinedCart.values()) {
+        try {
+          await addToCart({
+            productId: item.productId,
+            quantity: item.quantity
+          }, token);
+        } catch (error) {
+          console.error(`Error al añadir producto ${item.productId} al carrito:`, error);
         }
       }
+    } catch (error) {
+      console.warn("Error al sincronizar el carrito:", error);
     }
     
     // Devolvemos el carrito actualizado
@@ -153,14 +186,11 @@ const syncCart = async (cartItems, token, preferServerCart = false) => {
       return await getCart(token);
     } catch (error) {
       console.error("Error obteniendo carrito actualizado:", error);
-      // Si hay error al obtener el carrito actualizado, devolvemos al menos los items locales
+      // Si hay error al obtener el carrito actualizado, devolvemos al menos los items del mapa combinado
       return { 
         success: true, 
         cart: { 
-          products: cartItems.map(item => ({ 
-            productId: item._id, 
-            quantity: item.quantity 
-          }))
+          products: Array.from(combinedCart.values())
         }
       };
     }
