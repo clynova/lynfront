@@ -46,76 +46,86 @@ export const CartProvider = ({ children }) => {
             await syncCart(localCart, token);
           } else {
             // Si el carrito local está vacío, intentamos cargar desde el servidor
-            const serverCartResponse = await getCart(token);
-            
-            if (serverCartResponse?.cart?.products && serverCartResponse.cart.products.length > 0) {
-              // Cargar los detalles completos de cada producto
-              const serverCartItems = [];
+            try {
+              const serverCartResponse = await getCart(token);
               
-              for (const item of serverCartResponse.cart.products) {
-                try {
-                  // Obtener detalles del producto
-                  const productDetails = await getProductById(item.productId);
-                  
-                  if (productDetails && productDetails.product) {
-                    const product = productDetails.product;
-                    
-                    // Asegurar que el producto tiene todos los datos necesarios
-                    if (!product.name || !product.images || product.price === undefined) {
-                      console.warn(`Producto ${item.productId} con datos incompletos:`, product);
-                      // Intentamos una estrategia de recuperación: eliminar el producto defectuoso del carrito
-                      try {
-                        await removeFromCartAPI(item.productId, token);
-                        console.log(`Producto defectuoso ${item.productId} eliminado del carrito`);
-                      } catch (removeError) {
-                        console.error(`Error al eliminar producto defectuoso ${item.productId}:`, removeError);
-                      }
-                      continue; // Saltamos este producto
-                    }
-                    
-                    // Crear un objeto de carrito completo con todas las propiedades necesarias
-                    serverCartItems.push({
-                      _id: item.productId,
-                      name: product.name,
-                      price: product.price,
-                      images: Array.isArray(product.images) ? product.images : ['placeholder.png'],
-                      quantity: item.quantity,
-                      stock: product.stock || 1,
-                      // Otras propiedades del producto
-                      ...product
-                    });
-                  }
-                } catch (error) {
-                  console.error(`Error al obtener detalles del producto ${item.productId}:`, error);
-                  // Intentamos eliminar el producto problemático
+              if (serverCartResponse?.cart?.products && serverCartResponse.cart.products.length > 0) {
+                // Cargar los detalles completos de cada producto
+                const serverCartItems = [];
+                
+                for (const item of serverCartResponse.cart.products) {
                   try {
-                    await removeFromCartAPI(item.productId, token);
-                    console.log(`Producto problemático ${item.productId} eliminado del carrito`);
-                  } catch (removeError) {
-                    console.error(`Error al eliminar producto problemático ${item.productId}:`, removeError);
+                    // Obtener detalles del producto
+                    const productDetails = await getProductById(item.productId);
+                    
+                    if (productDetails && productDetails.product) {
+                      const product = productDetails.product;
+                      
+                      // Asegurar que el producto tiene todos los datos necesarios
+                      if (!product.name || !product.images || product.price === undefined) {
+                        console.warn(`Producto ${item.productId} con datos incompletos:`, product);
+                        // Intentamos una estrategia de recuperación: eliminar el producto defectuoso del carrito
+                        try {
+                          await removeFromCartAPI(item.productId, token);
+                          console.log(`Producto defectuoso ${item.productId} eliminado del carrito`);
+                        } catch (removeError) {
+                          console.error(`Error al eliminar producto defectuoso ${item.productId}:`, removeError);
+                        }
+                        continue; // Saltamos este producto
+                      }
+                      
+                      // Crear un objeto de carrito completo con todas las propiedades necesarias
+                      serverCartItems.push({
+                        _id: item.productId,
+                        name: product.name,
+                        price: product.price,
+                        images: Array.isArray(product.images) ? product.images : ['placeholder.png'],
+                        quantity: item.quantity,
+                        stock: product.stock || 1,
+                        // Otras propiedades del producto
+                        ...product
+                      });
+                    }
+                  } catch (error) {
+                    console.error(`Error al obtener detalles del producto ${item.productId}:`, error);
+                    // Intentamos eliminar el producto problemático
+                    try {
+                      await removeFromCartAPI(item.productId, token);
+                      console.log(`Producto problemático ${item.productId} eliminado del carrito`);
+                    } catch (removeError) {
+                      console.error(`Error al eliminar producto problemático ${item.productId}:`, removeError);
+                    }
                   }
                 }
-              }
-              
-              if (serverCartItems.length > 0) {
-                setCartItems(serverCartItems);
-                localStorage.setItem('cart', JSON.stringify(serverCartItems));
-                if (serverCartItems.length < serverCartResponse.cart.products.length) {
-                  toast.success('Se ha limpiado tu carrito de productos no disponibles');
-                } else {
-                  toast.success('Se ha cargado tu carrito guardado');
+                
+                if (serverCartItems.length > 0) {
+                  setCartItems(serverCartItems);
+                  localStorage.setItem('cart', JSON.stringify(serverCartItems));
+                  
+                  if (serverCartItems.length < serverCartResponse.cart.products.length) {
+                    toast.success('Se ha limpiado tu carrito de productos no disponibles');
+                  } else {
+                    toast.success('Se ha cargado tu carrito guardado');
+                  }
+                } else if (serverCartResponse.cart.products.length > 0) {
+                  // Si no pudimos cargar ningún producto pero había productos en el carrito
+                  // Limpiamos el carrito del servidor ya que los productos son inválidos
+                  await clearCartAPI(token);
+                  toast.error('Hubo un problema con los productos en tu carrito y ha sido limpiado');
                 }
-              } else if (serverCartResponse.cart.products.length > 0) {
-                // Si no pudimos cargar ningún producto pero había productos en el carrito
-                // Limpiamos el carrito del servidor ya que los productos son inválidos
-                await clearCartAPI(token);
-                toast.error('Hubo un problema con los productos en tu carrito y ha sido limpiado');
               }
+            } catch (getCartError) {
+              // Para usuarios nuevos, ignoramos errores al cargar el carrito
+              // Solo registramos el error pero no mostramos toast de error al usuario
+              console.log('No se pudo cargar el carrito, posiblemente sea un usuario nuevo:', getCartError);
             }
           }
         } catch (error) {
-          console.error('Error fetching cart:', error);
-          toast.error('Error al cargar tu carrito');
+          console.error('Error fetchCartFromAPI:', error);
+          // Solo mostrar error si no parece ser un usuario nuevo (error 400)
+          if (error?.response?.status !== 400) {
+            toast.error('Error al cargar tu carrito');
+          }
         } finally {
           setIsLoading(false);
         }
@@ -174,6 +184,32 @@ export const CartProvider = ({ children }) => {
       // If authenticated, sync with server
       if (isAuthenticated && token) {
         try {
+          // Verificar si el producto ya existe en el carrito del servidor
+          let serverCart;
+          try {
+            serverCart = await getCart(token);
+          } catch (error) {
+            console.log("No se pudo obtener el carrito del servidor:", error);
+            // Si hay error al obtener el carrito, asumimos que no existe y continuamos con la adición
+            serverCart = { cart: { products: [] } };
+          }
+          
+          // Buscar si el producto ya existe en el carrito del servidor
+          const existingServerItem = serverCart?.cart?.products?.find(item => 
+            item.productId === product._id
+          );
+          
+          // Si el producto ya existe en el servidor, primero lo eliminamos para evitar duplicados
+          if (existingServerItem) {
+            try {
+              await removeFromCartAPI(product._id, token);
+            } catch (removeError) {
+              console.error("Error al eliminar producto existente:", removeError);
+              // Continuamos con la adición aunque haya error al eliminar
+            }
+          }
+          
+          // Ahora agregamos el producto con la cantidad actualizada
           await addToCartAPI({ 
             productId: product._id, 
             quantity: newQuantity 
@@ -213,9 +249,13 @@ export const CartProvider = ({ children }) => {
         try {
           await removeFromCartAPI(productId, token);
         } catch (error) {
-          // Revert local state if API call fails
-          setCartItems(curr => [...curr, itemToRemove]);
-          toast.error('Error al eliminar del carrito');
+          // Si el error es 400, puede ser un problema con el carrito, pero ya eliminamos el item localmente
+          // así que no revertimos el estado local a menos que sea un error diferente
+          if (error?.response?.status !== 400) {
+            // Revert local state if API call fails
+            setCartItems(curr => [...curr, itemToRemove]);
+            toast.error('Error al eliminar del carrito');
+          }
           console.error('Error removing from cart:', error);
         }
       }
@@ -248,8 +288,32 @@ export const CartProvider = ({ children }) => {
       // If authenticated, sync with server
       if (isAuthenticated && token) {
         try {
-          // API might not have direct update endpoint, so remove and add with new quantity
-          await removeFromCartAPI(productId, token);
+          // Verificar si el producto ya existe en el carrito del servidor
+          let serverCart;
+          try {
+            serverCart = await getCart(token);
+          } catch (error) {
+            console.log("No se pudo obtener el carrito del servidor:", error);
+            // Si hay error al obtener el carrito, asumimos que no existe y continuamos con la actualización
+            serverCart = { cart: { products: [] } };
+          }
+          
+          // Buscar si el producto ya existe en el carrito del servidor
+          const existingServerItem = serverCart?.cart?.products?.find(item => 
+            item.productId === productId
+          );
+          
+          // Si el producto ya existe en el servidor, primero lo eliminamos para evitar duplicados
+          if (existingServerItem) {
+            try {
+              await removeFromCartAPI(productId, token);
+            } catch (removeError) {
+              // Si ocurre un error al eliminar, lo registramos pero continuamos
+              console.error("Error al eliminar producto existente durante actualización:", removeError);
+            }
+          }
+          
+          // Ahora agregamos el producto con la cantidad actualizada
           await addToCartAPI({ 
             productId: productId, 
             quantity: quantity 
