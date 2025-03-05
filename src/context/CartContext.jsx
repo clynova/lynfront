@@ -36,93 +36,54 @@ export const CartProvider = ({ children }) => {
       if (isAuthenticated && token) {
         setIsLoading(true);
         try {
-          // First check local storage cart
+          // Primero obtenemos el carrito del servidor para verificar el estado actual
+          let serverCartResponse;
+          try {
+            serverCartResponse = await getCart(token);
+          } catch (error) {
+            console.log('No se pudo obtener el carrito del servidor:', error);
+            serverCartResponse = { cart: { products: [] } };
+          }
+
+          // Obtenemos el carrito local
           const localCart = JSON.parse(localStorage.getItem('cart')) || [];
           
-          // No mezclamos automáticamente, sino que seguimos esta lógica:
+          // Verificamos si ya hay una sincronización en progreso (para evitar múltiples en recargas)
+          const lastSyncTime = localStorage.getItem('lastCartSync');
+          const now = Date.now();
+          
+          // Si se ha sincronizado en los últimos 2 segundos, no volvemos a sincronizar
+          // Esto evita sincronizaciones múltiples en recargas rápidas (F5)
+          if (lastSyncTime && (now - parseInt(lastSyncTime)) < 2000) {
+            console.log('Sincronización reciente detectada, usando carrito del servidor');
+            
+            // Si hay un carrito en el servidor, lo cargamos
+            if (serverCartResponse?.cart?.products && serverCartResponse.cart.products.length > 0) {
+              await loadServerCart(serverCartResponse);
+            }
+            
+            setIsLoading(false);
+            return;
+          }
+          
+          // Marcamos el tiempo de sincronización
+          localStorage.setItem('lastCartSync', now.toString());
+          
+          // Continuamos con la lógica existente
           if (localCart.length > 0) {
-            // Si hay productos en el carrito local, asumimos que el usuario quiere mantenerlos
-            // Sincronizamos este carrito con el servidor
             await syncCart(localCart, token);
           } else {
-            // Si el carrito local está vacío, intentamos cargar desde el servidor
             try {
-              const serverCartResponse = await getCart(token);
-              
+              // Si el carrito local está vacío pero hay productos en el servidor, los cargamos
               if (serverCartResponse?.cart?.products && serverCartResponse.cart.products.length > 0) {
-                // Cargar los detalles completos de cada producto
-                const serverCartItems = [];
-                
-                for (const item of serverCartResponse.cart.products) {
-                  try {
-                    // Obtener detalles del producto
-                    const productDetails = await getProductById(item.productId);
-                    
-                    if (productDetails && productDetails.product) {
-                      const product = productDetails.product;
-                      
-                      // Asegurar que el producto tiene todos los datos necesarios
-                      if (!product.name || !product.images || product.price === undefined) {
-                        console.warn(`Producto ${item.productId} con datos incompletos:`, product);
-                        // Intentamos una estrategia de recuperación: eliminar el producto defectuoso del carrito
-                        try {
-                          await removeFromCartAPI(item.productId, token);
-                          console.log(`Producto defectuoso ${item.productId} eliminado del carrito`);
-                        } catch (removeError) {
-                          console.error(`Error al eliminar producto defectuoso ${item.productId}:`, removeError);
-                        }
-                        continue; // Saltamos este producto
-                      }
-                      
-                      // Crear un objeto de carrito completo con todas las propiedades necesarias
-                      serverCartItems.push({
-                        _id: item.productId,
-                        name: product.name,
-                        price: product.price,
-                        images: Array.isArray(product.images) ? product.images : ['placeholder.png'],
-                        quantity: item.quantity,
-                        stock: product.stock || 1,
-                        // Otras propiedades del producto
-                        ...product
-                      });
-                    }
-                  } catch (error) {
-                    console.error(`Error al obtener detalles del producto ${item.productId}:`, error);
-                    // Intentamos eliminar el producto problemático
-                    try {
-                      await removeFromCartAPI(item.productId, token);
-                      console.log(`Producto problemático ${item.productId} eliminado del carrito`);
-                    } catch (removeError) {
-                      console.error(`Error al eliminar producto problemático ${item.productId}:`, removeError);
-                    }
-                  }
-                }
-                
-                if (serverCartItems.length > 0) {
-                  setCartItems(serverCartItems);
-                  localStorage.setItem('cart', JSON.stringify(serverCartItems));
-                  
-                  if (serverCartItems.length < serverCartResponse.cart.products.length) {
-                    toast.success('Se ha limpiado tu carrito de productos no disponibles');
-                  } else {
-                    toast.success('Se ha cargado tu carrito guardado');
-                  }
-                } else if (serverCartResponse.cart.products.length > 0) {
-                  // Si no pudimos cargar ningún producto pero había productos en el carrito
-                  // Limpiamos el carrito del servidor ya que los productos son inválidos
-                  await clearCartAPI(token);
-                  toast.error('Hubo un problema con los productos en tu carrito y ha sido limpiado');
-                }
+                await loadServerCart(serverCartResponse);
               }
             } catch (getCartError) {
-              // Para usuarios nuevos, ignoramos errores al cargar el carrito
-              // Solo registramos el error pero no mostramos toast de error al usuario
               console.log('No se pudo cargar el carrito, posiblemente sea un usuario nuevo:', getCartError);
             }
           }
         } catch (error) {
           console.error('Error fetchCartFromAPI:', error);
-          // Solo mostrar error si no parece ser un usuario nuevo (error 400)
           if (error?.response?.status !== 400) {
             toast.error('Error al cargar tu carrito');
           }
@@ -130,12 +91,74 @@ export const CartProvider = ({ children }) => {
           setIsLoading(false);
         }
       } else if (!isAuthenticated) {
-        // Si el usuario no está autenticado, asegurarse de cargar el carrito desde localStorage
-        // pero solo si no tenemos ya items en el carrito (para evitar resetear durante la carga inicial)
         const savedCart = localStorage.getItem('cart');
         if (savedCart && cartItems.length === 0) {
           setCartItems(JSON.parse(savedCart));
         }
+      }
+    };
+
+    // Función auxiliar para cargar el carrito del servidor
+    const loadServerCart = async (serverCartResponse) => {
+      // Cargar los detalles completos de cada producto
+      const serverCartItems = [];
+      
+      for (const item of serverCartResponse.cart.products) {
+        try {
+          // Obtener detalles del producto
+          const productDetails = await getProductById(item.productId);
+          
+          if (productDetails && productDetails.product) {
+            const product = productDetails.product;
+            
+            // Asegurar que el producto tiene todos los datos necesarios
+            if (!product.name || !product.images || product.price === undefined) {
+              console.warn(`Producto ${item.productId} con datos incompletos:`, product);
+              try {
+                await removeFromCartAPI(item.productId, token);
+                console.log(`Producto defectuoso ${item.productId} eliminado del carrito`);
+              } catch (removeError) {
+                console.error(`Error al eliminar producto defectuoso ${item.productId}:`, removeError);
+              }
+              continue; 
+            }
+            
+            // Crear objeto de carrito completo
+            serverCartItems.push({
+              _id: item.productId,
+              name: product.name,
+              price: product.price,
+              images: Array.isArray(product.images) ? product.images : ['placeholder.png'],
+              quantity: item.quantity,
+              stock: product.stock || 1,
+              ...product
+            });
+          }
+        } catch (error) {
+          console.error(`Error al obtener detalles del producto ${item.productId}:`, error);
+          try {
+            await removeFromCartAPI(item.productId, token);
+            console.log(`Producto problemático ${item.productId} eliminado del carrito`);
+          } catch (removeError) {
+            console.error(`Error al eliminar producto problemático ${item.productId}:`, removeError);
+          }
+        }
+      }
+      
+      if (serverCartItems.length > 0) {
+        setCartItems(serverCartItems);
+        localStorage.setItem('cart', JSON.stringify(serverCartItems));
+        
+        if (serverCartItems.length < serverCartResponse.cart.products.length) {
+          toast.success('Se ha limpiado tu carrito de productos no disponibles');
+        } else {
+          toast.success('Se ha cargado tu carrito guardado');
+        }
+      } else if (serverCartResponse.cart.products.length > 0) {
+        // Si no pudimos cargar ningún producto pero había productos en el carrito
+        // Limpiamos el carrito del servidor ya que los productos son inválidos
+        await clearCartAPI(token);
+        toast.error('Hubo un problema con los productos en tu carrito y ha sido limpiado');
       }
     };
 

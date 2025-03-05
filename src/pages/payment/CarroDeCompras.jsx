@@ -1,10 +1,93 @@
 import { useCart } from '../../context/CartContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { useEffect, useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { getCart } from '../../services/paymentService';
+import { getProductById } from '../../services/productService';
 
 const CarroDeCompras = () => {
-    const { cartItems, removeFromCart, updateQuantity, validateCartStock } = useCart();
+    const { cartItems, removeFromCart, updateQuantity, validateCartStock, setCartItems } = useCart();
+    const { token, isAuthenticated } = useAuth();
     const navigate = useNavigate();
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    // Efecto para recargar los datos del carrito desde la base de datos
+    useEffect(() => {
+        const refreshCartFromServer = async () => {
+            if (isAuthenticated && token && !isRefreshing) {
+                // Verificamos si ya se realizó una recarga reciente para evitar duplicaciones con F5
+                const lastRefreshTime = localStorage.getItem('lastCartRefresh');
+                const now = Date.now();
+                
+                // Si se ha refrescado en los últimos 3 segundos, omitimos esta actualización
+                if (lastRefreshTime && (now - parseInt(lastRefreshTime)) < 3000) {
+                    console.log('Recarga reciente detectada, omitiendo actualización');
+                    return;
+                }
+                
+                // Marcamos el inicio de la actualización
+                setIsRefreshing(true);
+                localStorage.setItem('lastCartRefresh', now.toString());
+                
+                try {
+                    // Obtenemos el carrito actualizado del servidor
+                    const serverCartResponse = await getCart(token);
+                    
+                    if (serverCartResponse?.cart?.products && serverCartResponse.cart.products.length > 0) {
+                        // Cargar los detalles completos de cada producto
+                        const serverCartItems = [];
+                        
+                        for (const item of serverCartResponse.cart.products) {
+                            try {
+                                // Obtener detalles del producto
+                                const productDetails = await getProductById(item.productId);
+                                
+                                if (productDetails && productDetails.product) {
+                                    const product = productDetails.product;
+                                    
+                                    // Asegurar que el producto tiene todos los datos necesarios
+                                    if (!product.name || !product.images || product.price === undefined) {
+                                        console.warn(`Producto ${item.productId} con datos incompletos:`, product);
+                                        continue;
+                                    }
+                                    
+                                    // Crear un objeto de carrito completo con todas las propiedades necesarias
+                                    serverCartItems.push({
+                                        _id: item.productId,
+                                        name: product.name,
+                                        price: product.price,
+                                        images: Array.isArray(product.images) ? product.images : ['placeholder.png'],
+                                        quantity: item.quantity,
+                                        stock: product.stock || 1,
+                                        ...product
+                                    });
+                                }
+                            } catch (error) {
+                                console.error(`Error al obtener detalles del producto ${item.productId}:`, error);
+                            }
+                        }
+                        
+                        if (serverCartItems.length > 0) {
+                            setCartItems(serverCartItems);
+                            localStorage.setItem('cart', JSON.stringify(serverCartItems));
+                            // Usamos un toast silencioso o lo eliminamos para evitar notificaciones constantes en recargas
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error al obtener el carrito del servidor:', error);
+                    // Solo mostramos un error si no es un 400 (que suele indicar "carrito vacío")
+                    if (error?.response?.status !== 400) {
+                        toast.error('Error al cargar el carrito');
+                    }
+                } finally {
+                    setIsRefreshing(false);
+                }
+            }
+        };
+        
+        refreshCartFromServer();
+    }, [isAuthenticated, token, setCartItems]);
 
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
@@ -63,7 +146,6 @@ const CarroDeCompras = () => {
                                         onChange={(e) => updateQuantity(item._id, parseInt(e.target.value))}
                                         className="border rounded p-1"
                                     >
-                                        {/* Uso de la función auxiliar para asegurar un stock válido */}
                                         {Array.from({ length: Math.min(10, getValidStock(item.stock)) }, (_, i) => (
                                             <option key={i + 1} value={i + 1}>
                                                 {i + 1}
