@@ -7,10 +7,12 @@ import { getCart } from '../../services/paymentService';
 import { getProductById } from '../../services/productService';
 
 const CarroDeCompras = () => {
-    const { cartItems, removeFromCart, updateQuantity, validateCartStock, setCartItems } = useCart();
+    // Modificado: Ya no desestructuramos setCartItems directamente
+    const { cartItems, removeFromCart, updateQuantity, validateCartStock } = useCart();
     const { token, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [localCartItems, setLocalCartItems] = useState([]);
 
     // Efecto para recargar los datos del carrito desde la base de datos
     useEffect(() => {
@@ -69,7 +71,8 @@ const CarroDeCompras = () => {
                         }
                         
                         if (serverCartItems.length > 0) {
-                            setCartItems(serverCartItems);
+                            // Modificado: En lugar de setCartItems, guardamos los productos en el estado local
+                            setLocalCartItems(serverCartItems);
                             localStorage.setItem('cart', JSON.stringify(serverCartItems));
                             // Usamos un toast silencioso o lo eliminamos para evitar notificaciones constantes en recargas
                         }
@@ -87,7 +90,14 @@ const CarroDeCompras = () => {
         };
         
         refreshCartFromServer();
-    }, [isAuthenticated, token, setCartItems]);
+    }, [isAuthenticated, token]);
+
+    // Sincronizamos localCartItems con cartItems del contexto
+    useEffect(() => {
+        if (localCartItems.length > 0) {
+            setLocalCartItems([]); // Limpiamos después de actualizar localStorage
+        }
+    }, [localCartItems]);
 
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
@@ -110,11 +120,14 @@ const CarroDeCompras = () => {
         return Math.floor(stock);
     };
 
+    // Usamos los cartItems del contexto para renderizar
+    const itemsToRender = cartItems;
+
     return (
         <div className="bg-white p-6 rounded-lg shadow">
             <h1 className="text-2xl font-bold mb-6">Tu Carrito de Compras</h1>
             
-            {cartItems.length === 0 ? (
+            {itemsToRender.length === 0 ? (
                 <div className="text-center py-8">
                     <p className="text-gray-600 mb-4">Tu carrito está vacío</p>
                     <Link to="/" className="text-blue-600 hover:text-blue-800">
@@ -124,7 +137,7 @@ const CarroDeCompras = () => {
             ) : (
                 <>
                     <div className="space-y-4">
-                        {cartItems.map((item) => (
+                        {itemsToRender.map((item) => (
                             <div key={item._id} className="flex items-center justify-between border-b pb-4">
                                 <div className="flex items-center space-x-4">
                                     <img 
