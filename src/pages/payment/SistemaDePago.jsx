@@ -1,12 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '../../context/CartContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { getPaymentMethods } from '../../services/paymentMethods';
+import { getImageUrl } from '../../utils/funcionesReutilizables';
 
 const SistemaDePago = () => {
     const { cartItems, clearCart, shippingInfo, validateCartStock } = useCart();
     const navigate = useNavigate();
-    const [paymentMethod, setPaymentMethod] = useState('card');
+    const [paymentMethods, setPaymentMethods] = useState([]);
+    const [selectedMethod, setSelectedMethod] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [cardInfo, setCardInfo] = useState({
         number: '',
         name: '',
@@ -14,20 +19,38 @@ const SistemaDePago = () => {
         cvv: ''
     });
 
+    useEffect(() => {
+        const fetchPaymentMethods = async () => {
+            try {
+                const response = await getPaymentMethods();
+                if (response.success && response.data) {
+                    setPaymentMethods(response.data);
+                    if (response.data.length > 0) {
+                        setSelectedMethod(response.data[0]._id);
+                    }
+                }
+            } catch (err) {
+                setError('Error al cargar los métodos de pago');
+                toast.error('Error al cargar los métodos de pago');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPaymentMethods();
+    }, []);
+
     const calculateSubtotal = () => {
         return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     };
 
-    // Calcular el peso total del carrito
     const calculateTotalWeight = () => {
         return cartItems.reduce((total, item) => total + (item.weight || 0) * item.quantity, 0);
     };
 
-    // Calcular el costo de envío basado en el método seleccionado y el peso
     const calculateShippingCost = () => {
         if (shippingInfo?.baseCost && shippingInfo?.extraCostPerKg !== undefined) {
             const totalWeight = calculateTotalWeight();
-            // Si el peso total es mayor que 1kg, calcular el costo adicional
             const extraWeight = Math.max(0, totalWeight - 1);
             const baseCost = parseFloat(shippingInfo.baseCost);
             const extraCostPerKg = parseFloat(shippingInfo.extraCostPerKg);
@@ -56,8 +79,36 @@ const SistemaDePago = () => {
             return;
         }
 
+        if (!selectedMethod) {
+            toast.error('Por favor selecciona un método de pago');
+            return;
+        }
+
+        // Aquí se procesaría el pago según el método seleccionado
         navigate('/checkout/confirmation');
     };
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-48">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="text-center py-8">
+                <p className="text-red-600">{error}</p>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="mt-4 text-blue-600 hover:text-blue-800"
+                >
+                    Reintentar
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-white p-6 rounded-lg shadow">
@@ -129,126 +180,65 @@ const SistemaDePago = () => {
                     </div>
                 </div>
 
-                {/* Payment Form */}
+                {/* Payment Methods */}
                 <div>
                     <h2 className="text-lg font-semibold mb-4">Método de Pago</h2>
                     <div className="space-y-4">
-                        <div className="flex space-x-4">
-                            <label className="flex items-center">
-                                <input
-                                    type="radio"
-                                    name="paymentMethod"
-                                    value="card"
-                                    checked={paymentMethod === 'card'}
-                                    onChange={(e) => setPaymentMethod(e.target.value)}
-                                    className="mr-2"
-                                />
-                                Tarjeta de Crédito/Débito
-                            </label>
-                            <label className="flex items-center">
-                                <input
-                                    type="radio"
-                                    name="paymentMethod"
-                                    value="paypal"
-                                    checked={paymentMethod === 'paypal'}
-                                    onChange={(e) => setPaymentMethod(e.target.value)}
-                                    className="mr-2"
-                                />
-                                PayPal
-                            </label>
-                        </div>
-
-                        {paymentMethod === 'card' && (
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        Número de Tarjeta
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="number"
-                                        value={cardInfo.number}
-                                        onChange={handleCardInfoChange}
-                                        placeholder="1234 5678 9012 3456"
-                                        className="mt-1 block w-full border rounded-md shadow-sm p-2"
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        Nombre en la Tarjeta
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={cardInfo.name}
-                                        onChange={handleCardInfoChange}
-                                        className="mt-1 block w-full border rounded-md shadow-sm p-2"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">
-                                            Fecha de Expiración
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="expiry"
-                                            value={cardInfo.expiry}
-                                            onChange={handleCardInfoChange}
-                                            placeholder="MM/AA"
-                                            className="mt-1 block w-full border rounded-md shadow-sm p-2"
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">
-                                            CVV
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="cvv"
-                                            value={cardInfo.cvv}
-                                            onChange={handleCardInfoChange}
-                                            placeholder="123"
-                                            className="mt-1 block w-full border rounded-md shadow-sm p-2"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                            </form>
-                        )}
-
-                        {paymentMethod === 'paypal' && (
-                            <div className="text-center p-8 border rounded">
-                                <p className="mb-4">Serás redirigido a PayPal para completar tu pago</p>
-                                <button 
-                                    onClick={handleSubmit}
-                                    className="bg-[#0070ba] text-white px-6 py-2 rounded hover:bg-[#003087]"
-                                >
-                                    Pagar con PayPal
-                                </button>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="flex justify-between items-center mt-8">
-                        <Link
-                            to="/checkout/envio"
-                            className="text-blue-600 hover:text-blue-800"
-                        >
-                            ← Volver al envío
-                        </Link>
-                        {paymentMethod === 'card' && (
-                            <button
-                                onClick={handleSubmit}
-                                className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+                        {paymentMethods.map((method) => (
+                            <label
+                                key={method._id}
+                                className={`flex items-center p-4 border rounded cursor-pointer hover:bg-gray-50 ${
+                                    selectedMethod === method._id ? 'border-blue-500 bg-blue-50' : ''
+                                }`}
                             >
-                                Confirmar Pedido
-                            </button>
+                                <input
+                                    type="radio"
+                                    name="paymentMethod"
+                                    value={method._id}
+                                    checked={selectedMethod === method._id}
+                                    onChange={(e) => setSelectedMethod(e.target.value)}
+                                    className="mr-3"
+                                />
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-3">
+                                        {method.logo_url && (
+                                            <img
+                                                src={getImageUrl(method.logo_url)}
+                                                alt={method.name}
+                                                className="h-8 w-auto object-contain"
+                                            />
+                                        )}
+                                        <div>
+                                            <p className="font-medium">{method.name}</p>
+                                            <p className="text-sm text-gray-600">{method.description}</p>
+                                            {method.commission_percentage > 0 && (
+                                                <p className="text-xs text-gray-500">
+                                                    Comisión: {method.commission_percentage}%
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
+                        ))}
+
+                        {selectedMethod && (
+                            <div className="mt-6">
+                                <div className="flex justify-between items-center">
+                                    <Link
+                                        to="/checkout/envio"
+                                        className="text-blue-600 hover:text-blue-800"
+                                    >
+                                        ← Volver al envío
+                                    </Link>
+                                    <button
+                                        onClick={handleSubmit}
+                                        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+                                    >
+                                        Confirmar Pedido
+                                    </button>
+                                </div>
+                            </div>
                         )}
                     </div>
                 </div>
