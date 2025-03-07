@@ -18,8 +18,28 @@ const SistemaDePago = () => {
         return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     };
 
-    const shippingCost = shippingInfo?.method === 'express' ? 99.00 : 0;
-    const total = calculateSubtotal() + shippingCost;
+    // Calcular el peso total del carrito
+    const calculateTotalWeight = () => {
+        return cartItems.reduce((total, item) => total + (item.weight || 0) * item.quantity, 0);
+    };
+
+    // Calcular el costo de envío basado en el método seleccionado y el peso
+    const calculateShippingCost = () => {
+        if (shippingInfo?.baseCost && shippingInfo?.extraCostPerKg !== undefined) {
+            const totalWeight = calculateTotalWeight();
+            // Si el peso total es mayor que 1kg, calcular el costo adicional
+            const extraWeight = Math.max(0, totalWeight - 1);
+            const baseCost = parseFloat(shippingInfo.baseCost);
+            const extraCostPerKg = parseFloat(shippingInfo.extraCostPerKg);
+            
+            return baseCost + (extraWeight * extraCostPerKg);
+        }
+        return 0;
+    };
+
+    const shippingCost = calculateShippingCost();
+    const subtotal = calculateSubtotal();
+    const total = subtotal + shippingCost;
 
     const handleCardInfoChange = (e) => {
         const { name, value } = e.target;
@@ -32,12 +52,10 @@ const SistemaDePago = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         
-        // Validar stock antes de procesar el pago
         if (!validateCartStock()) {
             return;
         }
 
-        // Aquí se procesaría el pago
         navigate('/checkout/confirmation');
     };
 
@@ -61,8 +79,13 @@ const SistemaDePago = () => {
                                 )}
                                 <div className="mt-2 pt-2 border-t">
                                     <p className="text-sm text-gray-600">
-                                        Método de envío: {shippingInfo.method === 'express' ? 'Express (1-2 días)' : 'Estándar (3-5 días)'}
+                                        Método de envío: {shippingInfo.methodName} ({shippingInfo.deliveryTime})
                                     </p>
+                                    {shippingInfo.carrierName && (
+                                        <p className="text-sm text-gray-600">
+                                            Transportista: {shippingInfo.carrierName}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -77,7 +100,9 @@ const SistemaDePago = () => {
                                     <div>
                                         <p className="font-medium">{item.name}</p>
                                         <p className="text-sm text-gray-600">Cantidad: {item.quantity}</p>
-                                        <p className="text-sm text-gray-500">Stock disponible: {item.stock}</p>
+                                        {item.weight && (
+                                            <p className="text-sm text-gray-500">Peso: {(item.weight * item.quantity).toFixed(2)}kg</p>
+                                        )}
                                     </div>
                                     <p>${(item.price * item.quantity).toFixed(2)}</p>
                                 </div>
@@ -85,11 +110,15 @@ const SistemaDePago = () => {
                             <div className="border-t pt-4 space-y-2">
                                 <div className="flex justify-between">
                                     <p>Subtotal</p>
-                                    <p>${calculateSubtotal().toFixed(2)}</p>
+                                    <p>${subtotal.toFixed(2)}</p>
                                 </div>
                                 <div className="flex justify-between">
-                                    <p>Envío</p>
+                                    <p>Envío {shippingInfo?.methodName && `(${shippingInfo.methodName})`}</p>
                                     <p>${shippingCost.toFixed(2)}</p>
+                                </div>
+                                <div className="flex justify-between text-sm text-gray-600">
+                                    <p>Peso total:</p>
+                                    <p>{calculateTotalWeight().toFixed(2)}kg</p>
                                 </div>
                                 <div className="flex justify-between font-bold">
                                     <p>Total</p>
