@@ -60,9 +60,22 @@ const SistemaDePago = () => {
         return 0;
     };
 
+    // Calcular la comisión del método de pago
+    const calculatePaymentCommission = (subtotalWithShipping) => {
+        if (selectedMethod) {
+            const selectedPaymentMethod = paymentMethods.find(method => method._id === selectedMethod);
+            if (selectedPaymentMethod?.commission_percentage) {
+                return (subtotalWithShipping * selectedPaymentMethod.commission_percentage) / 100;
+            }
+        }
+        return 0;
+    };
+
     const shippingCost = calculateShippingCost();
     const subtotal = calculateSubtotal();
-    const total = subtotal + shippingCost;
+    const subtotalWithShipping = subtotal + shippingCost;
+    const paymentCommission = calculatePaymentCommission(subtotalWithShipping);
+    const total = subtotalWithShipping + paymentCommission;
 
     const handleCardInfoChange = (e) => {
         const { name, value } = e.target;
@@ -171,6 +184,12 @@ const SistemaDePago = () => {
                                     <p>Peso total:</p>
                                     <p>{calculateTotalWeight().toFixed(2)}kg</p>
                                 </div>
+                                {selectedMethod && paymentCommission > 0 && (
+                                    <div className="flex justify-between text-sm">
+                                        <p>Comisión de pago:</p>
+                                        <p>${paymentCommission.toFixed(2)}</p>
+                                    </div>
+                                )}
                                 <div className="flex justify-between font-bold">
                                     <p>Total</p>
                                     <p>${total.toFixed(2)}</p>
