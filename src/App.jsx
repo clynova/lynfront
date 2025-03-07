@@ -78,7 +78,9 @@ const App = () => {
                       <Route index element={<CarroDeCompras />} />
                       <Route path="envio" element={<FormaEnvio />} />
                       <Route path="pago" element={<SistemaDePago />} />
-                      <Route path="confirmation" element={<Confirmation />} />
+                    </Route>
+                    <Route path="confirmation/checkout/success" element={<MainLayout />}>
+                      <Route index element={<Confirmation />} />
                     </Route>
                   </Route>
                   <Route path="/about" element={<div>About</div>} />

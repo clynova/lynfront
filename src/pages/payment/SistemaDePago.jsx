@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { getPaymentMethods } from '../../services/paymentMethods';
+import { createOrder, initiatePayment } from '../../services/checkoutService';
 import { getImageUrl } from '../../utils/funcionesReutilizables';
 
 const SistemaDePago = () => {
     const { cartItems, clearCart, shippingInfo, validateCartStock } = useCart();
+    const { token } = useAuth();
     const navigate = useNavigate();
     const [paymentMethods, setPaymentMethods] = useState([]);
     const [selectedMethod, setSelectedMethod] = useState(null);
@@ -18,6 +21,7 @@ const SistemaDePago = () => {
         expiry: '',
         cvv: ''
     });
+    const [isProcessing, setIsProcessing] = useState(false);
 
     useEffect(() => {
         const fetchPaymentMethods = async () => {
@@ -54,7 +58,7 @@ const SistemaDePago = () => {
             const extraWeight = Math.max(0, totalWeight - 1);
             const baseCost = parseFloat(shippingInfo.baseCost);
             const extraCostPerKg = parseFloat(shippingInfo.extraCostPerKg);
-            
+
             return baseCost + (extraWeight * extraCostPerKg);
         }
         return 0;
@@ -85,9 +89,9 @@ const SistemaDePago = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (!validateCartStock()) {
             return;
         }
@@ -97,8 +101,75 @@ const SistemaDePago = () => {
             return;
         }
 
-        // Aquí se procesaría el pago según el método seleccionado
-        navigate('/checkout/confirmation');
+        setIsProcessing(true);
+
+        try {
+            // Crear la orden
+            // Crear la orden
+            /*      const orderData = {
+                      shippingAddressId: shippingInfo.address._id,
+                      paymentMethod: selectedMethod,
+                      shippingMethod: shippingInfo.methodId,
+                      recipientName: shippingInfo.address.recipientName,
+                      phoneContact: shippingInfo.address.phoneContact,
+                      additionalInstructions: shippingInfo.address.reference
+                  };
+      
+                  */
+
+            const orderData = {
+                shippingAddressId: shippingInfo.address._id,
+                paymentMethod: selectedMethod,
+                shippingMethod: shippingInfo.carrierId,
+                recipientName: "María González",
+                phoneContact: "+56912345678",
+                additionalInstructions: "El portón es azul, por favor tocar el timbre"
+            };
+
+            const orderResponse = await createOrder(orderData, token);
+
+            if (!orderResponse.success) {
+                throw new Error(orderResponse.message || 'Error al crear la orden');
+            }
+
+            // Iniciar el proceso de pago
+            const paymentResponse = await initiatePayment(orderResponse.order._id, token);
+
+            // Construir URL de pago y abrir en nueva ventana
+            const paymentUrl = new URL(paymentResponse.redirectUrl);
+            paymentUrl.searchParams.set(
+                paymentResponse.payment_type === 'webpay' ? 'token_ws' : 'token',
+                paymentResponse.token
+            );
+
+            // Abrir ventana de pago
+            const width = 800;
+            const height = 600;
+            const left = (window.screen.width - width) / 2;
+            const top = (window.screen.height - height) / 2;
+
+            window.open(
+                paymentUrl.toString(),
+                'Pago',
+                `width=${width},height=${height},left=${left},top=${top},location=no,menubar=no,toolbar=no,status=no,scrollbars=yes,resizable=yes`
+            );
+
+            // Limpiar carrito y redirigir
+            /*   clearCart();
+               navigate('/checkout/confirmation', { 
+                   state: { 
+                       orderId: orderResponse.order._id,
+                       paymentType: paymentResponse.payment_type 
+                   }
+               });
+   
+   */
+
+
+        } catch (error) {
+            toast.error(error.message || 'Error al procesar el pago');
+            setIsProcessing(false);
+        }
     };
 
     if (loading) {
@@ -126,7 +197,7 @@ const SistemaDePago = () => {
     return (
         <div className="bg-white p-6 rounded-lg shadow">
             <h1 className="text-2xl font-bold mb-6">Finalizar Compra</h1>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Order Summary and Shipping Info */}
                 <div className="space-y-6">
@@ -206,9 +277,8 @@ const SistemaDePago = () => {
                         {paymentMethods.map((method) => (
                             <label
                                 key={method._id}
-                                className={`flex items-center p-4 border rounded cursor-pointer hover:bg-gray-50 ${
-                                    selectedMethod === method._id ? 'border-blue-500 bg-blue-50' : ''
-                                }`}
+                                className={`flex items-center p-4 border rounded cursor-pointer hover:bg-gray-50 ${selectedMethod === method._id ? 'border-blue-500 bg-blue-50' : ''
+                                    }`}
                             >
                                 <input
                                     type="radio"
@@ -252,9 +322,16 @@ const SistemaDePago = () => {
                                     </Link>
                                     <button
                                         onClick={handleSubmit}
-                                        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+                                        disabled={isProcessing}
+                                        className={`${isProcessing
+                                                ? 'bg-gray-400 cursor-not-allowed'
+                                                : 'bg-blue-600 hover:bg-blue-700'
+                                            } text-white px-6 py-2 rounded flex items-center gap-2`}
                                     >
-                                        Confirmar Pedido
+                                        {isProcessing && (
+                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                        )}
+                                        {isProcessing ? 'Procesando...' : 'Confirmar Pedido'}
                                     </button>
                                 </div>
                             </div>

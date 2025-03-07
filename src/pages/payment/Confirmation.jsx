@@ -1,59 +1,59 @@
-import { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { useContext, useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { toast } from 'react-hot-toast';
 
 const Confirmation = () => {
     const { cartItems, clearCart } = useCart();
+    const [orderStatus, setOrderStatus] = useState('processing');
+    const location = useLocation();
+    const navigate = useNavigate();
 
-    // Clear cart after showing confirmation
-    setTimeout(() => {
-        clearCart();
-    }, 1000);
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const orderId = params.get('order_id');
 
-    return (
-        <div className="bg-white p-8 rounded-lg shadow text-center">
-            <div className="mb-8">
-                <svg className="mx-auto h-16 w-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
-            </div>
+        if (!orderId) {
+            toast.error('No se encontró la orden');
+            navigate('/');
+            return;
+        }
 
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">¡Gracias por tu compra!</h1>
-            <p className="text-lg text-gray-600 mb-8">
-                Tu pedido ha sido confirmado y está siendo procesado.
-            </p>
+        // Aquí puedes agregar la lógica para verificar el estado del pago con el backend
+        // Por ahora solo mostramos el ID de la orden
+        setOrderStatus('success');
+    }, [location, navigate]);
 
-            <div className="max-w-md mx-auto mb-8">
-                <div className="border-t border-b py-4">
-                    <h2 className="text-lg font-semibold mb-4">Detalles del Pedido</h2>
-                    <div className="space-y-2">
-                        {cartItems.map((item) => (
-                            <div key={item._id} className="flex justify-between">
-                                <span>{item.name} x {item.quantity}</span>
-                                <span>${(item.price * item.quantity).toFixed(2)}</span>
-                            </div>
-                        ))}
-                    </div>
+    if (orderStatus === 'processing') {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <h2 className="text-xl font-semibold">Procesando tu pago...</h2>
+                    <p className="text-gray-600 mt-2">Por favor espera un momento</p>
                 </div>
             </div>
+        );
+    }
 
-            <p className="text-gray-600 mb-8">
-                Recibirás un correo electrónico con los detalles de tu pedido y la información de seguimiento.
-            </p>
-
-            <div className="space-x-4">
-                <Link
-                    to="/"
-                    className="inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+    return (
+        <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center">
+                <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <h2 className="text-2xl font-semibold text-gray-800">¡Pago Exitoso!</h2>
+                <p className="text-gray-600 mt-2">
+                    Tu orden ha sido procesada correctamente.
+                </p>
+                <button
+                    onClick={() => navigate('/profile/orders')}
+                    className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                    Volver a la Tienda
-                </Link>
-                <Link
-                    to="/myprofile/orders"
-                    className="inline-block text-blue-600 hover:text-blue-800"
-                >
-                    Ver Mis Pedidos
-                </Link>
+                    Ver mis pedidos
+                </button>
             </div>
         </div>
     );
