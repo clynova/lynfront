@@ -14,7 +14,6 @@ const ProfileSidebar = () => {
     { to: '/profile/orders', icon: FaHistory, label: 'Mis Pedidos' },
     { to: '/profile/wishlist', icon: FaHeart, label: 'Lista de Deseos' },
     { to: '/profile/addresses', icon: FaAddressCard, label: 'Direcciones' },
-    { to: '/profile/payment', icon: FaCreditCard, label: 'Métodos de Pago' },
     { to: '/profile/settings', icon: FaCog, label: 'Configuración' },
   ];
 

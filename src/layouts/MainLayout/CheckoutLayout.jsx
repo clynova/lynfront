@@ -9,13 +9,23 @@ const CheckoutLayout = () => {
         return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     };
 
-    // Determinar el costo de envío basado en la información guardada o la ubicación actual
+    // Calcular el peso total del carrito
+    const calculateTotalWeight = () => {
+        return cartItems.reduce((total, item) => total + (item.weight || 0) * item.quantity, 0);
+    };
+
+    // Determinar el costo de envío basado en el método seleccionado
     const getShippingCost = () => {
-        if (shippingInfo && shippingInfo.method) {
-            return shippingInfo.method === 'express' ? 99.00 : 0;
+        if (shippingInfo && shippingInfo.methodId) {
+            const totalWeight = calculateTotalWeight();
+            // Si el peso total es mayor que 1kg, calcular el costo adicional
+            const extraWeight = Math.max(0, totalWeight - 1); // Peso adicional después del primer kg
+            const baseCost = shippingInfo.baseCost || 0;
+            const extraCostPerKg = shippingInfo.extraCostPerKg || 0;
+            
+            return baseCost + (extraWeight * extraCostPerKg);
         }
-        // Si aún no hay método seleccionado pero estamos en la página de pago, mostrar el costo del express
-        return location.pathname === '/checkout/pago' ? 99.00 : 0;
+        return 0;
     };
 
     const shippingCost = getShippingCost();
@@ -38,6 +48,9 @@ const CheckoutLayout = () => {
                                     <div>
                                         <p>{item.name}</p>
                                         <p className="text-gray-600">Cantidad: {item.quantity}</p>
+                                        {item.weight && (
+                                            <p className="text-gray-500 text-xs">Peso: {(item.weight * item.quantity).toFixed(2)}kg</p>
+                                        )}
                                     </div>
                                     <p>${(item.price * item.quantity).toFixed(2)}</p>
                                 </div>
@@ -48,9 +61,14 @@ const CheckoutLayout = () => {
                                     <p>${calculateSubtotal().toFixed(2)}</p>
                                 </div>
                                 <div className="flex justify-between">
-                                    <p>Envío</p>
+                                    <p>Envío {shippingInfo?.methodName && `(${shippingInfo.methodName})`}</p>
                                     <p>${shippingCost.toFixed(2)}</p>
                                 </div>
+                                {shippingInfo?.deliveryTime && (
+                                    <div className="text-sm text-gray-600">
+                                        <p>Tiempo estimado: {shippingInfo.deliveryTime}</p>
+                                    </div>
+                                )}
                                 <div className="flex justify-between font-bold">
                                     <p>Total</p>
                                     <p>${total.toFixed(2)}</p>

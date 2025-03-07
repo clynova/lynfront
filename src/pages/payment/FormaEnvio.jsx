@@ -6,9 +6,12 @@ import { getAddresses, addAddress } from '../../services/userService';
 import { HiPlus } from 'react-icons/hi';
 import { AddressForm } from '../Perfil/MyAddresses';
 import { toast } from 'react-hot-toast';
+import { getShippingMethods } from '../../services/shippingMethods';
 
 const FormaEnvio = () => {
-    const [shippingMethod, setShippingMethod] = useState('standard');
+    const [shippingMethods, setShippingMethods] = useState([]);
+    const [selectedCarrier, setSelectedCarrier] = useState(null);
+    const [selectedMethod, setSelectedMethod] = useState(null);
     const [selectedAddressId, setSelectedAddressId] = useState('');
     const [addresses, setAddresses] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -17,25 +20,37 @@ const FormaEnvio = () => {
     const { saveShippingInfo } = useCart();
 
     useEffect(() => {
-        const fetchAddresses = async () => {
+        const fetchData = async () => {
             try {
-                const response = await getAddresses(token);
-                if (response.success) {
-                    setAddresses(response.data.addresses || []);
-                    // Si hay una dirección predeterminada, seleccionarla
-                    const defaultAddress = response.data.addresses?.find(addr => addr.isDefault);
+                // Fetch addresses
+                const addressResponse = await getAddresses(token);
+                if (addressResponse.success) {
+                    setAddresses(addressResponse.data.addresses || []);
+                    const defaultAddress = addressResponse.data.addresses?.find(addr => addr.isDefault);
                     if (defaultAddress) {
                         setSelectedAddressId(defaultAddress._id);
                     }
                 }
+
+                // Fetch shipping methods
+                const shippingResponse = await getShippingMethods(token);
+                if (shippingResponse.success) {
+                    setShippingMethods(shippingResponse.data);
+                    if (shippingResponse.data.length > 0) {
+                        setSelectedCarrier(shippingResponse.data[0]._id);
+                        if (shippingResponse.data[0].methods.length > 0) {
+                            setSelectedMethod(shippingResponse.data[0].methods[0]._id);
+                        }
+                    }
+                }
             } catch (error) {
-                toast.error("Error al cargar las direcciones");
+                toast.error("Error al cargar los datos");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchAddresses();
+        fetchData();
     }, [token]);
 
     const handleSubmit = (e) => {
@@ -44,10 +59,23 @@ const FormaEnvio = () => {
             toast.error("Por favor selecciona una dirección de envío");
             return;
         }
+        if (!selectedMethod) {
+            toast.error("Por favor selecciona un método de envío");
+            return;
+        }
 
         const selectedAddress = addresses.find(addr => addr._id === selectedAddressId);
+        const carrier = shippingMethods.find(c => c._id === selectedCarrier);
+        const method = carrier?.methods.find(m => m._id === selectedMethod);
+
         saveShippingInfo({
-            method: shippingMethod,
+            carrierId: selectedCarrier,
+            carrierName: carrier?.name,
+            methodId: selectedMethod,
+            methodName: method?.name,
+            deliveryTime: method?.delivery_time,
+            baseCost: method?.base_cost,
+            extraCostPerKg: method?.extra_cost_per_kg,
             address: selectedAddress
         });
 
@@ -85,35 +113,39 @@ const FormaEnvio = () => {
             <div className="mb-8">
                 <h2 className="text-lg font-semibold mb-4">Método de Envío</h2>
                 <div className="space-y-4">
-                    <label className="flex items-center p-4 border rounded cursor-pointer hover:bg-gray-50">
-                        <input
-                            type="radio"
-                            name="shipping"
-                            value="standard"
-                            checked={shippingMethod === 'standard'}
-                            onChange={(e) => setShippingMethod(e.target.value)}
-                            className="mr-3"
-                        />
-                        <div>
-                            <p className="font-medium">Envío Estándar</p>
-                            <p className="text-gray-600">3-5 días hábiles - Gratis</p>
+                    {shippingMethods.map((carrier) => (
+                        <div key={carrier._id} className="border rounded-lg p-4">
+                            <h3 className="font-medium text-lg mb-3">{carrier.name}</h3>
+                            <div className="space-y-3">
+                                {carrier.methods.map((method) => (
+                                    <label key={method._id} 
+                                           className={`flex items-center p-4 border rounded cursor-pointer hover:bg-gray-50 ${
+                                               selectedMethod === method._id ? 'border-blue-500 bg-blue-50' : ''
+                                           }`}>
+                                        <input
+                                            type="radio"
+                                            name="shipping"
+                                            value={method._id}
+                                            checked={selectedMethod === method._id}
+                                            onChange={() => {
+                                                setSelectedCarrier(carrier._id);
+                                                setSelectedMethod(method._id);
+                                            }}
+                                            className="mr-3"
+                                        />
+                                        <div>
+                                            <p className="font-medium">{method.name}</p>
+                                            <p className="text-gray-600">{method.delivery_time}</p>
+                                            <p className="text-gray-600">
+                                                Costo base: ${method.base_cost.toFixed(2)} 
+                                                {method.extra_cost_per_kg > 0 && ` + $${method.extra_cost_per_kg}/kg adicional`}
+                                            </p>
+                                        </div>
+                                    </label>
+                                ))}
+                            </div>
                         </div>
-                    </label>
-                    
-                    <label className="flex items-center p-4 border rounded cursor-pointer hover:bg-gray-50">
-                        <input
-                            type="radio"
-                            name="shipping"
-                            value="express"
-                            checked={shippingMethod === 'express'}
-                            onChange={(e) => setShippingMethod(e.target.value)}
-                            className="mr-3"
-                        />
-                        <div>
-                            <p className="font-medium">Envío Express</p>
-                            <p className="text-gray-600">1-2 días hábiles - $99.00</p>
-                        </div>
-                    </label>
+                    ))}
                 </div>
             </div>
 
@@ -179,7 +211,7 @@ const FormaEnvio = () => {
                 </Link>
                 <button
                     onClick={handleSubmit}
-                    disabled={!selectedAddressId || showAddressForm}
+                    disabled={!selectedAddressId || !selectedMethod || showAddressForm}
                     className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                     Continuar al pago
