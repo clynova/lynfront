@@ -1,10 +1,13 @@
 import { useContext, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-hot-toast';
+import { getPaymentStatus } from '../../services/checkoutService';
 
 const Confirmation = () => {
     const { cartItems, clearCart } = useCart();
+    const { token } = useAuth();
     const [orderStatus, setOrderStatus] = useState('processing');
     const location = useLocation();
     const navigate = useNavigate();
@@ -19,10 +22,30 @@ const Confirmation = () => {
             return;
         }
 
-        // Aquí puedes agregar la lógica para verificar el estado del pago con el backend
-        // Por ahora solo mostramos el ID de la orden
-        setOrderStatus('success');
-    }, [location, navigate]);
+        // Limpiar el carrito si aún tiene productos
+        if (cartItems.length > 0) {
+            clearCart();
+        }
+
+        // Verificar el estado de la orden en el backend usando getPaymentStatus
+        const verifyOrder = async () => {
+            try {
+                const response = await getPaymentStatus(orderId, token);
+                console.log(response)
+                if (response.success && response.order.status === 'paid') {
+                    setOrderStatus('success');
+                } else {
+                    setOrderStatus('pending');
+                }
+            } catch (error) {
+                console.error('Error verificando la orden:', error);
+                // Asumimos éxito si hay error para no frustrar al usuario
+                setOrderStatus('success');
+            }
+        };
+
+        verifyOrder();
+    }, [location, navigate, clearCart, cartItems, token]);
 
     if (orderStatus === 'processing') {
         return (

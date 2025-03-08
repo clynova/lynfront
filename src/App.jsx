@@ -30,6 +30,7 @@ import { CarroDeCompras } from "./pages/payment/CarroDeCompras";
 import { SistemaDePago } from "./pages/payment/SistemaDePago";
 import { CheckoutLayout } from "./layouts/MainLayout/CheckoutLayout";
 import { Confirmation } from './pages/payment/Confirmation';
+import { PaymentFailure } from './pages/payment/PaymentFailure';
 
 const App = () => {
   return (
@@ -79,9 +80,8 @@ const App = () => {
                       <Route path="envio" element={<FormaEnvio />} />
                       <Route path="pago" element={<SistemaDePago />} />
                     </Route>
-                    <Route path="confirmation/checkout/success" element={<MainLayout />}>
-                      <Route index element={<Confirmation />} />
-                    </Route>
+                    <Route path="confirmation/success" element={<Confirmation />} />
+                    <Route path="confirmation/failure" element={<PaymentFailure />} />
                   </Route>
                   <Route path="/about" element={<div>About</div>} />
                   <Route path="/contact" element={<div>Contact</div>} />

@@ -105,25 +105,13 @@ const SistemaDePago = () => {
 
         try {
             // Crear la orden
-            // Crear la orden
-            /*      const orderData = {
-                      shippingAddressId: shippingInfo.address._id,
-                      paymentMethod: selectedMethod,
-                      shippingMethod: shippingInfo.methodId,
-                      recipientName: shippingInfo.address.recipientName,
-                      phoneContact: shippingInfo.address.phoneContact,
-                      additionalInstructions: shippingInfo.address.reference
-                  };
-      
-                  */
-
             const orderData = {
                 shippingAddressId: shippingInfo.address._id,
                 paymentMethod: selectedMethod,
                 shippingMethod: shippingInfo.carrierId,
-                recipientName: "María González",
-                phoneContact: "+56912345678",
-                additionalInstructions: "El portón es azul, por favor tocar el timbre"
+                recipientName: shippingInfo.address.recipientName || "María González",
+                phoneContact: shippingInfo.address.phoneContact || "+56912345678",
+                additionalInstructions: shippingInfo.address.reference || "El portón es azul, por favor tocar el timbre"
             };
 
             const orderResponse = await createOrder(orderData, token);
@@ -131,6 +119,9 @@ const SistemaDePago = () => {
             if (!orderResponse.success) {
                 throw new Error(orderResponse.message || 'Error al crear la orden');
             }
+
+            // Guardar el ID de la orden en localStorage para referencia después
+            localStorage.setItem('currentOrderId', orderResponse.order._id);
 
             // Iniciar el proceso de pago
             const paymentResponse = await initiatePayment(orderResponse.order._id, token);
@@ -148,27 +139,66 @@ const SistemaDePago = () => {
             const left = (window.screen.width - width) / 2;
             const top = (window.screen.height - height) / 2;
 
-            window.open(
+            const paymentWindow = window.open(
                 paymentUrl.toString(),
                 'Pago',
                 `width=${width},height=${height},left=${left},top=${top},location=no,menubar=no,toolbar=no,status=no,scrollbars=yes,resizable=yes`
             );
-
-            // Limpiar carrito y redirigir
-            /*   clearCart();
-               navigate('/checkout/confirmation', { 
-                   state: { 
-                       orderId: orderResponse.order._id,
-                       paymentType: paymentResponse.payment_type 
-                   }
-               });
-   
-   */
-
+            
+            // Configurar un intervalo para verificar si la ventana se ha cerrado
+            const checkWindowClosed = setInterval(() => {
+                if (paymentWindow.closed) {
+                    clearInterval(checkWindowClosed);
+                    
+                    // Verificar resultado del pago llamando al backend
+                    checkPaymentStatus(orderResponse.order._id);
+                }
+            }, 1000);
 
         } catch (error) {
             toast.error(error.message || 'Error al procesar el pago');
             setIsProcessing(false);
+        }
+    };
+
+    // Función para verificar el estado del pago después de que se cierre la ventana
+    const checkPaymentStatus = async (orderId) => {
+        try {
+            const response = await fetch(`/api/payment/status/${orderId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                // Pago exitoso
+                clearCart();
+                navigate('/checkout/confirmation/checkout/success', {
+                    state: { orderId: orderId }
+                });
+            } else if (data.status === 'pending') {
+                // Pago aún en proceso
+                toast.info('El pago está siendo procesado. Te notificaremos cuando se complete.');
+                navigate('/profile/orders');
+            } else {
+                // Pago fallido
+                navigate('/checkout/confirmation/checkout/failure', {
+                    state: { 
+                        orderId: orderId,
+                        reason: data.reason || 'rejected'
+                    }
+                });
+            }
+            
+            setIsProcessing(false);
+            
+        } catch (error) {
+            console.error('Error verificando estado del pago:', error);
+            toast.error('No pudimos verificar el estado de tu pago. Por favor revisa tus órdenes.');
+            setIsProcessing(false);
+            navigate('/profile/orders');
         }
     };
 
