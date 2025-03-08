@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { getPaymentMethods } from '../../services/paymentMethods';
-import { createOrder, initiatePayment } from '../../services/checkoutService';
+import { createOrder, initiatePayment, getPaymentStatus } from '../../services/checkoutService';
 import { getImageUrl } from '../../utils/funcionesReutilizables';
 
 const SistemaDePago = () => {
@@ -153,7 +153,7 @@ const SistemaDePago = () => {
                     // Verificar resultado del pago llamando al backend
                     checkPaymentStatus(orderResponse.order._id);
                 }
-            }, 1000);
+            }, 5000);
 
         } catch (error) {
             toast.error(error.message || 'Error al procesar el pago');
@@ -164,30 +164,25 @@ const SistemaDePago = () => {
     // Función para verificar el estado del pago después de que se cierre la ventana
     const checkPaymentStatus = async (orderId) => {
         try {
-            const response = await fetch(`/api/payment/status/${orderId}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            
-            const data = await response.json();
-            
-            if (data.status === 'success') {
+            const response = await getPaymentStatus(orderId, token);
+            console.log(response)
+
+            if (response.paymentStatus === 'completed') {
                 // Pago exitoso
                 clearCart();
-                navigate('/checkout/confirmation/checkout/success', {
+                navigate('/checkout/confirmation/success', {
                     state: { orderId: orderId }
                 });
-            } else if (data.status === 'pending') {
+            } else if (response.order.paymentStatus === 'processing') {
                 // Pago aún en proceso
                 toast.info('El pago está siendo procesado. Te notificaremos cuando se complete.');
                 navigate('/profile/orders');
             } else {
                 // Pago fallido
-                navigate('/checkout/confirmation/checkout/failure', {
+                navigate('/checkout/confirmation/failure', {
                     state: { 
                         orderId: orderId,
-                        reason: data.reason || 'rejected'
+                        reason: response.order.statusReason || 'rejected'
                     }
                 });
             }
