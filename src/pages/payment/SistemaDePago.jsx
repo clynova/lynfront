@@ -144,12 +144,12 @@ const SistemaDePago = () => {
                 'Pago',
                 `width=${width},height=${height},left=${left},top=${top},location=no,menubar=no,toolbar=no,status=no,scrollbars=yes,resizable=yes`
             );
-            
+
             // Configurar un intervalo para verificar si la ventana se ha cerrado
             const checkWindowClosed = setInterval(() => {
                 if (paymentWindow.closed) {
                     clearInterval(checkWindowClosed);
-                    
+
                     // Verificar resultado del pago llamando al backend
                     checkPaymentStatus(orderResponse.order._id);
                 }
@@ -167,28 +167,34 @@ const SistemaDePago = () => {
             const response = await getPaymentStatus(orderId, token);
             console.log(response)
 
+            clearCart();
             if (response.paymentStatus === 'completed') {
-                // Pago exitoso
-                clearCart();
+                // Pago exitoso                
                 navigate('/checkout/confirmation/success', {
                     state: { orderId: orderId }
                 });
-            } else if (response.order.paymentStatus === 'processing') {
+            } else if (response.paymentStatus === 'failed') {
+                // Pago aún en proceso
+                toast.error('El pago está siendo procesado. Te notificaremos cuando se complete.');
+                navigate('/checkout/confirmation/failure', {
+                    state: { orderId: orderId }
+                })
+            } else if (response.paymentStatus === 'processing') {
                 // Pago aún en proceso
                 toast.info('El pago está siendo procesado. Te notificaremos cuando se complete.');
                 navigate('/profile/orders');
             } else {
                 // Pago fallido
                 navigate('/checkout/confirmation/failure', {
-                    state: { 
+                    state: {
                         orderId: orderId,
-                        reason: response.order.statusReason || 'rejected'
+                        reason: response.statusReason || 'rejected'
                     }
                 });
             }
-            
+
             setIsProcessing(false);
-            
+
         } catch (error) {
             console.error('Error verificando estado del pago:', error);
             toast.error('No pudimos verificar el estado de tu pago. Por favor revisa tus órdenes.');
@@ -349,8 +355,8 @@ const SistemaDePago = () => {
                                         onClick={handleSubmit}
                                         disabled={isProcessing}
                                         className={`${isProcessing
-                                                ? 'bg-gray-400 cursor-not-allowed'
-                                                : 'bg-blue-600 hover:bg-blue-700'
+                                            ? 'bg-gray-400 cursor-not-allowed'
+                                            : 'bg-blue-600 hover:bg-blue-700'
                                             } text-white px-6 py-2 rounded flex items-center gap-2`}
                                     >
                                         {isProcessing && (

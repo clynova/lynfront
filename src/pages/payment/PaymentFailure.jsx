@@ -9,8 +9,8 @@ const PaymentFailure = () => {
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
-        const orderId = params.get('order_id');
-        const reason = params.get('reason');
+        const orderId = params.get('order_id') || location.state?.orderId;;
+        const reason = params.get('reason') || 'rejected';
 
         if (!orderId) {
             toast.error('No se encontró información de la orden');
