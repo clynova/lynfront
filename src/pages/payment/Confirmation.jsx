@@ -14,7 +14,7 @@ const Confirmation = () => {
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
-        const orderId = params.get('order_id');
+        const orderId = params.get('order_id') || location.state?.orderId;;
 
         if (!orderId) {
             toast.error('No se encontró la orden');
