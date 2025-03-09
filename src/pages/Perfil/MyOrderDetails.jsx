@@ -169,7 +169,7 @@ const MyOrderDetails = () => {
                             <div className="space-y-2">
                                 <div className="flex justify-between items-center">
                                     <span>Subtotal:</span>
-                                    <span>${(order.total - order.shipping.cost).toLocaleString('es-CL')}</span>
+                                    <span>${(order.subtotal).toLocaleString('es-CL')}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span>Costo de envío:</span>
