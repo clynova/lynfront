@@ -1,46 +1,46 @@
 import PropTypes from 'prop-types';
-import { formatCurrency } from '../../utils/funcionesReutilizables';
+import { useNavigate } from 'react-router-dom';
 
 const OrderItem = ({ order, formatDate, getStatusBadgeColor }) => {
-    return (
-        <div className="border dark:border-gray-700 rounded-lg p-4">
-            <div className="flex justify-between items-start mb-4">
-                <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Pedido #{order._id.slice(-8)}
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {formatDate(order.orderDate)}
-                    </p>
-                </div>
-                <span className={`px-3 py-1 rounded-full text-sm ${getStatusBadgeColor(order.status)}`}>
-                    {order.status}
-                </span>
-            </div>
+    const navigate = useNavigate();
 
-            <div className="space-y-3">
-                {order.products.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center">
-                        <div>
-                            <p className="font-medium text-gray-900 dark:text-white">
-                                {item.productId.name}
-                            </p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                Cantidad: {item.quantity}
-                            </p>
-                        </div>
-                        <p className="font-medium text-gray-900 dark:text-white">
-                            {formatCurrency(item.price * item.quantity)}
+    const totalProducts = order.products.reduce((acc, item) => acc + item.quantity, 0);
+
+    return (
+        <div 
+            onClick={() => navigate(`/profile/orders/${order._id}`)}
+            className="bg-white dark:bg-gray-700 rounded-lg shadow p-4 hover:shadow-lg transition-shadow cursor-pointer"
+        >
+            <div className="flex flex-col sm:flex-row justify-between gap-4">
+                <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                        <h3 className="font-medium">Pedido #{order._id.slice(-6)}</h3>
+                        <span className={`px-2 py-1 text-xs rounded-full ${getStatusBadgeColor(order.status)}`}>
+                            {order.status === 'completed' ? 'Completado' : 
+                             order.status === 'pending' ? 'Pendiente' : 'Cancelado'}
+                        </span>
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Fecha: {formatDate(order.orderDate)}
+                    </p>
+                    <div className="mt-2">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {totalProducts} producto{totalProducts !== 1 ? 's' : ''}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Envío: {order.shipping.carrier.name} - {order.shipping.method}
                         </p>
                     </div>
-                ))}
-            </div>
-
-            <div className="mt-4 pt-4 border-t dark:border-gray-700">
-                <div className="flex justify-between items-center">
-                    <p className="font-medium text-gray-900 dark:text-white">Total</p>
-                    <p className="font-bold text-gray-900 dark:text-white">{formatCurrency(order.total)}</p>
                 </div>
+                <div className="text-right">
+                    <p className="font-bold text-lg">${order.total.toLocaleString('es-CL')}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {order.payment.provider}
+                    </p>
+                </div>
+            </div>
+            <div className="mt-3 text-indigo-600 text-sm hover:text-indigo-800">
+                Ver detalles →
             </div>
         </div>
     );
@@ -53,14 +53,23 @@ OrderItem.propTypes = {
         status: PropTypes.string.isRequired,
         products: PropTypes.arrayOf(
             PropTypes.shape({
-                productId: PropTypes.shape({
-                    name: PropTypes.string.isRequired
+                product: PropTypes.shape({
+                    name: PropTypes.string.isRequired,
                 }),
                 quantity: PropTypes.number.isRequired,
                 price: PropTypes.number.isRequired
             })
         ).isRequired,
-        total: PropTypes.number.isRequired
+        total: PropTypes.number.isRequired,
+        shipping: PropTypes.shape({
+            carrier: PropTypes.shape({
+                name: PropTypes.string.isRequired
+            }).isRequired,
+            method: PropTypes.string.isRequired
+        }).isRequired,
+        payment: PropTypes.shape({
+            provider: PropTypes.string.isRequired
+        }).isRequired
     }).isRequired,
     formatDate: PropTypes.func.isRequired,
     getStatusBadgeColor: PropTypes.func.isRequired

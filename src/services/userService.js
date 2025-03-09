@@ -210,6 +210,20 @@ const changePassword = async (passwordData, token) => {
     }
 }
 
+export const getOrderById = async (orderId, token) => {
+    try {
+        const response = await api.get(`/api/order/${orderId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    }
+    catch (error) {
+        throw error.response?.data || { success: false, message: 'Error al obtener los detalles del pedido' };
+    }
+};
+
 export {
     updateProfile,
     getOrders,

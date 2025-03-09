@@ -31,6 +31,7 @@ import { SistemaDePago } from "./pages/payment/SistemaDePago";
 import { CheckoutLayout } from "./layouts/MainLayout/CheckoutLayout";
 import { Confirmation } from './pages/payment/Confirmation';
 import { PaymentFailure } from './pages/payment/PaymentFailure';
+import { MyOrderDetails } from "./pages/Perfil/MyOrderDetails";
 
 const App = () => {
   return (
@@ -65,6 +66,7 @@ const App = () => {
                     <Route element={<ProfileLayout />}>
                       <Route index element={<MyProfile />} />
                       <Route path="orders" element={<MyOrders />} />
+                      <Route path="orders/:orderId" element={<MyOrderDetails />} />
                       <Route path="wishlist" element={<MyWishlist />} />
                       <Route path="addresses" element={<MyAddresses />} />
                       <Route path="settings" element={<MyConfiguration />} />
