@@ -176,8 +176,8 @@ const MyOrderDetails = () => {
                                     <span>${order.shipping.cost.toLocaleString('es-CL')}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
-                                    <span>Comisión {order.payment.provider}:</span>
-                                    <span>${(order.payment.amount - order.total).toLocaleString('es-CL')}</span>
+                                    <span>Comisión {order.payment.provider} ({order.payment.commissionPercentage}%):</span>
+                                    <span>${order.payment.commissionAmount.toLocaleString('es-CL')}</span>
                                 </div>
                                 <div className="flex justify-between items-center font-bold text-lg pt-2 border-t dark:border-gray-600">
                                     <span>Total con comisión:</span>
