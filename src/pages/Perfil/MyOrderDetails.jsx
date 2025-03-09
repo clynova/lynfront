@@ -54,14 +54,14 @@ const MyOrderDetails = () => {
     if (!order) return null;
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
             <div className="mb-6 flex justify-between items-center">
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                     Detalles del Pedido #{order._id.slice(-6)}
                 </h1>
                 <button
                     onClick={() => navigate('/profile/orders')}
-                    className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+                    className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
                 >
                     Volver a Pedidos
                 </button>
@@ -70,20 +70,20 @@ const MyOrderDetails = () => {
             <div className="space-y-6">
                 {/* Estado y Fecha */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <h2 className="font-semibold mb-2">Estado del Pedido</h2>
+                    <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-600">
+                        <h2 className="font-semibold mb-2 text-gray-900 dark:text-white">Estado del Pedido</h2>
                         <span className={`px-2 py-1 rounded-full text-sm ${
-                            order.status === 'completed' ? 'bg-green-100 text-green-800' :
-                            order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-red-100 text-red-800'
+                            order.status === 'completed' ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400' :
+                            order.status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400' :
+                            'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400'
                         }`}>
                             {order.status === 'completed' ? 'Completado' :
                              order.status === 'pending' ? 'Pendiente' : 'Cancelado'}
                         </span>
                     </div>
-                    <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <h2 className="font-semibold mb-2">Fecha del Pedido</h2>
-                        <p>{new Date(order.orderDate).toLocaleDateString('es-ES', {
+                    <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-600">
+                        <h2 className="font-semibold mb-2 text-gray-900 dark:text-white">Fecha del Pedido</h2>
+                        <p className="text-gray-700 dark:text-gray-300">{new Date(order.orderDate).toLocaleDateString('es-ES', {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric'
@@ -92,25 +92,25 @@ const MyOrderDetails = () => {
                 </div>
 
                 {/* Productos */}
-                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                    <h2 className="font-semibold mb-4">Productos</h2>
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-100 dark:border-gray-600">
+                    <h2 className="font-semibold mb-4 text-gray-900 dark:text-white">Productos</h2>
                     <div className="space-y-4">
                         {order.products.map((item) => (
-                            <div key={item.product._id} className="flex justify-between items-center border-b dark:border-gray-600 pb-2">
+                            <div key={item.product._id} className="flex justify-between items-center border-b dark:border-gray-600/50 pb-2">
                                 <div className="flex items-center space-x-4">
                                     <img 
                                         src={getImageUrl(item.product.images[0])} 
                                         alt={item.product.name}
-                                        className="w-16 h-16 object-cover rounded"
+                                        className="w-16 h-16 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
                                     />
                                     <div>
-                                        <p className="font-medium">{item.product.name}</p>
+                                        <p className="font-medium text-gray-900 dark:text-white">{item.product.name}</p>
                                         <p className="text-sm text-gray-600 dark:text-gray-400">
                                             Cantidad: {item.quantity}
                                         </p>
                                     </div>
                                 </div>
-                                <p className="font-medium">
+                                <p className="font-medium text-gray-900 dark:text-white">
                                     ${(item.price * item.quantity).toLocaleString('es-CL')}
                                 </p>
                             </div>
@@ -119,11 +119,11 @@ const MyOrderDetails = () => {
                 </div>
 
                 {/* Información de Envío */}
-                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                    <h2 className="font-semibold mb-4">Información de Envío</h2>
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-100 dark:border-gray-600">
+                    <h2 className="font-semibold mb-4 text-gray-900 dark:text-white">Información de Envío</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <h3 className="text-sm font-medium mb-2">Dirección de Envío</h3>
+                            <h3 className="text-sm font-medium mb-2 text-gray-800 dark:text-gray-200">Dirección de Envío</h3>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                 {order.shippingAddress.recipientName}<br />
                                 {order.shippingAddress.street}<br />
@@ -138,13 +138,13 @@ const MyOrderDetails = () => {
                             )}
                         </div>
                         <div>
-                            <h3 className="text-sm font-medium mb-2">Método de Envío</h3>
+                            <h3 className="text-sm font-medium mb-2 text-gray-800 dark:text-gray-200">Método de Envío</h3>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                 {order.shipping.carrier.name} - {order.shipping.method}<br />
                                 Costo de envío: ${order.shipping.cost.toLocaleString('es-CL')}
                             </p>
                             {order.shipping.trackingNumber && (
-                                <p className="mt-2 text-sm">
+                                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
                                     Número de seguimiento: {order.shipping.trackingNumber}
                                 </p>
                             )}
@@ -153,35 +153,35 @@ const MyOrderDetails = () => {
                 </div>
 
                 {/* Información de Pago */}
-                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                    <h2 className="font-semibold mb-4">Información de Pago</h2>
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-100 dark:border-gray-600">
+                    <h2 className="font-semibold mb-4 text-gray-900 dark:text-white">Información de Pago</h2>
                     <div className="space-y-2">
-                        <p>Estado: {order.payment.status === 'completed' ? 'Completado' : 'Pendiente'}</p>
-                        <p>Método: {order.payment.provider}</p>
+                        <p className="text-gray-700 dark:text-gray-300">Estado: {order.payment.status === 'completed' ? 'Completado' : 'Pendiente'}</p>
+                        <p className="text-gray-700 dark:text-gray-300">Método: {order.payment.provider}</p>
                         {order.payment.paymentDetails && (
                             <>
-                                <p>Número de tarjeta: ****{order.payment.paymentDetails.card_detail?.card_number}</p>
-                                <p>Código de autorización: {order.payment.paymentDetails.authorization_code}</p>
-                                <p>Fecha de transacción: {new Date(order.payment.paymentDetails.transaction_date).toLocaleString('es-ES')}</p>
+                                <p className="text-gray-700 dark:text-gray-300">Número de tarjeta: ****{order.payment.paymentDetails.card_detail?.card_number}</p>
+                                <p className="text-gray-700 dark:text-gray-300">Código de autorización: {order.payment.paymentDetails.authorization_code}</p>
+                                <p className="text-gray-700 dark:text-gray-300">Fecha de transacción: {new Date(order.payment.paymentDetails.transaction_date).toLocaleString('es-ES')}</p>
                             </>
                         )}
-                        <div className="mt-4 pt-4 border-t dark:border-gray-600">
+                        <div className="mt-4 pt-4 border-t dark:border-gray-600/50">
                             <div className="space-y-2">
                                 <div className="flex justify-between items-center">
-                                    <span>Subtotal:</span>
-                                    <span>${(order.subtotal).toLocaleString('es-CL')}</span>
+                                    <span className="text-gray-700 dark:text-gray-300">Subtotal:</span>
+                                    <span className="text-gray-900 dark:text-white">${(order.subtotal).toLocaleString('es-CL')}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span>Costo de envío:</span>
-                                    <span>${order.shipping.cost.toLocaleString('es-CL')}</span>
+                                    <span className="text-gray-700 dark:text-gray-300">Costo de envío:</span>
+                                    <span className="text-gray-900 dark:text-white">${order.shipping.cost.toLocaleString('es-CL')}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
                                     <span>Comisión {order.payment.provider} ({order.payment.commissionPercentage}%):</span>
                                     <span>${order.payment.commissionAmount.toLocaleString('es-CL')}</span>
                                 </div>
-                                <div className="flex justify-between items-center font-bold text-lg pt-2 border-t dark:border-gray-600">
-                                    <span>Total con comisión:</span>
-                                    <span>${order.payment.amount.toLocaleString('es-CL')}</span>
+                                <div className="flex justify-between items-center font-bold text-lg pt-2 border-t dark:border-gray-600/50">
+                                    <span className="text-gray-900 dark:text-white">Total con comisión:</span>
+                                    <span className="text-gray-900 dark:text-white">${order.payment.amount.toLocaleString('es-CL')}</span>
                                 </div>
                             </div>
                         </div>
