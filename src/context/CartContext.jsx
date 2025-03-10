@@ -438,6 +438,59 @@ export const CartProvider = ({ children }) => {
     return isValid;
   };
 
+  // Funciones de cálculo compartidas para el resumen de orden
+  const calculateSubtotal = () => {
+    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+  };
+  
+  const calculateTax = (subtotal) => {
+    return subtotal * 0.16; // 16% de impuesto
+  };
+  
+  const calculateTotalWeight = () => {
+    return cartItems.reduce((total, item) => total + (item.weight || 0) * item.quantity, 0);
+  };
+  
+  const calculateShippingCost = () => {
+    if (shippingInfo?.baseCost && shippingInfo?.extraCostPerKg !== undefined) {
+      const totalWeight = calculateTotalWeight();
+      const extraWeight = Math.max(0, totalWeight - 1);
+      const baseCost = parseFloat(shippingInfo.baseCost);
+      const extraCostPerKg = parseFloat(shippingInfo.extraCostPerKg);
+
+      return baseCost + (extraWeight * extraCostPerKg);
+    }
+    return 0;
+  };
+  
+  const getOrderSummary = (selectedPaymentMethod, includeVAT = false) => {
+    const subtotal = calculateSubtotal();
+    const tax = includeVAT ? calculateTax(subtotal) : 0; // Solo aplicar impuestos si se solicita explícitamente
+    
+    // Asegurarse de que el costo de envío sea un número
+    let shipping = 0;
+    if (shippingInfo?.baseCost) {
+        shipping = parseFloat(shippingInfo.baseCost);
+    }
+    
+    let paymentCommission = 0;
+    if (selectedPaymentMethod?.commission_percentage) {
+        paymentCommission = ((subtotal + shipping) * selectedPaymentMethod.commission_percentage) / 100;
+    }
+    
+    const total = subtotal + tax + shipping + paymentCommission;
+    
+    return {
+        subtotal,
+        tax,
+        shipping,
+        paymentCommission,
+        total,
+        items: cartItems,
+        shippingInfo
+    };
+  };
+
   return (
     <CartContext.Provider value={{
       cartItems,
@@ -455,7 +508,12 @@ export const CartProvider = ({ children }) => {
       savePaymentInfo,
       getCartTotal,
       validateCartStock,
-      isLoading
+      isLoading,
+      calculateSubtotal,
+      calculateTax,
+      calculateShippingCost,
+      calculateTotalWeight,
+      getOrderSummary
     }}>
       {children}
     </CartContext.Provider>

@@ -5,23 +5,121 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { getPaymentMethods } from '../../services/paymentMethods';
 import { createOrder, initiatePayment, getPaymentStatus } from '../../services/checkoutService';
-import { getImageUrl } from '../../utils/funcionesReutilizables';
+import { FiArrowLeft, FiArrowRight, FiLock, FiCreditCard, FiCheckCircle, FiAlertTriangle } from 'react-icons/fi';
+import { BsPaypal, BsBank, BsShieldLock, BsCreditCard2Front } from 'react-icons/bs';
+import { HiShieldCheck } from 'react-icons/hi';
+import CartSummary from '../../components/Cart/CartSummary';
 
+// Componente para la tarjeta de método de pago
+const PaymentMethodCard = ({ method, selected, onSelect }) => {
+    const getMethodIcon = () => {
+        switch (method.type.toLowerCase()) {
+            case 'credit_card':
+            case 'debit_card':
+                return <BsCreditCard2Front size={24} className="text-gray-600" />;
+            case 'paypal':
+                return <BsPaypal size={24} className="text-blue-600" />;
+            case 'bank_transfer':
+                return <BsBank size={24} className="text-green-600" />;
+            default:
+                return <FiCreditCard size={24} className="text-gray-600" />;
+        }
+    };
+
+    return (
+        <div
+            onClick={() => onSelect(method._id)}
+            className={`border rounded-lg p-4 cursor-pointer transition-all ${selected
+                    ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50'
+                    : 'border-gray-200 hover:border-blue-300 hover:shadow-md'
+                }`}
+        >
+            <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                    {getMethodIcon()}
+                    <div>
+                        <h3 className="font-medium">{method.name}</h3>
+                        {method.commission_percentage > 0 && (
+                            <p className="text-sm text-gray-500">
+                                Comisión: {method.commission_percentage}%
+                            </p>
+                        )}
+                    </div>
+                </div>
+                {selected && <FiCheckCircle className="text-blue-600" size={20} />}
+            </div>
+        </div>
+    );
+};
+
+
+
+// Barra de progreso para el checkout
+const CheckoutProgress = () => (
+    <div className="mb-8">
+        <div className="flex justify-between">
+            <div className="text-gray-400">Carrito</div>
+            <div className="text-gray-400">Envío</div>
+            <div className="text-blue-500 font-medium">Pago</div>
+            <div className="text-gray-400">Confirmación</div>
+        </div>
+        <div className="mt-2 h-2 bg-gray-200 rounded-full">
+            <div className="h-full w-3/4 bg-blue-500 rounded-full"></div>
+        </div>
+    </div>
+);
+
+// Componente de garantías y políticas
+const GuaranteesAndPolicies = () => (
+    <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+        <h3 className="font-bold text-lg mb-3 text-gray-600">Garantías y Políticas</h3>
+        <ul className="space-y-3">
+            <li className="flex items-start">
+                <FiCheckCircle className="text-green-600 mt-1 mr-2 flex-shrink-0" />
+                <span className="text-sm text-gray-500">Garantía de satisfacción de 30 días</span>
+            </li>
+            <li className="flex items-start">
+                <FiCheckCircle className="text-green-600 mt-1 mr-2 flex-shrink-0" />
+                <span className="text-sm text-gray-500">Envíos protegidos contra daños</span>
+            </li>
+            <li className="flex items-start">
+                <FiCheckCircle className="text-green-600 mt-1 mr-2 flex-shrink-0" />
+                <span className="text-sm text-gray-500">Soporte al cliente 24/7</span>
+            </li>
+            <li className="flex items-start">
+                <FiAlertTriangle className="text-amber-600 mt-1 mr-2 flex-shrink-0" />
+                <span className="text-sm text-amber-700">Al confirmar, aceptas nuestros términos y condiciones</span>
+            </li>
+        </ul>
+    </div>
+);
+
+// Componente principal
 const SistemaDePago = () => {
     const { cartItems, clearCart, shippingInfo, validateCartStock } = useCart();
     const { token } = useAuth();
     const navigate = useNavigate();
+
     const [paymentMethods, setPaymentMethods] = useState([]);
     const [selectedMethod, setSelectedMethod] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [cardInfo, setCardInfo] = useState({
-        number: '',
-        name: '',
-        expiry: '',
-        cvv: ''
-    });
     const [isProcessing, setIsProcessing] = useState(false);
+
+    const selectedPaymentMethod = selectedMethod
+        ? paymentMethods.find(method => method._id === selectedMethod)
+        : null;
+
+    const calculatePaymentCommission = () => {
+        if (selectedPaymentMethod?.commission_percentage) {
+            const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+            const shipping = shippingInfo?.baseCost ? parseFloat(shippingInfo.baseCost) : 0;
+            return ((subtotal + shipping) * selectedPaymentMethod.commission_percentage) / 100;
+        }
+        return 0;
+    };
+
+    const paymentCommission = calculatePaymentCommission();
 
     useEffect(() => {
         const fetchPaymentMethods = async () => {
@@ -44,147 +142,33 @@ const SistemaDePago = () => {
         fetchPaymentMethods();
     }, []);
 
-    const calculateSubtotal = () => {
-        return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-    };
-
-    const calculateTotalWeight = () => {
-        return cartItems.reduce((total, item) => total + (item.weight || 0) * item.quantity, 0);
-    };
-
-    const calculateShippingCost = () => {
-        if (shippingInfo?.baseCost && shippingInfo?.extraCostPerKg !== undefined) {
-            const totalWeight = calculateTotalWeight();
-            const extraWeight = Math.max(0, totalWeight - 1);
-            const baseCost = parseFloat(shippingInfo.baseCost);
-            const extraCostPerKg = parseFloat(shippingInfo.extraCostPerKg);
-
-            return baseCost + (extraWeight * extraCostPerKg);
+    useEffect(() => {
+        if (!shippingInfo) {
+            navigate('/checkout/envio');
         }
-        return 0;
-    };
+    }, [shippingInfo, navigate]);
 
-    // Calcular la comisión del método de pago
-    const calculatePaymentCommission = (subtotalWithShipping) => {
-        if (selectedMethod) {
-            const selectedPaymentMethod = paymentMethods.find(method => method._id === selectedMethod);
-            if (selectedPaymentMethod?.commission_percentage) {
-                return (subtotalWithShipping * selectedPaymentMethod.commission_percentage) / 100;
-            }
-        }
-        return 0;
-    };
 
-    const shippingCost = calculateShippingCost();
-    const subtotal = calculateSubtotal();
-    const subtotalWithShipping = subtotal + shippingCost;
-    const paymentCommission = calculatePaymentCommission(subtotalWithShipping);
-    const total = subtotalWithShipping + paymentCommission;
 
-    const handleCardInfoChange = (e) => {
-        const { name, value } = e.target;
-        setCardInfo(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        if (!validateCartStock()) {
-            return;
-        }
-
-        if (!selectedMethod) {
-            toast.error('Por favor selecciona un método de pago');
-            return;
-        }
-
-        setIsProcessing(true);
-
-        try {
-            // Crear la orden
-            const orderData = {
-                shippingAddressId: shippingInfo.address._id,
-                paymentMethod: selectedMethod,
-                shippingMethod: shippingInfo.carrierId,
-                recipientName: shippingInfo.recipientInfo.recipientName,
-                phoneContact: shippingInfo.recipientInfo.phoneContact,
-                additionalInstructions: shippingInfo.recipientInfo.additionalInstructions || ''
-            };
-
-            const orderResponse = await createOrder(orderData, token);
-
-            if (!orderResponse.success) {
-                throw new Error(orderResponse.message || 'Error al crear la orden');
-            }
-
-            // Guardar el ID de la orden en localStorage para referencia después
-            localStorage.setItem('currentOrderId', orderResponse.order._id);
-
-            // Iniciar el proceso de pago
-            const paymentResponse = await initiatePayment(orderResponse.order._id, token);
-
-            // Construir URL de pago y abrir en nueva ventana
-            const paymentUrl = new URL(paymentResponse.redirectUrl);
-            paymentUrl.searchParams.set(
-                paymentResponse.payment_type === 'webpay' ? 'token_ws' : 'token',
-                paymentResponse.token
-            );
-
-            // Abrir ventana de pago
-            const width = 800;
-            const height = 600;
-            const left = (window.screen.width - width) / 2;
-            const top = (window.screen.height - height) / 2;
-
-            const paymentWindow = window.open(
-                paymentUrl.toString(),
-                'Pago',
-                `width=${width},height=${height},left=${left},top=${top},location=no,menubar=no,toolbar=no,status=no,scrollbars=yes,resizable=yes`
-            );
-
-            // Configurar un intervalo para verificar si la ventana se ha cerrado
-            const checkWindowClosed = setInterval(() => {
-                if (paymentWindow.closed) {
-                    clearInterval(checkWindowClosed);
-
-                    // Verificar resultado del pago llamando al backend
-                    checkPaymentStatus(orderResponse.order._id);
-                }
-            }, 5000);
-
-        } catch (error) {
-            toast.error(error.message || 'Error al procesar el pago');
-            setIsProcessing(false);
-        }
-    };
-
-    // Función para verificar el estado del pago después de que se cierre la ventana
     const checkPaymentStatus = async (orderId) => {
         try {
             const response = await getPaymentStatus(orderId, token);
-            console.log(response)
+            console.log(response);
 
             clearCart();
             if (response.paymentStatus === 'completed') {
-                // Pago exitoso                
                 navigate('/checkout/confirmation/success', {
                     state: { orderId: orderId }
                 });
             } else if (response.paymentStatus === 'failed') {
-                // Pago aún en proceso
-                toast.error('El pago está siendo procesado. Te notificaremos cuando se complete.');
+                toast.error('El pago ha fallado. Por favor intenta nuevamente.');
                 navigate('/checkout/confirmation/failure', {
                     state: { orderId: orderId }
-                })
+                });
             } else if (response.paymentStatus === 'processing') {
-                // Pago aún en proceso
                 toast.info('El pago está siendo procesado. Te notificaremos cuando se complete.');
                 navigate('/profile/orders');
             } else {
-                // Pago fallido
                 navigate('/checkout/confirmation/failure', {
                     state: {
                         orderId: orderId,
@@ -203,175 +187,168 @@ const SistemaDePago = () => {
         }
     };
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!validateCartStock()) {
+            return;
+        }
+
+        if (!selectedMethod) {
+            toast.error('Por favor selecciona un método de pago');
+            return;
+        }
+
+        setIsProcessing(true);
+        toast.loading('Procesando tu pago...', { id: 'payment' });
+
+        try {
+            const orderData = {
+                shippingAddressId: shippingInfo.address._id,
+                paymentMethod: selectedMethod,
+                shippingMethod: shippingInfo.carrierId,
+                recipientName: shippingInfo.recipientInfo.recipientName,
+                phoneContact: shippingInfo.recipientInfo.phoneContact,
+                additionalInstructions: shippingInfo.recipientInfo.additionalInstructions || ''
+            };
+
+            const orderResponse = await createOrder(orderData, token);
+
+            if (!orderResponse.success) {
+                throw new Error(orderResponse.message || 'Error al crear la orden');
+            }
+
+            localStorage.setItem('currentOrderId', orderResponse.order._id);
+
+            const paymentResponse = await initiatePayment(orderResponse.order._id, token);
+
+            const paymentUrl = new URL(paymentResponse.redirectUrl);
+            paymentUrl.searchParams.set(
+                paymentResponse.payment_type === 'webpay' ? 'token_ws' : 'token',
+                paymentResponse.token
+            );
+
+            const width = 800;
+            const height = 600;
+            const left = (window.screen.width - width) / 2;
+            const top = (window.screen.height - height) / 2;
+
+            toast.dismiss('payment');
+
+            const paymentWindow = window.open(
+                paymentUrl.toString(),
+                'Pago',
+                `width=${width},height=${height},left=${left},top=${top},location=no,menubar=no,toolbar=no,status=no,scrollbars=yes,resizable=yes`
+            );
+
+            const checkWindowClosed = setInterval(() => {
+                if (paymentWindow.closed) {
+                    clearInterval(checkWindowClosed);
+
+                    checkPaymentStatus(orderResponse.order._id);
+                }
+            }, 5000);
+
+        } catch (error) {
+            console.error('Error en el proceso de pago:', error);
+            toast.dismiss('payment');
+            toast.error(error.message || 'Error al procesar el pago');
+            setIsProcessing(false);
+        }
+    };
+
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-48">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="text-center py-8">
-                <p className="text-red-600">{error}</p>
-                <button
-                    onClick={() => window.location.reload()}
-                    className="mt-4 text-blue-600 hover:text-blue-800"
-                >
-                    Reintentar
-                </button>
+            <div className="max-w-7xl mx-auto px-4 py-8">
+                <h1 className="text-3xl font-bold mb-6 text-gray-700">Procesando...</h1>
+                <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+                    <p className="mt-4 text-gray-500">Cargando información de pago...</p>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow">
-            <h1 className="text-2xl font-bold mb-6">Finalizar Compra</h1>
+        <div className="max-w-7xl mx-auto px-4 py-8">
+            <h1 className="text-3xl font-bold mb-2 text-white">Finalizar Compra</h1>
+            <p className="text-gray-500 mb-6">Complete los detalles de pago para finalizar su compra.</p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Order Summary and Shipping Info */}
-                <div className="space-y-6">
-                    {/* Shipping Address Display */}
-                    <div className="border rounded-lg p-4">
-                        <h2 className="text-lg font-semibold mb-3">Dirección de Envío</h2>
-                        {shippingInfo?.address && (
-                            <div className="space-y-1">
-                                <p className="font-medium">{shippingInfo.address.street}</p>
-                                <p className="text-gray-600">{shippingInfo.address.city}, {shippingInfo.address.state}</p>
-                                <p className="text-gray-600">{shippingInfo.address.country}, {shippingInfo.address.zipCode}</p>
-                                {shippingInfo.address.reference && (
-                                    <p className="text-gray-500 text-sm">Ref: {shippingInfo.address.reference}</p>
-                                )}
-                                <div className="mt-2 pt-2 border-t">
-                                    <p className="text-sm text-gray-600">
-                                        Método de envío: {shippingInfo.methodName} ({shippingInfo.deliveryTime})
-                                    </p>
-                                    {shippingInfo.carrierName && (
-                                        <p className="text-sm text-gray-600">
-                                            Transportista: {shippingInfo.carrierName}
-                                        </p>
-                                    )}
-                                </div>
+            <CheckoutProgress />
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2">
+                    <form onSubmit={handleSubmit}>
+                        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+                            <h2 className="text-xl font-bold mb-4 text-gray-600">Método de Pago</h2>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                {paymentMethods.map(method => (
+                                    <PaymentMethodCard
+                                        key={method._id}
+                                        method={method}
+                                        selected={selectedMethod === method._id}
+                                        onSelect={setSelectedMethod}
+                                    />
+                                ))}
                             </div>
-                        )}
-                    </div>
 
-                    {/* Order Summary */}
-                    <div>
-                        <h2 className="text-lg font-semibold mb-3">Resumen del Pedido</h2>
-                        <div className="border rounded-lg p-4 space-y-4">
-                            {cartItems.map((item) => (
-                                <div key={item._id} className="flex justify-between">
-                                    <div>
-                                        <p className="font-medium">{item.name}</p>
-                                        <p className="text-sm text-gray-600">Cantidad: {item.quantity}</p>
-                                        {item.weight && (
-                                            <p className="text-sm text-gray-500">Peso: {(item.weight * item.quantity).toFixed(2)}kg</p>
-                                        )}
-                                    </div>
-                                    <p>${(item.price * item.quantity).toFixed(2)}</p>
+                            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="flex items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                    <FiLock className="text-green-600 mr-2" size={20} />
+                                    <span className="text-sm">Pago Seguro</span>
                                 </div>
-                            ))}
-                            <div className="border-t pt-4 space-y-2">
-                                <div className="flex justify-between">
-                                    <p>Subtotal</p>
-                                    <p>${subtotal.toFixed(2)}</p>
+                                <div className="flex items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                    <BsShieldLock className="text-green-600 mr-2" size={20} />
+                                    <span className="text-sm">Datos Encriptados</span>
                                 </div>
-                                <div className="flex justify-between">
-                                    <p>Envío {shippingInfo?.methodName && `(${shippingInfo.methodName})`}</p>
-                                    <p>${shippingCost.toFixed(2)}</p>
-                                </div>
-                                <div className="flex justify-between text-sm text-gray-600">
-                                    <p>Peso total:</p>
-                                    <p>{calculateTotalWeight().toFixed(2)}kg</p>
-                                </div>
-                                {selectedMethod && paymentCommission > 0 && (
-                                    <div className="flex justify-between text-sm">
-                                        <p>Comisión de pago:</p>
-                                        <p>${paymentCommission.toFixed(2)}</p>
-                                    </div>
-                                )}
-                                <div className="flex justify-between font-bold">
-                                    <p>Total</p>
-                                    <p>${total.toFixed(2)}</p>
+                                <div className="flex items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                    <HiShieldCheck className="text-green-600 mr-2" size={20} />
+                                    <span className="text-sm">Transacción Protegida</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                {/* Payment Methods */}
-                <div>
-                    <h2 className="text-lg font-semibold mb-4">Método de Pago</h2>
-                    <div className="space-y-4">
-                        {paymentMethods.map((method) => (
-                            <label
-                                key={method._id}
-                                className={`flex items-center p-4 border rounded cursor-pointer hover:bg-gray-50 ${selectedMethod === method._id ? 'border-blue-500 bg-blue-50' : ''
+                        <div className="flex justify-between mt-8">
+                            <Link
+                                to="/checkout/envio"
+                                className="flex items-center text-blue-500 hover:text-blue-700 py-2 px-4"
+                                onClick={() => !isProcessing}
+                            >
+                                <FiArrowLeft className="mr-2" /> Volver a envío
+                            </Link>
+                            <button
+                                type="submit"
+                                disabled={isProcessing || !selectedMethod}
+                                className={`py-3 px-6 rounded-lg flex items-center ${isProcessing
+                                        ? 'bg-gray-400 cursor-not-allowed'
+                                        : 'bg-blue-500 hover:bg-blue-600 text-white'
                                     }`}
                             >
-                                <input
-                                    type="radio"
-                                    name="paymentMethod"
-                                    value={method._id}
-                                    checked={selectedMethod === method._id}
-                                    onChange={(e) => setSelectedMethod(e.target.value)}
-                                    className="mr-3"
-                                />
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-3">
-                                        {method.logo_url && (
-                                            <img
-                                                src={getImageUrl(method.logo_url)}
-                                                alt={method.name}
-                                                className="h-8 w-auto object-contain"
-                                            />
-                                        )}
-                                        <div>
-                                            <p className="font-medium">{method.name}</p>
-                                            <p className="text-sm text-gray-600">{method.description}</p>
-                                            {method.commission_percentage > 0 && (
-                                                <p className="text-xs text-gray-500">
-                                                    Comisión: {method.commission_percentage}%
-                                                </p>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </label>
-                        ))}
+                                {isProcessing ? (
+                                    <>Procesando<span className="ml-2 animate-pulse">...</span></>
+                                ) : (
+                                    <>Confirmar y Pagar <FiArrowRight className="ml-2" /></>
+                                )}
+                            </button>
+                        </div>
+                    </form>
+                </div>
 
-                        {selectedMethod && (
-                            <div className="mt-6">
-                                <div className="flex justify-between items-center">
-                                    <Link
-                                        to="/checkout/envio"
-                                        className="text-blue-600 hover:text-blue-800"
-                                    >
-                                        ← Volver al envío
-                                    </Link>
-                                    <button
-                                        onClick={handleSubmit}
-                                        disabled={isProcessing}
-                                        className={`${isProcessing
-                                            ? 'bg-gray-400 cursor-not-allowed'
-                                            : 'bg-blue-600 hover:bg-blue-700'
-                                            } text-white px-6 py-2 rounded flex items-center gap-2`}
-                                    >
-                                        {isProcessing && (
-                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                        )}
-                                        {isProcessing ? 'Procesando...' : 'Confirmar Pedido'}
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                <div className="lg:col-span-1">
+                    <CartSummary
+                        cartItems={cartItems}
+                        shippingInfo={shippingInfo}
+                        paymentMethod={selectedPaymentMethod}
+                        showButton={false}
+                        loading={loading}
+                    />
+
+                    <GuaranteesAndPolicies />
                 </div>
             </div>
         </div>
     );
-}
+};
 
 export { SistemaDePago };
