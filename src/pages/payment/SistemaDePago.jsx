@@ -109,9 +109,9 @@ const SistemaDePago = () => {
                 shippingAddressId: shippingInfo.address._id,
                 paymentMethod: selectedMethod,
                 shippingMethod: shippingInfo.carrierId,
-                recipientName: shippingInfo.address.recipientName || "María González",
-                phoneContact: shippingInfo.address.phoneContact || "+56912345678",
-                additionalInstructions: shippingInfo.address.reference || "El portón es azul, por favor tocar el timbre"
+                recipientName: shippingInfo.recipientInfo.recipientName,
+                phoneContact: shippingInfo.recipientInfo.phoneContact,
+                additionalInstructions: shippingInfo.recipientInfo.additionalInstructions || ''
             };
 
             const orderResponse = await createOrder(orderData, token);

@@ -16,6 +16,11 @@ const FormaEnvio = () => {
     const [addresses, setAddresses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showAddressForm, setShowAddressForm] = useState(false);
+    const [recipientInfo, setRecipientInfo] = useState({
+        recipientName: '',
+        phoneContact: '',
+        additionalInstructions: ''
+    });
     const { token } = useAuth();
     const { saveShippingInfo } = useCart();
 
@@ -63,6 +68,10 @@ const FormaEnvio = () => {
             toast.error("Por favor selecciona un método de envío");
             return;
         }
+        if (!recipientInfo.recipientName || !recipientInfo.phoneContact) {
+            toast.error("Por favor completa la información del destinatario");
+            return;
+        }
 
         const selectedAddress = addresses.find(addr => addr._id === selectedAddressId);
         const carrier = shippingMethods.find(c => c._id === selectedCarrier);
@@ -76,7 +85,8 @@ const FormaEnvio = () => {
             deliveryTime: method?.delivery_time,
             baseCost: method?.base_cost,
             extraCostPerKg: method?.extra_cost_per_kg,
-            address: selectedAddress
+            address: selectedAddress,
+            recipientInfo: recipientInfo
         });
 
         // Navegar a la página de pago
@@ -96,6 +106,14 @@ const FormaEnvio = () => {
         } catch (error) {
             toast.error("Error al agregar la dirección");
         }
+    };
+
+    const handleRecipientInfoChange = (e) => {
+        const { name, value } = e.target;
+        setRecipientInfo(prev => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
     if (loading) {
@@ -169,36 +187,87 @@ const FormaEnvio = () => {
                         onCancel={() => setShowAddressForm(false)}
                     />
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {addresses.map((address) => (
-                            <label
-                                key={address._id}
-                                className={`flex items-start p-4 border rounded cursor-pointer hover:bg-gray-50 ${
-                                    selectedAddressId === address._id ? 'border-blue-500 bg-blue-50' : ''
-                                }`}
-                            >
-                                <input
-                                    type="radio"
-                                    name="address"
-                                    value={address._id}
-                                    checked={selectedAddressId === address._id}
-                                    onChange={(e) => setSelectedAddressId(e.target.value)}
-                                    className="mr-3 mt-1"
-                                />
-                                <div>
-                                    <p className="font-medium">{address.street}</p>
-                                    <p className="text-gray-600">{address.city}, {address.state}</p>
-                                    <p className="text-gray-600">{address.country}, {address.zipCode}</p>
-                                    {address.reference && (
-                                        <p className="text-gray-500 text-sm">Ref: {address.reference}</p>
-                                    )}
-                                    {address.isDefault && (
-                                        <span className="text-green-600 text-sm">Predeterminada</span>
-                                    )}
+                    <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            {addresses.map((address) => (
+                                <label
+                                    key={address._id}
+                                    className={`flex items-start p-4 border rounded cursor-pointer hover:bg-gray-50 ${
+                                        selectedAddressId === address._id ? 'border-blue-500 bg-blue-50' : ''
+                                    }`}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="address"
+                                        value={address._id}
+                                        checked={selectedAddressId === address._id}
+                                        onChange={(e) => setSelectedAddressId(e.target.value)}
+                                        className="mr-3 mt-1"
+                                    />
+                                    <div>
+                                        <p className="font-medium">{address.street}</p>
+                                        <p className="text-gray-600">{address.city}, {address.state}</p>
+                                        <p className="text-gray-600">{address.country}, {address.zipCode}</p>
+                                        {address.reference && (
+                                            <p className="text-gray-500 text-sm">Ref: {address.reference}</p>
+                                        )}
+                                        {address.isDefault && (
+                                            <span className="text-green-600 text-sm">Predeterminada</span>
+                                        )}
+                                    </div>
+                                </label>
+                            ))}
+                        </div>
+                        
+                        {selectedAddressId && (
+                            <div className="mt-6 space-y-4 border rounded-lg p-4">
+                                <h3 className="font-medium text-lg mb-3">Información del destinatario</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Nombre del destinatario *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="recipientName"
+                                            value={recipientInfo.recipientName}
+                                            onChange={handleRecipientInfoChange}
+                                            className="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
+                                            required
+                                            placeholder="Nombre completo"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Teléfono de contacto *
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            name="phoneContact"
+                                            value={recipientInfo.phoneContact}
+                                            onChange={handleRecipientInfoChange}
+                                            className="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
+                                            required
+                                            placeholder="+56912345678"
+                                        />
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Instrucciones adicionales
+                                        </label>
+                                        <textarea
+                                            name="additionalInstructions"
+                                            value={recipientInfo.additionalInstructions}
+                                            onChange={handleRecipientInfoChange}
+                                            className="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
+                                            rows="2"
+                                            placeholder="Instrucciones para la entrega (opcional)"
+                                        />
+                                    </div>
                                 </div>
-                            </label>
-                        ))}
-                    </div>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
 
