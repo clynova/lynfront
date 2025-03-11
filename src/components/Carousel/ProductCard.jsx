@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { addProductToWishlist } from '../../services/userService';
 import toast from 'react-hot-toast';
+import { getImageUrl, formatCurrency } from '../../utils/funcionesReutilizables';
 
 const ProductCard = ({ product }) => {
     const [imageError, setImageError] = useState(false);
@@ -92,11 +93,11 @@ const ProductCard = ({ product }) => {
                     </Link>
                     <div className="flex items-center justify-between mb-4">
                         <span className="text-xl font-bold text-gray-900 dark:text-white">
-                            ${product.price?.toFixed(2)}
+                            {formatCurrency(product.price)}
                         </span>
                         {product.oldPrice && (
                             <span className="text-sm text-gray-500 line-through">
-                                ${product.oldPrice.toFixed(2)}
+                                {formatCurrency(product.oldPrice)}
                             </span>
                         )}
                     </div>

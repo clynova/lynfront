@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getWishlist, removeFromWishlist } from "../../services/userService";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
-import { getImageUrl } from "../../utils/funcionesReutilizables";
+import { getImageUrl, formatCurrency } from "../../utils/funcionesReutilizables";
 import { Link } from "react-router-dom";
 import { HiOutlineTrash, HiShoppingCart } from "react-icons/hi";
 import { toast } from "react-hot-toast";
@@ -116,7 +116,7 @@ const MyWishlist = () => {
                                 </Link>
                                 <div className="flex justify-between items-center mb-4">
                                     <span className="text-lg font-bold text-gray-900 dark:text-white">
-                                        ${product.price}
+                                        {formatCurrency(product.price)}
                                     </span>
                                     <span className={`text-sm ${
                                         product.stock > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'

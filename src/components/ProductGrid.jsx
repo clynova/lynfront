@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { CiHeart } from "react-icons/ci";
 import { HiHeart } from "react-icons/hi";
-import { cortarTexto } from '../utils/funcionesReutilizables';
+import { cortarTexto, formatCurrency } from '../utils/funcionesReutilizables';
 import { useProducts } from '../context/ProductContext';
 import { addProductToWishlist } from '../services/userService';
 import { useAuth } from '../context/AuthContext';
@@ -138,7 +138,7 @@ const ProductGrid = () => {
                 <span className="text-2xl font-bold text-gray-900 dark:text-white 
                              group-hover:text-blue-600 dark:group-hover:text-blue-400 
                              transition-colors duration-200">
-                  ${product.price}
+                  {formatCurrency(product.price)}
                 </span>
                 {product.stock > 0 && (
                   <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">

@@ -1,6 +1,8 @@
 import { useCart } from '../../context/CartContext';
 import { FiArrowRight, FiLock } from 'react-icons/fi';
-import { getImageUrl } from '../../utils/funcionesReutilizables';
+import { getImageUrl, formatCurrency } from '../../utils/funcionesReutilizables';
+import PropTypes from 'prop-types';
+
 /**
  * Componente reutilizable para mostrar el resumen de la compra
  * 
@@ -77,8 +79,8 @@ const CartSummary = ({
                                 <div className="flex-grow">
                                     <p className="text-sm font-medium truncate">{item.name}</p>
                                     <div className="flex justify-between text-sm text-gray-500">
-                                        <span>{item.quantity} x ${item.price.toFixed(2)}</span>
-                                        <span>${(item.price * item.quantity).toFixed(2)}</span>
+                                        <span>{item.quantity} x {formatCurrency(item.price)}</span>
+                                        <span>{formatCurrency(item.price * item.quantity)}</span>
                                     </div>
                                 </div>
                             </div>
@@ -90,7 +92,7 @@ const CartSummary = ({
             <div className="space-y-3 mb-4">
                 <div className="flex justify-between">
                     <span className="text-gray-500">Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span>{formatCurrency(subtotal)}</span>
                 </div>
                 
                 <div className="flex justify-between">
@@ -98,7 +100,7 @@ const CartSummary = ({
                     <span>
                         {shippingCost === 0 
                             ? 'Se calcula en el siguiente paso' 
-                            : `$${shippingCost.toFixed(2)}`
+                            : formatCurrency(shippingCost)
                         }
                     </span>
                 </div>
@@ -106,13 +108,13 @@ const CartSummary = ({
                 {paymentCommission > 0 && (
                     <div className="flex justify-between">
                         <span className="text-gray-500">Comisión de pago</span>
-                        <span>${paymentCommission.toFixed(2)}</span>
+                        <span>{formatCurrency(paymentCommission)}</span>
                     </div>
                 )}
                 
                 <div className="flex justify-between border-t pt-2 font-bold mt-2">
                     <span>Total</span>
-                    <span className="text-blue-500 text-xl">${total.toFixed(2)}</span>
+                    <span className="text-blue-500 text-xl">{formatCurrency(total)}</span>
                 </div>
             </div>
             
@@ -157,4 +159,15 @@ const CartSummary = ({
     );
 };
 
-export default CartSummary; 
+CartSummary.propTypes = {
+    cartItems: PropTypes.array,
+    onContinue: PropTypes.func,
+    shippingMethod: PropTypes.object,
+    shippingInfo: PropTypes.object,
+    paymentMethod: PropTypes.object,
+    showButton: PropTypes.bool,
+    buttonText: PropTypes.string,
+    loading: PropTypes.bool
+};
+
+export default CartSummary;

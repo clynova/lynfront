@@ -1,7 +1,7 @@
 import { HiMinus, HiPlus, HiX } from 'react-icons/hi';
 import { useCart } from '../../context/CartContext';
 import PropTypes from 'prop-types';
-import { getImageUrl } from '../../utils/funcionesReutilizables';
+import { getImageUrl, formatCurrency } from '../../utils/funcionesReutilizables';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 
@@ -31,7 +31,7 @@ const CartItem = ({ item }) => {
       />
       <div className="flex-1 ml-4">
         <h3 className="text-sm font-medium text-slate-200">{item.name}</h3>
-        <p className="text-sm text-slate-400">${item.price}</p>
+        <p className="text-sm text-slate-400">{formatCurrency(item.price)}</p>
         <div className="flex items-center mt-2">
           <button
             onClick={() => updateQuantity(item._id, item.quantity - 1)}

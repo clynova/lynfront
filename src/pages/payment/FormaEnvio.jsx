@@ -9,6 +9,7 @@ import { AddressForm } from '../Perfil/MyAddresses';
 import { toast } from 'react-hot-toast';
 import { getShippingMethods } from '../../services/shippingMethods';
 import CartSummary from '../../components/Cart/CartSummary';
+import { formatCurrency } from '../../utils/funcionesReutilizables';
 
 const AddressCard = ({ address, selected, onSelect, onEdit, onDelete }) => {
     const getAddressTypeIcon = () => {
@@ -127,7 +128,7 @@ const ShippingMethodSelect = ({ shippingMethods, selectedCarrier, selectedMethod
                                                     Tiempo estimado de entrega: {method.delivery_time}
                                                 </div>
                                                 <div className="text-blue-600 font-medium mt-1">
-                                                    ${method.base_cost}
+                                                    {formatCurrency(method.base_cost)}
                                                 </div>
                                             </label>
                                         </div>

@@ -8,7 +8,7 @@ import { getProductById } from '../../services/productService';
 import { FiTrash2, FiShoppingBag, FiArrowRight, FiLock } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import CartSummary from '../../components/Cart/CartSummary';
-import { getImageUrl } from '../../utils/funcionesReutilizables';
+import { getImageUrl, formatCurrency } from '../../utils/funcionesReutilizables';
 
 // Componente para el producto en el carrito
 const CartItem = ({ item, updateQuantity, removeFromCart, getValidStock }) => {
@@ -30,7 +30,7 @@ const CartItem = ({ item, updateQuantity, removeFromCart, getValidStock }) => {
                     <Link to={`/producto/${item._id}`} className="font-medium text-lg text-gray-800 hover:text-blue-600 transition-colors">
                         {item.name}
                     </Link>
-                    <p className="text-blue-600 font-bold">${item.price.toFixed(2)}</p>
+                    <p className="text-blue-600 font-bold">{formatCurrency(item.price)}</p>
                     <p className="text-sm text-gray-500">
                         Stock disponible: {getValidStock(item.stock)}
                     </p>
@@ -64,7 +64,7 @@ const CartItem = ({ item, updateQuantity, removeFromCart, getValidStock }) => {
                 </div>
                 
                 <div className="text-right">
-                    <p className="font-bold">${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="font-bold">{formatCurrency(item.price * item.quantity)}</p>
                 </div>
                 
                 <button

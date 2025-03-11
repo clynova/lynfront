@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
+import { formatCurrency } from '../../utils/funcionesReutilizables';
 
 const OrderItem = ({ order, formatDate, getStatusBadgeColor }) => {
     const navigate = useNavigate();
@@ -33,7 +34,7 @@ const OrderItem = ({ order, formatDate, getStatusBadgeColor }) => {
                     </div>
                 </div>
                 <div className="text-right">
-                    <p className="font-bold text-lg text-gray-900 dark:text-white">${order.total.toLocaleString('es-CL')}</p>
+                    <p className="font-bold text-lg text-gray-900 dark:text-white">{formatCurrency(order.total)}</p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                         {order.payment.provider}
                     </p>
