@@ -128,10 +128,20 @@ const deleteAddress = async (addressId, token) => {
                 Authorization: `Bearer ${token}`,
             },
         });
-        return response.data;
+        
+        // Devolver la respuesta con la misma estructura que las otras funciones
+        return {
+            success: response.data.success || true,
+            msg: response.data.msg || "Dirección eliminada correctamente",
+            data: response.data.data
+        };
     }
     catch (error) {
-        throw error.response?.data;
+        console.error('Error en deleteAddress:', error);
+        return {
+            success: false,
+            msg: error.response?.data?.message || 'Error al eliminar la dirección'
+        };
     }
 }
 

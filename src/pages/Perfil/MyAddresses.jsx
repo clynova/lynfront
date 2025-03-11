@@ -219,10 +219,12 @@ const MyAddresses = () => {
                 const response = await deleteAddress(addressId, token);
                 if (response.success) {
                     setAddresses(prev => prev.filter(addr => addr._id !== addressId));
-                    toast.success("Dirección eliminada correctamente");
+                    toast.success(response.msg);
+                } else {
+                    throw new Error(response.msg);
                 }
             } catch (error) {
-                toast.error("Error al eliminar la dirección");
+                toast.error(error.message || "Error al eliminar la dirección");
             }
         }
     };

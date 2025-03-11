@@ -2,16 +2,14 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
-import { getAddresses, addAddress } from '../../services/userService';
+import { getAddresses, addAddress, deleteAddress, updateAddress } from '../../services/userService';
 import { HiPlus, HiHome, HiLocationMarker, HiOfficeBuilding, HiCheckCircle } from 'react-icons/hi';
 import { FiArrowLeft, FiArrowRight, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { AddressForm } from '../Perfil/MyAddresses';
 import { toast } from 'react-hot-toast';
 import { getShippingMethods } from '../../services/shippingMethods';
-import { motion, AnimatePresence } from 'framer-motion';
 import CartSummary from '../../components/Cart/CartSummary';
 
-// Componente de tarjeta de dirección
 const AddressCard = ({ address, selected, onSelect, onEdit, onDelete }) => {
     const getAddressTypeIcon = () => {
         switch (address.addressType) {
@@ -25,13 +23,12 @@ const AddressCard = ({ address, selected, onSelect, onEdit, onDelete }) => {
     };
 
     return (
-        <div 
+        <div
             onClick={() => onSelect(address._id)}
-            className={`border rounded-lg p-4 cursor-pointer transition-all mb-3 ${
-                selected 
-                    ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50' 
-                    : 'border-gray-200 hover:border-blue-300 hover:shadow-md'
-            }`}
+            className={`border rounded-lg p-4 cursor-pointer transition-all mb-3 ${selected
+                ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50'
+                : 'border-gray-200 hover:border-blue-300 hover:shadow-md'
+                }`}
         >
             <div className="flex justify-between items-start">
                 <div className="flex items-center space-x-2 text-gray-700 mb-2">
@@ -47,7 +44,7 @@ const AddressCard = ({ address, selected, onSelect, onEdit, onDelete }) => {
                     </div>
                 )}
             </div>
-            
+
             <div className="mb-2">
                 <p className="font-medium">{address.recipient}</p>
                 <p className="text-gray-700">
@@ -60,9 +57,9 @@ const AddressCard = ({ address, selected, onSelect, onEdit, onDelete }) => {
                 <p className="text-gray-700">CP: {address.zipCode}</p>
                 {address.phoneContact && <p className="text-gray-700">Tel: {address.phoneContact}</p>}
             </div>
-            
+
             <div className="flex space-x-2 mt-3">
-                <button 
+                <button
                     onClick={(e) => {
                         e.stopPropagation();
                         onEdit(address);
@@ -71,14 +68,15 @@ const AddressCard = ({ address, selected, onSelect, onEdit, onDelete }) => {
                 >
                     <FiEdit2 className="mr-1" /> Editar
                 </button>
-                <button 
+                <button
                     onClick={(e) => {
                         e.stopPropagation();
                         onDelete(address._id);
                     }}
-                    className="text-sm flex items-center text-gray-600 hover:text-red-600 py-1 px-2 rounded hover:bg-gray-100"
+                    className="p-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                    aria-label="Eliminar dirección"
                 >
-                    <FiTrash2 className="mr-1" /> Eliminar
+                    <FiTrash2 className="w-5 h-5" />
                 </button>
             </div>
         </div>
@@ -90,7 +88,7 @@ const ShippingMethodSelect = ({ shippingMethods, selectedCarrier, selectedMethod
     return (
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
             <h2 className="text-xl font-bold mb-4">Método de Envío</h2>
-            
+
             <div className="space-y-6">
                 {shippingMethods.map((carrier) => (
                     <div key={carrier._id} className="border-b pb-4 last:border-b-0 last:pb-0">
@@ -108,7 +106,7 @@ const ShippingMethodSelect = ({ shippingMethods, selectedCarrier, selectedMethod
                                 {carrier.name}
                             </label>
                         </div>
-                        
+
                         {selectedCarrier === carrier._id && (
                             <div className="ml-7 space-y-3">
                                 {carrier.methods.map((method) => (
@@ -140,7 +138,7 @@ const ShippingMethodSelect = ({ shippingMethods, selectedCarrier, selectedMethod
                     </div>
                 ))}
             </div>
-            
+
             {shippingMethods.length === 0 && (
                 <div className="text-center py-6 text-gray-500">
                     No hay métodos de envío disponibles en este momento.
@@ -155,7 +153,7 @@ const RecipientInfoForm = ({ recipientInfo, onChange }) => {
     return (
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
             <h2 className="text-xl font-bold mb-4">Información del Destinatario</h2>
-            
+
             <div className="space-y-4">
                 <div>
                     <label htmlFor="recipientName" className="block text-sm font-medium text-gray-700 mb-1">
@@ -172,7 +170,7 @@ const RecipientInfoForm = ({ recipientInfo, onChange }) => {
                         required
                     />
                 </div>
-                
+
                 <div>
                     <label htmlFor="phoneContact" className="block text-sm font-medium text-gray-700 mb-1">
                         Teléfono de contacto*
@@ -188,7 +186,7 @@ const RecipientInfoForm = ({ recipientInfo, onChange }) => {
                         required
                     />
                 </div>
-                
+
                 <div>
                     <label htmlFor="additionalInstructions" className="block text-sm font-medium text-gray-700 mb-1">
                         Instrucciones adicionales (opcional)
@@ -332,7 +330,7 @@ const FormaEnvio = () => {
             const response = await addAddress(fullAddressData, token);
             if (response.success && response.data) {
                 const newAddress = response.data;
-                
+
                 // Actualizar el estado de las direcciones
                 setAddresses(prev => {
                     // Si la nueva dirección es predeterminada, actualizar las demás
@@ -342,10 +340,10 @@ const FormaEnvio = () => {
                     }));
                     return [...updatedAddresses, newAddress];
                 });
-                
+
                 // Seleccionar la nueva dirección
                 setSelectedAddressId(newAddress._id);
-                
+
                 // Actualizar la información del destinatario si es necesario
                 if (newAddress.recipient && newAddress.phoneContact) {
                     setRecipientInfo(prev => ({
@@ -355,7 +353,7 @@ const FormaEnvio = () => {
                         additionalInstructions: newAddress.additionalInstructions || ''
                     }));
                 }
-                
+
                 setShowAddressForm(false);
                 setAddressToEdit(null);
                 toast.success("Dirección agregada correctamente");
@@ -379,9 +377,30 @@ const FormaEnvio = () => {
         setShowAddressForm(true);
     };
 
+    // Componente de tarjeta de dirección
     const handleDeleteAddress = async (addressId) => {
-        // Aquí deberías implementar la lógica para eliminar la dirección
-        toast.error("Función de eliminación no implementada");
+        if (window.confirm("¿Estás seguro de que deseas eliminar esta dirección?")) {
+            try {
+                const response = await deleteAddress(addressId, token);
+                if (response.success) {
+                    setAddresses(prev => prev.filter(addr => addr._id !== addressId));
+                    // Si la dirección eliminada era la seleccionada, limpiar la selección
+                    if (selectedAddressId === addressId) {
+                        setSelectedAddressId('');
+                        setRecipientInfo({
+                            recipientName: '',
+                            phoneContact: '',
+                            additionalInstructions: ''
+                        });
+                    }
+                    toast.success(response.msg);
+                } else {
+                    throw new Error(response.msg);
+                }
+            } catch (error) {
+                toast.error(error.message || "Error al eliminar la dirección");
+            }
+        }
     };
 
     const handleAddAddress = async (addressData) => {
@@ -389,7 +408,7 @@ const FormaEnvio = () => {
             const response = await addAddress(addressData, token);
             if (response.success) {
                 const newAddress = response.data;
-                
+
                 // Actualizar el estado de las direcciones
                 setAddresses(prev => {
                     const updatedAddresses = prev.map(addr => ({
@@ -398,21 +417,21 @@ const FormaEnvio = () => {
                     }));
                     return [...updatedAddresses, newAddress];
                 });
-                
+
                 // Seleccionar la nueva dirección automáticamente
                 setSelectedAddressId(newAddress._id);
-                
+
                 // Actualizar la información del destinatario
                 setRecipientInfo({
                     recipientName: newAddress.recipient || '',
                     phoneContact: newAddress.phoneContact || '',
                     additionalInstructions: newAddress.additionalInstructions || ''
                 });
-                
+
                 // Cerrar el formulario y mostrar mensaje de éxito
                 setShowAddressForm(false);
                 toast.success(response.msg || "Dirección agregada correctamente");
-                
+
                 // Refrescar la lista de direcciones
                 await fetchAddresses();
             }
@@ -430,9 +449,9 @@ const FormaEnvio = () => {
         <div className="max-w-7xl mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-2 text-white">Información de Envío</h1>
             <p className="text-gray-500 mb-6">Selecciona tu dirección y método de envío preferido.</p>
-            
+
             <CheckoutProgress />
-            
+
             {loading ? (
                 <div className="text-center py-8">
                     <p className="text-gray-500">Cargando información...</p>
@@ -454,7 +473,7 @@ const FormaEnvio = () => {
                                     <HiPlus className="mr-1" /> Nueva dirección
                                 </button>
                             </div>
-                            
+
                             {showAddressForm && (
                                 <div className="mb-6">
                                     <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
@@ -471,7 +490,7 @@ const FormaEnvio = () => {
                                                 &times;
                                             </button>
                                         </div>
-                                        <AddressForm 
+                                        <AddressForm
                                             onSubmit={handleAddAddress}
                                             initialData={addressToEdit}
                                             onCancel={() => setShowAddressForm(false)}
@@ -508,7 +527,7 @@ const FormaEnvio = () => {
                                 )}
                             </div>
                         </div>
-                        
+
                         <form onSubmit={handleSubmit}>
                             {/* Sección de métodos de envío */}
                             <ShippingMethodSelect
@@ -518,13 +537,13 @@ const FormaEnvio = () => {
                                 onCarrierChange={setSelectedCarrier}
                                 onMethodChange={setSelectedMethod}
                             />
-                            
+
                             {/* Información del destinatario */}
                             <RecipientInfoForm
                                 recipientInfo={recipientInfo}
                                 onChange={handleRecipientInfoChange}
                             />
-                            
+
                             {/* Botones de navegación */}
                             <div className="flex justify-between mt-8">
                                 <Link
@@ -542,11 +561,11 @@ const FormaEnvio = () => {
                             </div>
                         </form>
                     </div>
-                    
+
                     {/* Resumen del pedido */}
                     <div className="lg:col-span-1">
-                        <CartSummary 
-                            cartItems={cartItems} 
+                        <CartSummary
+                            cartItems={cartItems}
                             shippingMethod={selectedShippingMethod}
                             showButton={false}
                         />
