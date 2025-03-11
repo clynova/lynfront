@@ -240,18 +240,27 @@ const FormaEnvio = () => {
     const { token } = useAuth();
     const { cartItems, saveShippingInfo } = useCart();
 
+    const fetchAddresses = async () => {
+        try {
+            const addressResponse = await getAddresses(token);
+            if (addressResponse.success) {
+                setAddresses(addressResponse.data.addresses || []);
+                // Si hay una dirección predeterminada, seleccionarla
+                const defaultAddress = addressResponse.data.addresses?.find(addr => addr.isDefault);
+                if (defaultAddress) {
+                    setSelectedAddressId(defaultAddress._id);
+                }
+            }
+        } catch (error) {
+            toast.error("Error al cargar las direcciones");
+        }
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
                 // Fetch addresses
-                const addressResponse = await getAddresses(token);
-                if (addressResponse.success) {
-                    setAddresses(addressResponse.data.addresses || []);
-                    const defaultAddress = addressResponse.data.addresses?.find(addr => addr.isDefault);
-                    if (defaultAddress) {
-                        setSelectedAddressId(defaultAddress._id);
-                    }
-                }
+                await fetchAddresses();
 
                 // Fetch shipping methods
                 const shippingResponse = await getShippingMethods(token);
@@ -311,17 +320,49 @@ const FormaEnvio = () => {
 
     const handleAddressSubmit = async (addressData) => {
         try {
-            const response = await addAddress(addressData, token);
+            // Asegurarnos de que tenemos todos los campos necesarios
+            const fullAddressData = {
+                ...addressData,
+                recipient: recipientInfo.recipientName || addressData.recipientName,
+                phoneContact: recipientInfo.phoneContact || addressData.phoneContact,
+                additionalInstructions: recipientInfo.additionalInstructions || addressData.additionalInstructions,
+                addressType: addressData.addressType || 'home'
+            };
+
+            const response = await addAddress(fullAddressData, token);
             if (response.success && response.data) {
                 const newAddress = response.data;
-                setAddresses(prev => [...prev, newAddress]);
+                
+                // Actualizar el estado de las direcciones
+                setAddresses(prev => {
+                    // Si la nueva dirección es predeterminada, actualizar las demás
+                    const updatedAddresses = prev.map(addr => ({
+                        ...addr,
+                        isDefault: newAddress.isDefault ? false : addr.isDefault
+                    }));
+                    return [...updatedAddresses, newAddress];
+                });
+                
+                // Seleccionar la nueva dirección
                 setSelectedAddressId(newAddress._id);
+                
+                // Actualizar la información del destinatario si es necesario
+                if (newAddress.recipient && newAddress.phoneContact) {
+                    setRecipientInfo(prev => ({
+                        ...prev,
+                        recipientName: newAddress.recipient,
+                        phoneContact: newAddress.phoneContact,
+                        additionalInstructions: newAddress.additionalInstructions || ''
+                    }));
+                }
+                
                 setShowAddressForm(false);
                 setAddressToEdit(null);
                 toast.success("Dirección agregada correctamente");
             }
         } catch (error) {
-            toast.error("Error al guardar la dirección");
+            console.error('Error al guardar la dirección:', error);
+            toast.error(error.message || "Error al guardar la dirección");
         }
     };
 
@@ -343,6 +384,44 @@ const FormaEnvio = () => {
         toast.error("Función de eliminación no implementada");
     };
 
+    const handleAddAddress = async (addressData) => {
+        try {
+            const response = await addAddress(addressData, token);
+            if (response.success) {
+                const newAddress = response.data;
+                
+                // Actualizar el estado de las direcciones
+                setAddresses(prev => {
+                    const updatedAddresses = prev.map(addr => ({
+                        ...addr,
+                        isDefault: newAddress.isDefault ? false : addr.isDefault
+                    }));
+                    return [...updatedAddresses, newAddress];
+                });
+                
+                // Seleccionar la nueva dirección automáticamente
+                setSelectedAddressId(newAddress._id);
+                
+                // Actualizar la información del destinatario
+                setRecipientInfo({
+                    recipientName: newAddress.recipient || '',
+                    phoneContact: newAddress.phoneContact || '',
+                    additionalInstructions: newAddress.additionalInstructions || ''
+                });
+                
+                // Cerrar el formulario y mostrar mensaje de éxito
+                setShowAddressForm(false);
+                toast.success(response.msg || "Dirección agregada correctamente");
+                
+                // Refrescar la lista de direcciones
+                await fetchAddresses();
+            }
+        } catch (error) {
+            console.error('Error al agregar dirección:', error);
+            toast.error(error.message || "Hubo un problema al agregar la dirección");
+        }
+    };
+
     const selectedShippingMethod = selectedMethod ? shippingMethods
         .find(c => c._id === selectedCarrier)
         ?.methods.find(m => m._id === selectedMethod) : null;
@@ -359,86 +438,78 @@ const FormaEnvio = () => {
                     <p className="text-gray-500">Cargando información...</p>
                 </div>
             ) : (
-                <form onSubmit={handleSubmit}>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div className="lg:col-span-2">
-                            {/* Sección de direcciones */}
-                            <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-                                <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-xl font-bold text-gray-600">Dirección de Envío</h2>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setAddressToEdit(null);
-                                            setShowAddressForm(true);
-                                        }}
-                                        className="flex items-center text-blue-500 hover:text-blue-700"
-                                    >
-                                        <HiPlus className="mr-1" /> Nueva dirección
-                                    </button>
-                                </div>
-                                
-                                <AnimatePresence>
-                                    {showAddressForm && (
-                                        <motion.div
-                                            initial={{ opacity: 0, height: 0 }}
-                                            animate={{ opacity: 1, height: 'auto' }}
-                                            exit={{ opacity: 0, height: 0 }}
-                                            className="overflow-hidden mb-6"
-                                        >
-                                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                                                <div className="flex justify-between items-center mb-4">
-                                                    <h3 className="font-medium">{addressToEdit ? 'Editar dirección' : 'Agregar nueva dirección'}</h3>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setShowAddressForm(false);
-                                                            setAddressToEdit(null);
-                                                        }}
-                                                        className="text-gray-500 hover:text-gray-700"
-                                                    >
-                                                        &times;
-                                                    </button>
-                                                </div>
-                                                <AddressForm 
-                                                    onSubmit={handleAddressSubmit} 
-                                                    initialData={addressToEdit}
-                                                />
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                                
-                                <div className="space-y-2">
-                                    {addresses.length === 0 ? (
-                                        <div className="text-center py-8 border border-dashed border-gray-300 rounded-lg">
-                                            <HiLocationMarker className="mx-auto h-10 w-10 text-gray-400 mb-2" />
-                                            <p className="text-gray-600 mb-4">No tienes direcciones guardadas</p>
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowAddressForm(true)}
-                                                className="text-blue-600 font-medium hover:text-blue-800"
-                                            >
-                                                Agrega tu primera dirección
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {addresses.map((address) => (
-                                                <AddressCard
-                                                    key={address._id}
-                                                    address={address}
-                                                    selected={selectedAddressId === address._id}
-                                                    onSelect={setSelectedAddressId}
-                                                    onEdit={handleEditAddress}
-                                                    onDelete={handleDeleteAddress}
-                                                />
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2">
+                        {/* Sección de direcciones */}
+                        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-bold text-gray-600">Dirección de Envío</h2>
+                                <button
+                                    onClick={() => {
+                                        setAddressToEdit(null);
+                                        setShowAddressForm(true);
+                                    }}
+                                    className="flex items-center text-blue-500 hover:text-blue-700"
+                                >
+                                    <HiPlus className="mr-1" /> Nueva dirección
+                                </button>
                             </div>
                             
+                            {showAddressForm && (
+                                <div className="mb-6">
+                                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h3 className="font-medium">{addressToEdit ? 'Editar dirección' : 'Agregar nueva dirección'}</h3>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setShowAddressForm(false);
+                                                    setAddressToEdit(null);
+                                                }}
+                                                className="text-gray-500 hover:text-gray-700"
+                                            >
+                                                &times;
+                                            </button>
+                                        </div>
+                                        <AddressForm 
+                                            onSubmit={handleAddAddress}
+                                            initialData={addressToEdit}
+                                            onCancel={() => setShowAddressForm(false)}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="space-y-2">
+                                {addresses.length === 0 ? (
+                                    <div className="text-center py-8 border border-dashed border-gray-300 rounded-lg">
+                                        <HiLocationMarker className="mx-auto h-10 w-10 text-gray-400 mb-2" />
+                                        <p className="text-gray-600 mb-4">No tienes direcciones guardadas</p>
+                                        <button
+                                            onClick={() => setShowAddressForm(true)}
+                                            className="text-blue-600 font-medium hover:text-blue-800"
+                                        >
+                                            Agrega tu primera dirección
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {addresses.map((address) => (
+                                            <AddressCard
+                                                key={address._id}
+                                                address={address}
+                                                selected={selectedAddressId === address._id}
+                                                onSelect={setSelectedAddressId}
+                                                onEdit={handleEditAddress}
+                                                onDelete={handleDeleteAddress}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        
+                        <form onSubmit={handleSubmit}>
                             {/* Sección de métodos de envío */}
                             <ShippingMethodSelect
                                 shippingMethods={shippingMethods}
@@ -469,18 +540,18 @@ const FormaEnvio = () => {
                                     Continuar al pago <FiArrowRight className="ml-2" />
                                 </button>
                             </div>
-                        </div>
-                        
-                        {/* Resumen del pedido */}
-                        <div className="lg:col-span-1">
-                            <CartSummary 
-                                cartItems={cartItems} 
-                                shippingMethod={selectedShippingMethod}
-                                showButton={false}
-                            />
-                        </div>
+                        </form>
                     </div>
-                </form>
+                    
+                    {/* Resumen del pedido */}
+                    <div className="lg:col-span-1">
+                        <CartSummary 
+                            cartItems={cartItems} 
+                            shippingMethod={selectedShippingMethod}
+                            showButton={false}
+                        />
+                    </div>
+                </div>
             )}
         </div>
     );

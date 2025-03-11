@@ -84,19 +84,28 @@ const getAddresses = async (token) => {
     }
 }
 
-const addAddress = async (addressData, token) => {
+export const addAddress = async (addressData, token) => {
     try {
         const response = await api.post("/api/user/addresses", addressData, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
         });
-        return response.data;
+        
+        // Devolver la respuesta exactamente como viene de la API
+        return {
+            success: response.data.success,
+            msg: response.data.msg,
+            data: response.data.data
+        };
+    } catch (error) {
+        console.error('Error en addAddress:', error);
+        return {
+            success: false,
+            message: error.response?.data?.message || 'Error al agregar la dirección'
+        };
     }
-    catch (error) {
-        throw error.response?.data;
-    }
-}
+};
 
 const updateAddress = async (addressId, addressData, token) => {
     try {
@@ -231,7 +240,6 @@ export {
     addProductToWishlist,
     removeFromWishlist,
     getAddresses,
-    addAddress,
     updateAddress,
     deleteAddress,
     getMyPaymentMethods,
