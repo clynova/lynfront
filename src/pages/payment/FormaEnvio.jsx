@@ -377,6 +377,42 @@ const FormaEnvio = () => {
         setShowAddressForm(true);
     };
 
+    const handleUpdateAddress = async (addressData) => {
+        try {
+            const response = await updateAddress(addressToEdit._id, addressData, token);
+            if (response.success && response.data) {
+                const updatedAddress = response.data;
+                
+                setAddresses(prev => prev.map(addr => {
+                    if (addr._id === addressToEdit._id) {
+                        return updatedAddress;
+                    }
+                    if (updatedAddress.isDefault) {
+                        return { ...addr, isDefault: false };
+                    }
+                    return addr;
+                }));
+
+                // Actualizar la selección si la dirección editada era la seleccionada
+                if (selectedAddressId === addressToEdit._id) {
+                    setSelectedAddressId(updatedAddress._id);
+                    setRecipientInfo({
+                        recipientName: updatedAddress.recipient || '',
+                        phoneContact: updatedAddress.phoneContact || '',
+                        additionalInstructions: updatedAddress.additionalInstructions || ''
+                    });
+                }
+                
+                setShowAddressForm(false);
+                setAddressToEdit(null);
+                toast.success("Dirección actualizada correctamente");
+            }
+        } catch (error) {
+            console.error('Error al actualizar la dirección:', error);
+            toast.error(error.message || "Error al actualizar la dirección");
+        }
+    };
+
     // Componente de tarjeta de dirección
     const handleDeleteAddress = async (addressId) => {
         if (window.confirm("¿Estás seguro de que deseas eliminar esta dirección?")) {
@@ -491,9 +527,12 @@ const FormaEnvio = () => {
                                             </button>
                                         </div>
                                         <AddressForm
-                                            onSubmit={handleAddAddress}
+                                            onSubmit={addressToEdit ? handleUpdateAddress : handleAddAddress}
                                             initialData={addressToEdit}
-                                            onCancel={() => setShowAddressForm(false)}
+                                            onCancel={() => {
+                                                setShowAddressForm(false);
+                                                setAddressToEdit(null);
+                                            }}
                                         />
                                     </div>
                                 </div>
